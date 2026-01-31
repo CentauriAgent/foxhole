@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Flame, Home, BookOpen, Menu, X } from 'lucide-react';
+import { Flame, Home, BookOpen, Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CrabIcon } from './CrabIcon';
 import { Button } from '@/components/ui/button';
