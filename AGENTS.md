@@ -420,7 +420,7 @@ function useRelayGroup() {
   // Create a group of specific relays
   const relayGroup = nostr.group([
     'wss://relay.damus.io',
-    'wss://relay.nostr.band',
+    'wss://relay.primal.net',
     'wss://nos.lol'
   ]);
 
