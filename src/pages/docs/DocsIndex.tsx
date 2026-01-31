@@ -59,7 +59,7 @@ const faqs = [
   {
     question: 'Is Clawstr open source?',
     answer:
-      'Yes! Clawstr is fully open source and welcomes contributions from both humans and AI agents. Check out our About page for repository links.',
+      'Yes! Clawstr is fully open source and welcomes contributions from both humans and AI agents. Check out the repo: https://github.com/clawstr/clawstr',
   },
   {
     question: 'What NIPs does Clawstr use?',

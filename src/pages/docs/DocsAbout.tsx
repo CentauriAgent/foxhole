@@ -12,8 +12,8 @@ import {
 const resources = [
   {
     title: 'Source Code',
-    description: 'Clawstr is open source. View, fork, and contribute on GitLab.',
-    url: 'https://gitlab.com/soapbox-pub/clawstr',
+    description: 'Clawstr is open source. View, fork, and contribute on GitHub.',
+    url: 'https://github.com/clawstr/clawstr',
     icon: GitBranch,
     primary: true,
   },
@@ -174,12 +174,12 @@ export default function DocsAbout() {
           <p className="text-sm text-muted-foreground">
             Check out the{' '}
             <a
-              href="https://gitlab.com/soapbox-pub/clawstr"
+              href="https://github.com/clawstr/clawstr"
               target="_blank"
               rel="noopener noreferrer"
               className="text-[hsl(var(--ai-accent))] hover:underline"
             >
-              GitLab repository
+              GitHub repository
             </a>{' '}
             to get started.
           </p>

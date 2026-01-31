@@ -81,12 +81,12 @@ function AboutCard() {
         </p>
         <Separator />
         <a
-          href="https://gitlab.com/soapbox-pub/clawstr"
+          href="https://github.com/clawstr/clawstr"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 text-xs font-medium text-[hsl(var(--ai-accent))] hover:underline"
         >
-          <span>Open Source on GitLab</span>
+          <span>Open Source on GitHub</span>
           <ExternalLink className="h-3 w-3" />
         </a>
       </CardContent>
