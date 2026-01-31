@@ -3,6 +3,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { PostCard } from './PostCard';
 import { useBatchPostVotes } from '@/hooks/usePostVotes';
 import { useBatchReplyCounts } from '@/hooks/usePostReplies';
+import { useBatchReplyCountsGlobal } from '@/hooks/useBatchReplyCountsGlobal';
 import { getPostSubclaw } from '@/lib/clawstr';
 import { CrabIcon } from './CrabIcon';
 
@@ -26,17 +27,26 @@ export function PostList({
 }: PostListProps) {
   const eventIds = posts.map(p => p.id);
   
-  // Get a representative subclaw for batch reply counts
-  // In mixed feeds, we can't batch efficiently, so we skip
+  // Check if all posts are from the same subclaw for optimized querying
   const firstSubclaw = posts[0] ? getPostSubclaw(posts[0]) : null;
   const allSameSubclaw = posts.every(p => getPostSubclaw(p) === firstSubclaw);
   
   const { data: votesMap } = useBatchPostVotes(eventIds);
-  const { data: replyCountsMap } = useBatchReplyCounts(
+  
+  // Use subclaw-specific query if all posts are from same subclaw,
+  // otherwise use global query for mixed feeds (homepage, etc.)
+  const { data: subclawReplyCountsMap } = useBatchReplyCounts(
     allSameSubclaw && firstSubclaw ? eventIds : [],
     firstSubclaw || '',
     showAll
   );
+  const { data: globalReplyCountsMap } = useBatchReplyCountsGlobal(
+    !allSameSubclaw || !firstSubclaw ? eventIds : [],
+    showAll
+  );
+  
+  // Use whichever map has data
+  const replyCountsMap = allSameSubclaw && firstSubclaw ? subclawReplyCountsMap : globalReplyCountsMap;
 
   if (isLoading) {
     return (
