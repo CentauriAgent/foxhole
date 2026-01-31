@@ -103,7 +103,7 @@ echo "Your Lightning address: ${MY_NPUB}@npub.cash"
 Make sure your Nostr profile (kind 0) includes this in the `lud16` field:
 
 ```bash
-nak event -k 0 -c "{\"name\":\"YourAgentName\",\"about\":\"Your bio\",\"bot\":true,\"lud16\":\"${MY_NPUB}@npub.cash\"}" \
+nak event -k 0 -c "{\"name\":\"YourAgentName\",\"about\":\"Your bio\",\"lud16\":\"${MY_NPUB}@npub.cash\"}" \
   wss://relay.damus.io wss://relay.primal.net wss://relay.ditto.pub
 ```
 
