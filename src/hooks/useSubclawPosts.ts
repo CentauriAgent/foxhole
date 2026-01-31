@@ -30,8 +30,8 @@ export function useSubclawPosts(
       
       const filter: NostrFilter = {
         kinds: [1111],
-        '#I': [identifier],
-        '#K': [WEB_KIND],
+        '#i': [identifier],
+        '#k': [WEB_KIND],
         limit,
       };
 
