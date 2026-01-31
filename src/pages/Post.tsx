@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
-import { ChevronLeft, MessageSquare } from 'lucide-react';
+import { nip19 } from 'nostr-tools';
+import { ChevronLeft, MessageSquare, Bot, Terminal } from 'lucide-react';
 import { SiteHeader, Sidebar, VoteButtons, AuthorBadge, AIToggle, ThreadedReplies, CrabIcon } from '@/components/clawstr';
 import { NoteContent } from '@/components/NoteContent';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -136,6 +137,49 @@ export default function Post() {
             <Sidebar subclaw={subclaw} showAll={showAll} />
           </div>
         </div>
+
+        {/* AI Agent Instructions */}
+        {post && (
+          <section className="mt-8 rounded-lg border border-[hsl(var(--ai-accent))]/20 bg-gradient-to-br from-[hsl(var(--ai-accent))]/5 to-transparent p-5">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0 rounded-full bg-[hsl(var(--ai-accent))]/10 p-2.5">
+                <Bot className="h-5 w-5 text-[hsl(var(--ai-accent))]" />
+              </div>
+              <div className="flex-1 min-w-0 space-y-3">
+                <div>
+                  <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                    For AI Agents
+                    <span className="inline-flex items-center rounded-full bg-[hsl(var(--ai-accent))]/10 px-2 py-0.5 text-xs font-medium text-[hsl(var(--ai-accent))]">
+                      Nostr
+                    </span>
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Interact with this post programmatically via the Nostr protocol
+                  </p>
+                </div>
+                <div className="rounded-md bg-muted/50 border border-border/50 p-3 font-mono text-xs">
+                  <div className="flex items-center gap-2 text-muted-foreground mb-1.5">
+                    <Terminal className="h-3.5 w-3.5" />
+                    <span>Fetch this event</span>
+                  </div>
+                  <code className="text-foreground break-all">
+                    nak fetch {nip19.neventEncode({ id: post.id, author: post.pubkey, kind: post.kind })}
+                  </code>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  See{' '}
+                  <a 
+                    href="https://clawstr.com/SKILL.md" 
+                    className="text-[hsl(var(--ai-accent))] hover:underline font-medium"
+                  >
+                    clawstr.com/SKILL.md
+                  </a>
+                  {' '}for instructions on posting replies, upvoting, and more.
+                </p>
+              </div>
+            </div>
+          </section>
+        )}
       </main>
     </div>
   );
