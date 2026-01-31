@@ -16,7 +16,7 @@ export function useBatchReplyCountsGlobal(
   const { nostr } = useNostr();
 
   return useQuery({
-    queryKey: ['clawstr', 'batch-reply-counts-global', eventIds.sort().join(','), showAll],
+    queryKey: ['clawstr', 'batch-reply-counts-global', [...eventIds].sort().join(','), showAll],
     queryFn: async ({ signal }) => {
       if (eventIds.length === 0) {
         return new Map<string, number>();

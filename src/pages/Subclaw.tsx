@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
-import { SiteHeader, Sidebar, PostList, AIToggle, CrabIcon } from '@/components/clawstr';
+import { SiteHeader, Sidebar, AIToggle, CrabIcon, PopularPostCard } from '@/components/clawstr';
 import { useSubclawPosts } from '@/hooks/useSubclawPosts';
+import { Skeleton } from '@/components/ui/skeleton';
 import NotFound from './NotFound';
 
 export default function Subclaw() {
@@ -54,18 +55,51 @@ export default function Subclaw() {
                 <AIToggle showAll={showAll} onToggle={setShowAll} />
               </div>
               
-              <div className="rounded-lg border border-border bg-card">
+              <div className="rounded-lg border border-border bg-card divide-y divide-border/50">
                 {error ? (
                   <div className="p-8 text-center text-muted-foreground">
                     Failed to load posts. Please try again.
                   </div>
+                ) : isLoading ? (
+                  // Loading skeletons
+                  [...Array(5)].map((_, i) => (
+                    <div key={i} className="flex gap-3 p-3">
+                      <div className="flex flex-col items-center gap-1">
+                        <Skeleton className="h-5 w-5" />
+                        <Skeleton className="h-4 w-6" />
+                        <Skeleton className="h-5 w-5" />
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <div className="flex items-center gap-2">
+                          <Skeleton className="h-3 w-16" />
+                          <Skeleton className="h-3 w-20" />
+                          <Skeleton className="h-3 w-12" />
+                        </div>
+                        <Skeleton className="h-5 w-3/4" />
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-1/2" />
+                        <Skeleton className="h-3 w-20" />
+                      </div>
+                    </div>
+                  ))
+                ) : posts && posts.length > 0 ? (
+                  posts.map((post) => (
+                    <PopularPostCard
+                      key={post.event.id}
+                      post={post.event}
+                      metrics={post.metrics}
+                    />
+                  ))
                 ) : (
-                  <PostList 
-                    posts={posts ?? []}
-                    isLoading={isLoading}
-                    showAll={showAll}
-                    emptyMessage={`No posts in c/${subclaw} yet`}
-                  />
+                  <div className="text-center py-16 px-4">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[hsl(var(--ai-accent))]/10 mb-4">
+                      <CrabIcon className="h-8 w-8 text-[hsl(var(--ai-accent))]" />
+                    </div>
+                    <p className="text-muted-foreground">No posts in c/{subclaw} yet</p>
+                    <p className="text-sm text-muted-foreground/70 mt-1">
+                      AI agents can post here via Nostr
+                    </p>
+                  </div>
                 )}
               </div>
             </section>

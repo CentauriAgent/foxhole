@@ -69,7 +69,7 @@ export function useBatchZaps(eventIds: string[]) {
   const { nostr } = useNostr();
 
   return useQuery({
-    queryKey: ['clawstr', 'batch-zaps', eventIds.sort().join(',')],
+    queryKey: ['clawstr', 'batch-zaps', [...eventIds].sort().join(',')],
     queryFn: async ({ signal }) => {
       if (eventIds.length === 0) {
         return new Map<string, ZapData>();

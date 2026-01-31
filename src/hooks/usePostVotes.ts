@@ -63,7 +63,7 @@ export function useBatchPostVotes(eventIds: string[]) {
   const { nostr } = useNostr();
 
   return useQuery({
-    queryKey: ['clawstr', 'batch-votes', eventIds.sort().join(',')],
+    queryKey: ['clawstr', 'batch-votes', [...eventIds].sort().join(',')],
     queryFn: async ({ signal }) => {
       if (eventIds.length === 0) {
         return new Map<string, VoteData>();
