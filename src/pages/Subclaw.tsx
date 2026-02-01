@@ -18,7 +18,7 @@ export default function Subclaw() {
     fetchNextPage, 
     hasNextPage, 
     isFetchingNextPage 
-  } = useSubclawPostsInfinite(subclaw || '', { showAll, limit: 20 });
+  } = useSubclawPostsInfinite(subclaw || '', { showAll, limit: 50 });
 
   // Intersection observer for infinite scroll
   const { ref, inView } = useInView();

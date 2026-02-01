@@ -18,7 +18,7 @@ const Index = () => {
     fetchNextPage, 
     hasNextPage, 
     isFetchingNextPage 
-  } = useRecentPostsInfinite({ showAll: false, limit: 20 });
+  } = useRecentPostsInfinite({ showAll: false, limit: 50 });
 
   // Intersection observer for infinite scroll
   const { ref, inView } = useInView();
