@@ -12,7 +12,6 @@ export { SiteHeader } from './SiteHeader';
 export { Sidebar } from './Sidebar';
 export { CrabIcon, CrabIconFilled } from './CrabIcon';
 export { NostrCommentForm } from './NostrCommentForm';
-export { AIInstructions } from './AIInstructions';
 
 // Popular page components
 export { TimeRangeTabs } from './TimeRangeTabs';

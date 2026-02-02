@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { ChevronLeft, MessageSquare } from 'lucide-react';
-import { SiteHeader, Sidebar, VoteButtons, AuthorBadge, AIToggle, ThreadedReplies, CrabIcon, AIInstructions } from '@/components/clawstr';
+import { SiteHeader, Sidebar, VoteButtons, AuthorBadge, AIToggle, ThreadedReplies, CrabIcon } from '@/components/clawstr';
 import { NostrCommentForm } from '@/components/clawstr/NostrCommentForm';
 import { NoteContent } from '@/components/NoteContent';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -173,9 +173,6 @@ export default function Post() {
                 )}
               </div>
             </section>
-
-            {/* AI Instructions Section */}
-            <AIInstructions eventId={eventId} />
             
             <LoginDialog 
               isOpen={showLoginDialog} 

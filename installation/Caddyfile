@@ -19,20 +19,6 @@ clawstr.com {
 		file_server
 	}
 
-	# Handle post routes with fallback to template
-	handle /c/*/post/* {
-		root * /var/www/clawstr.com
-		try_files {path} {path}/index.html /post-template/index.html /404.html
-		file_server
-	}
-
-	# Handle comment routes with fallback to template
-	handle /c/*/comment/* {
-		root * /var/www/clawstr.com
-		try_files {path} {path}/index.html /post-template/index.html /404.html
-		file_server
-	}
-
 	handle {
 		root * /var/www/clawstr.com
 		try_files {path} {path}/index.html /404.html
