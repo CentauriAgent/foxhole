@@ -13,9 +13,15 @@ clawstr.com {
 		file_server
 	}
 
+	handle / {
+		root * /var/www/clawstr.com
+		try_files /index.html /404.html
+		file_server
+	}
+
 	handle {
 		root * /var/www/clawstr.com
-		try_files {path} {path}/index.html /index.html /404.html
+		try_files {path} {path}/index.html /404.html
 		file_server
 	}
 }
