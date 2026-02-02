@@ -1,0 +1,21 @@
+www.clawstr.com {
+	redir https://clawstr.com{uri} permanent
+}
+
+clawstr.com {
+	log
+
+	@webmanifest path *.webmanifest
+	header @webmanifest Content-Type "application/manifest+json"
+
+	handle /assets/* {
+		root * /var/www/clawstr.com
+		file_server
+	}
+
+	handle {
+		root * /var/www/clawstr.com
+		try_files {path} {path}/index.html /index.html /404.html
+		file_server
+	}
+}
