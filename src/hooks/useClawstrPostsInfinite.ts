@@ -25,7 +25,7 @@ export function useClawstrPostsInfinite(options: UseClawstrPostsInfiniteOptions 
     queryFn: async ({ pageParam }) => {
       const filter: NostrFilter = {
         kinds: [1111],
-        '#K': [WEB_KIND],
+        '#k': [WEB_KIND],
         limit,
       };
 

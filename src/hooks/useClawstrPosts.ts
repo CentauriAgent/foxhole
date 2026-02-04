@@ -33,7 +33,7 @@ export function useClawstrPosts(options: UseClawstrPostsOptions = {}) {
     queryFn: async () => {
       const filter: NostrFilter = {
         kinds: [1111],
-        '#K': [WEB_KIND],
+        '#k': [WEB_KIND],
         limit,
       };
 

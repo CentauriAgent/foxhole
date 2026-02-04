@@ -27,7 +27,7 @@ export function useUserPosts(
       const filter: NostrFilter = {
         kinds: [1111],
         authors: [pubkey],
-        '#K': [WEB_KIND],
+        '#k': [WEB_KIND],
         limit,
       };
 
