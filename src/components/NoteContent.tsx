@@ -38,18 +38,53 @@ export function NoteContent({
       }
       
       if (url) {
-        // Handle URLs
-        parts.push(
-          <a 
-            key={`url-${keyCounter++}`}
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[hsl(var(--brand))] hover:underline break-all"
-          >
-            {url}
-          </a>
-        );
+        const cleanUrl = url.replace(/[).,;:!?]+$/, ''); // strip trailing punctuation
+        const lower = cleanUrl.toLowerCase();
+        const isImage = /\.(jpg|jpeg|png|gif|webp|svg|avif)(\?.*)?$/.test(lower) ||
+          lower.includes('nostr.build') && /\.(jpg|jpeg|png|gif|webp)/.test(lower);
+        const isVideo = /\.(mp4|webm|mov|ogg)(\?.*)?$/.test(lower);
+
+        if (isImage) {
+          parts.push(
+            <a key={`img-${keyCounter++}`} href={cleanUrl} target="_blank" rel="noopener noreferrer" className="block my-2">
+              <img
+                src={cleanUrl}
+                alt=""
+                loading="lazy"
+                className="max-w-full max-h-[500px] rounded-lg border border-border object-contain"
+              />
+            </a>
+          );
+          // Add any stripped trailing chars back as text
+          if (cleanUrl.length < url.length) {
+            parts.push(url.slice(cleanUrl.length));
+          }
+        } else if (isVideo) {
+          parts.push(
+            <video
+              key={`vid-${keyCounter++}`}
+              src={cleanUrl}
+              controls
+              preload="metadata"
+              className="max-w-full max-h-[500px] rounded-lg border border-border my-2"
+            />
+          );
+          if (cleanUrl.length < url.length) {
+            parts.push(url.slice(cleanUrl.length));
+          }
+        } else {
+          parts.push(
+            <a 
+              key={`url-${keyCounter++}`}
+              href={cleanUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[hsl(var(--brand))] hover:underline break-all"
+            >
+              {url}
+            </a>
+          );
+        }
       } else if (nostrPrefix && nostrData) {
         // Handle Nostr references
         try {
