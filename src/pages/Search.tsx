@@ -96,6 +96,11 @@ export default function Search() {
                 />
               </div>
               
+              <Button type="submit" className="w-full h-11 gap-2 bg-[hsl(var(--brand))] hover:bg-[hsl(var(--brand))]/90 text-[hsl(var(--brand-foreground))]">
+                <SearchIcon className="h-4 w-4" />
+                Search
+              </Button>
+
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   {denParam && (
