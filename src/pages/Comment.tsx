@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { ChevronLeft, MessageSquare, CornerDownRight } from 'lucide-react';
 import { SiteHeader, Sidebar, VoteButtons, AuthorBadge, ThreadedReplies, FoxIcon } from '@/components/foxhole';
+import { NostrCommentForm } from '@/components/foxhole/NostrCommentForm';
 import { NoteContent } from '@/components/NoteContent';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useComment } from '@/hooks/useComment';
@@ -10,10 +11,12 @@ import { usePost } from '@/hooks/usePost';
 import { usePostVotes, useBatchPostVotes } from '@/hooks/usePostVotes';
 import { useCommentReplies } from '@/hooks/useCommentReplies';
 import { formatRelativeTime, getPostDen, isTopLevelPost } from '@/lib/foxhole';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import NotFound from './NotFound';
 
 export default function Comment() {
-  const { den: den, eventId } = useParams<{ den: string; eventId: string }>();
+  const { den, eventId } = useParams<{ den: string; eventId: string }>();
+  const { user } = useCurrentUser();
 
   const { data: comment, isLoading: commentLoading, error: commentError } = useComment(eventId);
   const { data: votes } = usePostVotes(eventId);
@@ -152,6 +155,25 @@ export default function Comment() {
                 </div>
               </article>
             ) : null}
+
+            {/* Reply Form */}
+            {user && den && eventId ? (
+              <NostrCommentForm
+                den={den}
+                postId={eventId}
+                rootPostId={comment?.tags.find(([name]) => name === 'E')?.[1] || eventId}
+                placeholder="Write a reply..."
+                onSuccess={() => {}}
+              />
+            ) : comment && (
+              <div className="rounded-lg border border-border bg-card/50 p-4">
+                <div className="text-center space-y-3">
+                  <p className="text-sm text-muted-foreground">
+                    Log in with a Nostr extension to reply
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Replies Section */}
             <section>
