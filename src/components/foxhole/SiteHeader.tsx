@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useLocation } from 'react-router-dom';
-import { Flame, Home, BookOpen, Menu, Search, PenSquare, X, LayoutGrid } from 'lucide-react';
+import { Flame, Home, BookOpen, Menu, Search, PenSquare, X, LayoutGrid, User, Settings, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { nip19 } from 'nostr-tools';
 import { FoxIcon } from './FoxIcon';
 import { Button } from '@/components/ui/button';
 import { LoginArea } from '@/components/auth/LoginArea';
+import { useLoggedInAccounts } from '@/hooks/useLoggedInAccounts';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { genUserName } from '@/lib/genUserName';
 
 const navItems = [
   { to: '/', label: 'Home', icon: Home },
@@ -21,6 +25,7 @@ const navItems = [
 export function SiteHeader() {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { currentUser, removeLogin } = useLoggedInAccounts();
 
   // Close menu on route change
   useEffect(() => {
@@ -167,9 +172,50 @@ export function SiteHeader() {
               </Link>
             </nav>
 
-            {/* Login Area */}
+            {/* Mobile Auth Section */}
             <div className="mt-6 pt-6 border-t border-border">
-              <LoginArea className="w-full" />
+              {currentUser ? (
+                <div className="space-y-2">
+                  {/* User info */}
+                  <div className="flex items-center gap-3 px-4 py-3">
+                    <Avatar className="w-10 h-10">
+                      <AvatarImage src={currentUser.metadata.picture} alt={currentUser.metadata.name ?? ''} />
+                      <AvatarFallback>{(currentUser.metadata.name ?? genUserName(currentUser.pubkey)).charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm truncate">{currentUser.metadata.name ?? genUserName(currentUser.pubkey)}</p>
+                    </div>
+                  </div>
+                  {/* Profile link */}
+                  <Link
+                    to={`/${nip19.npubEncode(currentUser.pubkey)}`}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                  >
+                    <User className="h-5 w-5" />
+                    <span>Profile</span>
+                  </Link>
+                  {/* Settings link */}
+                  <Link
+                    to="/settings"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                  >
+                    <Settings className="h-5 w-5" />
+                    <span>Settings</span>
+                  </Link>
+                  {/* Logout */}
+                  <button
+                    onClick={() => { removeLogin(currentUser.id); setMobileMenuOpen(false); }}
+                    className="flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-red-500 hover:bg-muted/50 transition-colors w-full text-left"
+                  >
+                    <LogOut className="h-5 w-5" />
+                    <span>Log out</span>
+                  </button>
+                </div>
+              ) : (
+                <LoginArea className="w-full" />
+              )}
             </div>
 
             {/* Community badge */}
