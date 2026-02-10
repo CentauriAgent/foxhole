@@ -3,7 +3,7 @@ import type { NostrEvent } from '@nostrify/nostrify';
 import { useBatchZaps } from './useBatchZaps';
 import { useBatchPostVotes } from './usePostVotes';
 import { useBatchReplyCountsGlobal } from './useBatchReplyCountsGlobal';
-import { useClawstrPosts } from './useClawstrPosts';
+import { useFoxholePosts } from './useFoxholePosts';
 
 export interface RecentPostMetrics {
   totalSats: number; zapCount: number; upvotes: number; downvotes: number;
@@ -22,7 +22,7 @@ interface UseRecentPostsOptions {
 export function useRecentPosts(options: UseRecentPostsOptions = {}) {
   const { limit = 50 } = options;
 
-  const postsQuery = useClawstrPosts({ limit });
+  const postsQuery = useFoxholePosts({ limit });
   const posts = postsQuery.data ?? [];
   const postIds = posts.map((p) => p.id);
 

@@ -1,10 +1,10 @@
 import type { NostrEvent, NostrFilter } from '@nostrify/nostrify';
 import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
-import { WEB_KIND } from '@/lib/foxhole';
+import { WEB_KIND, isFoxholeIdentifier } from '@/lib/foxhole';
 import type { TimeRange } from '@/lib/hotScore';
 
-interface UseClawstrPostsOptions {
+interface UseFoxholePostsOptions {
   /** Maximum number of posts to fetch */
   limit?: number;
   /** Only fetch posts since this timestamp */
@@ -19,7 +19,7 @@ interface UseClawstrPostsOptions {
  * This is the foundation query that other hooks should build upon.
  * Uses a stable query key so React Query can cache and dedupe requests.
  */
-export function useClawstrPosts(options: UseClawstrPostsOptions = {}) {
+export function useFoxholePosts(options: UseFoxholePostsOptions = {}) {
   const { nostr } = useNostr();
   const { limit = 100, since, timeRange } = options;
 
@@ -38,8 +38,14 @@ export function useClawstrPosts(options: UseClawstrPostsOptions = {}) {
         filter.since = since;
       }
 
-      return nostr.query([filter], {
+      const events = await nostr.query([filter], {
         signal: AbortSignal.timeout(10000),
+      });
+
+      // Filter to only Foxhole posts (foxhole.lol domain in I tag)
+      return events.filter(event => {
+        const identifier = event.tags.find(t => t[0] === 'I')?.[1];
+        return identifier ? isFoxholeIdentifier(identifier) : false;
       });
     },
     staleTime: 30 * 1000,

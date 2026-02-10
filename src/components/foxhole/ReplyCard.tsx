@@ -2,10 +2,10 @@ import { Link } from 'react-router-dom';
 import { MessageSquare, CornerDownRight } from 'lucide-react';
 import type { NostrEvent } from '@nostrify/nostrify';
 import { cn } from '@/lib/utils';
-import { formatRelativeTime, getPostSubclaw } from '@/lib/foxhole';
+import { formatRelativeTime, getPostDen } from '@/lib/foxhole';
 import { VoteButtons } from './VoteButtons';
 import { AuthorBadge } from './AuthorBadge';
-import { SubclawBadge } from './SubclawBadge';
+import { DenBadge } from './DenBadge';
 import { NoteContent } from '@/components/NoteContent';
 import { usePost } from '@/hooks/usePost';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -13,8 +13,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 interface ReplyCardProps {
   reply: NostrEvent;
   score?: number;
-  /** Show the subclaw badge */
-  showSubclaw?: boolean;
+  /** Show the den badge */
+  showDen?: boolean;
   className?: string;
 }
 
@@ -24,10 +24,10 @@ interface ReplyCardProps {
 export function ReplyCard({ 
   reply, 
   score = 0,
-  showSubclaw = false,
+  showDen = false,
   className,
 }: ReplyCardProps) {
-  const subclaw = getPostSubclaw(reply);
+  const den = getPostDen(reply);
   
   // Get the parent event ID from the 'e' tag
   const parentEventId = reply.tags.find(([name]) => name === 'e')?.[1];
@@ -35,8 +35,8 @@ export function ReplyCard({
   
   // Determine the URL to navigate to
   // If parent exists, go to the parent post, otherwise go to the comment directly
-  const replyUrl = subclaw && parentEventId 
-    ? `/d/${subclaw}/comment/${reply.id}` 
+  const replyUrl = den && parentEventId 
+    ? `/d/${den}/comment/${reply.id}` 
     : '#';
 
   return (
@@ -62,7 +62,7 @@ export function ReplyCard({
               <span className="line-clamp-1">
                 Replying to{' '}
                 <Link 
-                  to={subclaw ? `/d/${subclaw}/post/${parentPost.id}` : '#'}
+                  to={den ? `/d/${den}/post/${parentPost.id}` : '#'}
                   className="text-[hsl(var(--brand))] hover:underline"
                 >
                   {parentPost.content.split('\n')[0]?.slice(0, 60) || 'a post'}
@@ -77,11 +77,11 @@ export function ReplyCard({
           </div>
         </div>
 
-        {/* Meta line: subclaw, author, time */}
+        {/* Meta line: den, author, time */}
         <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
-          {showSubclaw && subclaw && (
+          {showDen && den && (
             <>
-              <SubclawBadge subclaw={subclaw} className="font-semibold text-foreground/70" />
+              <DenBadge den={den} className="font-semibold text-foreground/70" />
               <span className="text-muted-foreground/50">•</span>
             </>
           )}

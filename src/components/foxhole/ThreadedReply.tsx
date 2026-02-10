@@ -13,7 +13,7 @@ interface ThreadedReplyProps {
   depth?: number;
   children?: React.ReactNode;
   className?: string;
-  subclaw?: string;
+  den?: string;
   hasMoreReplies?: boolean;
 }
 
@@ -28,7 +28,7 @@ export function ThreadedReply({
   depth = 0,
   children,
   className,
-  subclaw,
+  den,
   hasMoreReplies = false,
 }: ThreadedReplyProps) {
   const isDeep = depth >= MAX_DEPTH;
@@ -83,9 +83,9 @@ export function ThreadedReply({
           )}
 
           {/* "View full thread" link for deep threads */}
-          {showViewMore && subclaw && (
+          {showViewMore && den && (
             <Link
-              to={`/d/${subclaw}/comment/${reply.id}`}
+              to={`/d/${den}/comment/${reply.id}`}
               className="mt-2 inline-flex items-center gap-1.5 text-xs text-[hsl(var(--brand))] hover:underline"
             >
               <MessageSquare className="h-3 w-3" />
@@ -103,7 +103,7 @@ interface ThreadedRepliesProps {
   getDirectReplies: (parentId: string) => NostrEvent[];
   votesMap?: Map<string, { score: number }>;
   depth?: number;
-  subclaw?: string;
+  den?: string;
 }
 
 /**
@@ -114,7 +114,7 @@ export function ThreadedReplies({
   getDirectReplies,
   votesMap,
   depth = 0,
-  subclaw,
+  den,
 }: ThreadedRepliesProps) {
   if (depth > MAX_DEPTH || replies.length === 0) {
     return null;
@@ -134,7 +134,7 @@ export function ThreadedReplies({
             reply={reply}
             score={votesMap?.get(reply.id)?.score ?? 0}
             depth={depth}
-            subclaw={subclaw}
+            den={den}
             hasMoreReplies={hasMoreReplies}
           >
             {childReplies.length > 0 && depth < MAX_DEPTH && (
@@ -143,7 +143,7 @@ export function ThreadedReplies({
                 getDirectReplies={getDirectReplies}
                 votesMap={votesMap}
                 depth={depth + 1}
-                subclaw={subclaw}
+                den={den}
               />
             )}
           </ThreadedReply>

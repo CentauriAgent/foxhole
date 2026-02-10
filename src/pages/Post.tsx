@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { ChevronLeft, MessageSquare } from 'lucide-react';
-import { SiteHeader, Sidebar, VoteButtons, AuthorBadge, ThreadedReplies, FoxIcon } from '@/components/clawstr';
-import { NostrCommentForm } from '@/components/clawstr/NostrCommentForm';
+import { SiteHeader, Sidebar, VoteButtons, AuthorBadge, ThreadedReplies, FoxIcon } from '@/components/foxhole';
+import { NostrCommentForm } from '@/components/foxhole/NostrCommentForm';
 import { NoteContent } from '@/components/NoteContent';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
@@ -12,17 +12,17 @@ import { usePostVotes } from '@/hooks/usePostVotes';
 import { usePostReplies } from '@/hooks/usePostReplies';
 import { useBatchPostVotes } from '@/hooks/usePostVotes';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { formatRelativeTime, getPostSubclaw } from '@/lib/foxhole';
+import { formatRelativeTime, getPostDen } from '@/lib/foxhole';
 import LoginDialog from '@/components/auth/LoginDialog';
 import NotFound from './NotFound';
 
 export default function Post() {
-  const { den: subclaw, eventId } = useParams<{ den: string; eventId: string }>();
+  const { den: den, eventId } = useParams<{ den: string; eventId: string }>();
   const [showLoginDialog, setShowLoginDialog] = useState(false);
 
   const { data: post, isLoading: postLoading, error: postError } = usePost(eventId);
   const { data: votes } = usePostVotes(eventId);
-  const { data: repliesData, isLoading: repliesLoading } = usePostReplies(eventId, subclaw || '');
+  const { data: repliesData, isLoading: repliesLoading } = usePostReplies(eventId, den || '');
   const { user } = useCurrentUser();
   
   // Get votes for all replies
@@ -30,12 +30,12 @@ export default function Post() {
   const { data: replyVotesMap } = useBatchPostVotes(replyIds);
 
   // SEO
-  const postSubclaw = post ? getPostSubclaw(post) : subclaw;
+  const postDen = post ? getPostDen(post) : den;
   const postTitle = post?.content.split('\n')[0]?.slice(0, 60) || 'Post';
   
   useSeoMeta({
-    title: postSubclaw ? `${postTitle} - c/${postSubclaw} - Clawstr` : 'Post - Clawstr',
-    description: post?.content.slice(0, 160) || 'View post on Clawstr',
+    title: postDen ? `${postTitle} - d/${postDen} - Foxhole` : 'Post - Foxhole',
+    description: post?.content.slice(0, 160) || 'View post on Foxhole',
   });
 
   if (postError || (!postLoading && !post)) {
@@ -51,13 +51,13 @@ export default function Post() {
           {/* Main Content */}
           <div className="space-y-4">
             {/* Back link */}
-            {subclaw && (
+            {den && (
               <Link 
-                to={`/d/${subclaw}`}
+                to={`/d/${den}`}
                 className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 <ChevronLeft className="h-4 w-4" />
-                Back to c/{subclaw}
+                Back to c/{den}
               </Link>
             )}
 
@@ -109,9 +109,9 @@ export default function Post() {
               </div>
 
               {/* Human comment form or login button - only shown when "Everyone" is selected */}
-              {user ? (
+              {user && den && eventId ? (
                   <NostrCommentForm 
-                    subclaw={subclaw} 
+                    den={den} 
                     postId={eventId}
                     onSuccess={() => {
                       // Optionally refetch comments after posting
@@ -145,7 +145,7 @@ export default function Post() {
                       replies={repliesData.directReplies}
                       getDirectReplies={repliesData.getDirectReplies}
                       votesMap={replyVotesMap}
-                      subclaw={subclaw}
+                      den={den}
                     />
                   </div>
                 ) : (

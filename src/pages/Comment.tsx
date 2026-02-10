@@ -2,22 +2,22 @@ import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { ChevronLeft, MessageSquare, CornerDownRight } from 'lucide-react';
-import { SiteHeader, Sidebar, VoteButtons, AuthorBadge, ThreadedReplies, FoxIcon } from '@/components/clawstr';
+import { SiteHeader, Sidebar, VoteButtons, AuthorBadge, ThreadedReplies, FoxIcon } from '@/components/foxhole';
 import { NoteContent } from '@/components/NoteContent';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useComment } from '@/hooks/useComment';
 import { usePost } from '@/hooks/usePost';
 import { usePostVotes, useBatchPostVotes } from '@/hooks/usePostVotes';
 import { useCommentReplies } from '@/hooks/useCommentReplies';
-import { formatRelativeTime, getPostSubclaw, isTopLevelPost } from '@/lib/foxhole';
+import { formatRelativeTime, getPostDen, isTopLevelPost } from '@/lib/foxhole';
 import NotFound from './NotFound';
 
 export default function Comment() {
-  const { den: subclaw, eventId } = useParams<{ den: string; eventId: string }>();
+  const { den: den, eventId } = useParams<{ den: string; eventId: string }>();
 
   const { data: comment, isLoading: commentLoading, error: commentError } = useComment(eventId);
   const { data: votes } = usePostVotes(eventId);
-  const { data: repliesData, isLoading: repliesLoading } = useCommentReplies(eventId, subclaw || '');
+  const { data: repliesData, isLoading: repliesLoading } = useCommentReplies(eventId, den || '');
   
   // Get votes for all replies
   const replyIds = repliesData?.allReplies.map(r => r.id) ?? [];
@@ -34,12 +34,12 @@ export default function Comment() {
   const isParentRootPost = parentPost ? isTopLevelPost(parentPost) : false;
 
   // SEO
-  const commentSubclaw = comment ? getPostSubclaw(comment) : subclaw;
+  const commentDen = comment ? getPostDen(comment) : den;
   const commentTitle = comment?.content.split('\n')[0]?.slice(0, 60) || 'Comment';
   
   useSeoMeta({
-    title: commentSubclaw ? `${commentTitle} - c/${commentSubclaw} - Clawstr` : 'Comment - Clawstr',
-    description: comment?.content.slice(0, 160) || 'View comment on Clawstr',
+    title: commentDen ? `${commentTitle} - d/${commentDen} - Foxhole` : 'Comment - Foxhole',
+    description: comment?.content.slice(0, 160) || 'View comment on Foxhole',
   });
 
   if (commentError || (!commentLoading && !comment)) {
@@ -55,9 +55,9 @@ export default function Comment() {
           {/* Main Content */}
           <div className="space-y-4">
             {/* Back link */}
-            {subclaw && parentPostId && (
+            {den && parentPostId && (
               <Link 
-                to={isParentRootPost ? `/d/${subclaw}/post/${parentPostId}` : `/d/${subclaw}/comment/${parentPostId}`}
+                to={isParentRootPost ? `/d/${den}/post/${parentPostId}` : `/d/${den}/comment/${parentPostId}`}
                 className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 <ChevronLeft className="h-4 w-4" />
@@ -74,7 +74,7 @@ export default function Comment() {
                   {isParentRootPost ? 'Original Post' : 'Replying to'}
                 </p>
                 <Link 
-                  to={isParentRootPost ? `/d/${subclaw}/post/${parentPost.id}` : `/d/${subclaw}/comment/${parentPost.id}`}
+                  to={isParentRootPost ? `/d/${den}/post/${parentPost.id}` : `/d/${den}/comment/${parentPost.id}`}
                   className="block"
                 >
                   <article className="rounded-lg border border-border/50 bg-muted/30 p-4 hover:bg-muted/50 transition-colors">
@@ -170,7 +170,7 @@ export default function Comment() {
                       replies={repliesData.directReplies}
                       getDirectReplies={repliesData.getDirectReplies}
                       votesMap={replyVotesMap}
-                      subclaw={subclaw}
+                      den={den}
                     />
                   </div>
                 ) : (
@@ -180,7 +180,7 @@ export default function Comment() {
                     </div>
                     <p className="text-muted-foreground">No replies yet</p>
                     <p className="text-sm text-muted-foreground/70 mt-1">
-                      AI agents can reply via Nostr
+                      Be the first to join the conversation
                     </p>
                   </div>
                 )}

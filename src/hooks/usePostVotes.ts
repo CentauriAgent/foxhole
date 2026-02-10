@@ -19,7 +19,7 @@ export function usePostVotes(eventId: string | undefined) {
   const { nostr } = useNostr();
 
   return useQuery<VoteData>({
-    queryKey: ['clawstr', 'votes', eventId],
+    queryKey: ['foxhole', 'votes', eventId],
     queryFn: async ({ signal }) => {
       if (!eventId) {
         return { upvotes: 0, downvotes: 0, score: 0, reactions: [] };
@@ -67,7 +67,7 @@ export function useBatchPostVotes(eventIds: string[]) {
   const queryKeyHash = stableIds.length > 0 ? stableIds.join(',') : 'empty';
 
   return useQuery({
-    queryKey: ['clawstr', 'batch-votes', queryKeyHash],
+    queryKey: ['foxhole', 'batch-votes', queryKeyHash],
     queryFn: async ({ signal }) => {
       if (eventIds.length === 0) {
         return new Map<string, VoteData>();

@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
 import type { NostrEvent } from '@nostrify/nostrify';
 import { cn } from '@/lib/utils';
-import { formatRelativeTime, getPostSubclaw, isTopLevelPost } from '@/lib/foxhole';
+import { formatRelativeTime, getPostDen, isTopLevelPost } from '@/lib/foxhole';
 import { AuthorBadge } from './AuthorBadge';
-import { SubclawBadge } from './SubclawBadge';
+import { DenBadge } from './DenBadge';
 import { NoteContent } from '@/components/NoteContent';
 
 interface SearchResultCardProps {
@@ -16,14 +16,14 @@ interface SearchResultCardProps {
  * Handles both top-level posts and comment replies.
  */
 export function SearchResultCard({ event, className }: SearchResultCardProps) {
-  const subclaw = getPostSubclaw(event);
+  const den = getPostDen(event);
   const isPost = isTopLevelPost(event);
   
   // Determine the URL based on whether it's a post or comment
-  const eventUrl = subclaw 
+  const eventUrl = den 
     ? isPost 
-      ? `/d/${subclaw}/post/${event.id}`
-      : `/d/${subclaw}/comment/${event.id}`
+      ? `/d/${den}/post/${event.id}`
+      : `/d/${den}/comment/${event.id}`
     : '#';
 
   // Extract title from first line if it looks like a title
@@ -41,7 +41,7 @@ export function SearchResultCard({ event, className }: SearchResultCardProps) {
       className
     )}>
       <div className="space-y-2">
-        {/* Meta line: type, subclaw, author, time */}
+        {/* Meta line: type, den, author, time */}
         <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
           {/* Post or Comment badge */}
           <span className={cn(
@@ -53,10 +53,10 @@ export function SearchResultCard({ event, className }: SearchResultCardProps) {
             {isPost ? 'Post' : 'Comment'}
           </span>
           
-          {subclaw && (
+          {den && (
             <>
               <span className="text-muted-foreground/50">in</span>
-              <SubclawBadge subclaw={subclaw} className="font-semibold text-foreground/70" />
+              <DenBadge den={den} className="font-semibold text-foreground/70" />
             </>
           )}
           

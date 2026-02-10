@@ -2,42 +2,35 @@ import { Link } from 'react-router-dom';
 import { MessageSquare, Zap } from 'lucide-react';
 import type { NostrEvent } from '@nostrify/nostrify';
 import { cn } from '@/lib/utils';
-import { formatRelativeTime, getPostSubclaw, formatCount } from '@/lib/foxhole';
+import { formatRelativeTime, getPostDen, formatCount } from '@/lib/foxhole';
 import { formatSats } from '@/lib/hotScore';
 import { VoteButtons } from './VoteButtons';
 import { AuthorBadge } from './AuthorBadge';
-import { SubclawBadge } from './SubclawBadge';
+import { DenBadge } from './DenBadge';
 import { NoteContent } from '@/components/NoteContent';
+import type { PopularPostMetrics } from '@/hooks/usePopularPosts';
 
-interface PostCardProps {
+interface PopularPostCardProps {
   post: NostrEvent;
-  score?: number;
-  replyCount?: number;
-  /** Total sats zapped to this post */
-  totalSats?: number;
-  /** Show the subclaw badge (for homepage/mixed feeds) */
-  showSubclaw?: boolean;
-  /** Compact mode for feed lists */
-  compact?: boolean;
+  metrics: PopularPostMetrics;
+  rank?: number;
   className?: string;
 }
 
 /**
- * Reddit-style post card with vote buttons, content, and metadata.
+ * Post card variant for Popular page with engagement metrics display.
+ * Shows zap amounts, vote score, and reply count prominently.
  */
-export function PostCard({ 
+export function PopularPostCard({ 
   post, 
-  score = 0,
-  replyCount = 0,
-  totalSats = 0,
-  showSubclaw = false,
-  compact = false,
+  metrics,
+  rank,
   className,
-}: PostCardProps) {
-  const subclaw = getPostSubclaw(post);
-  const postUrl = subclaw ? `/d/${subclaw}/post/${post.id}` : '#';
+}: PopularPostCardProps) {
+  const den = getPostDen(post);
+  const postUrl = den ? `/d/${den}/post/${post.id}` : '#';
 
-  // Extract title from first line if it looks like a title (short, no punctuation at end)
+  // Extract title from first line if it looks like a title
   const lines = post.content.split('\n').filter(l => l.trim());
   const firstLine = lines[0] || '';
   const hasTitle = firstLine.length <= 120 && !firstLine.match(/[.!?]$/);
@@ -48,22 +41,27 @@ export function PostCard({
 
   return (
     <article className={cn(
-      "group flex gap-3 p-3 transition-colors",
+      "group flex gap-3 p-3 transition-colors rounded-lg",
       "hover:bg-muted/50",
       className
     )}>
-      {/* Vote Column */}
-      <div className="flex-shrink-0 pt-0.5">
-        <VoteButtons score={score} size={compact ? 'sm' : 'md'} />
+      {/* Rank + Vote Column */}
+      <div className="flex-shrink-0 flex items-start gap-2">
+        {rank !== undefined && (
+          <span className="text-lg font-bold text-muted-foreground/50 w-6 text-right pt-1">
+            {rank}
+          </span>
+        )}
+        <VoteButtons score={metrics.score} size="sm" />
       </div>
 
       {/* Content Column */}
       <div className="flex-1 min-w-0 space-y-1.5">
-        {/* Meta line: subclaw, author, time */}
+        {/* Meta line: den, author, time */}
         <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
-          {showSubclaw && subclaw && (
+          {den && (
             <>
-              <SubclawBadge subclaw={subclaw} className="font-semibold text-foreground/70" />
+              <DenBadge den={den} className="font-semibold text-foreground/70" />
               <span className="text-muted-foreground/50">•</span>
             </>
           )}
@@ -78,42 +76,39 @@ export function PostCard({
         <Link to={postUrl} className="block">
           {title ? (
             <>
-              <h3 className={cn(
-                "font-semibold text-foreground group-hover:text-[hsl(var(--brand))] transition-colors",
-                compact ? "text-sm" : "text-base"
-              )}>
+              <h3 className="font-semibold text-sm text-foreground group-hover:text-[hsl(var(--brand))] transition-colors">
                 {title}
               </h3>
-              {!compact && bodyContent && (
-                <div className="mt-1 text-sm text-muted-foreground line-clamp-3">
+              {bodyContent && (
+                <div className="mt-1 text-sm text-muted-foreground line-clamp-2">
                   <NoteContent event={{ ...post, content: bodyContent }} />
                 </div>
               )}
             </>
           ) : (
-            <div className={cn(
-              "text-foreground",
-              compact ? "text-sm line-clamp-2" : "text-sm line-clamp-4"
-            )}>
+            <div className="text-sm text-foreground line-clamp-3">
               <NoteContent event={post} />
             </div>
           )}
         </Link>
 
-        {/* Actions bar */}
+        {/* Engagement bar */}
         <div className="flex items-center gap-4 pt-1">
-          {totalSats > 0 && (
+          {/* Zap amount - highlighted */}
+          {metrics.totalSats > 0 && (
             <div className="inline-flex items-center gap-1 text-xs font-medium text-amber-500">
               <Zap className="h-3.5 w-3.5 fill-amber-500" />
-              <span>{formatSats(totalSats)} {totalSats === 1 ? 'sat' : 'sats'}</span>
+              <span>{formatSats(metrics.totalSats)} sats</span>
             </div>
           )}
+          
+          {/* Comments */}
           <Link 
             to={postUrl}
             className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
-            <MessageSquare className="h-4 w-4" />
-            <span>{formatCount(replyCount)} {replyCount === 1 ? 'comment' : 'comments'}</span>
+            <MessageSquare className="h-3.5 w-3.5" />
+            <span>{formatCount(metrics.replyCount)} {metrics.replyCount === 1 ? 'comment' : 'comments'}</span>
           </Link>
         </div>
       </div>

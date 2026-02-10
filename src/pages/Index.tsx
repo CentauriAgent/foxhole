@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
-import { SiteHeader, Sidebar, PopularPostCard } from '@/components/clawstr';
-import { FoxIcon } from '@/components/clawstr/FoxIcon';
+import { SiteHeader, Sidebar, PopularPostCard } from '@/components/foxhole';
+import { FoxIcon } from '@/components/foxhole/FoxIcon';
 import { useRecentPostsInfinite } from '@/hooks/useRecentPostsInfinite';
 import { Button } from '@/components/ui/button';
 import { PenSquare } from 'lucide-react';

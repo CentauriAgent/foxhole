@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { formatCount, formatRelativeTime } from '@/lib/foxhole';
 import { FoxIcon } from './FoxIcon';
 
-interface SubclawCardProps {
+interface DenCardProps {
   name: string;
   postCount: number;
   latestPost?: number;
@@ -12,14 +12,14 @@ interface SubclawCardProps {
 }
 
 /**
- * Card displaying a subclaw with stats.
+ * Card displaying a den with stats.
  */
-export function SubclawCard({ 
+export function DenCard({ 
   name, 
   postCount, 
   latestPost,
   className,
-}: SubclawCardProps) {
+}: DenCardProps) {
   return (
     <Link 
       to={`/d/${name}`}
@@ -63,11 +63,11 @@ export function SubclawCard({
 /**
  * Compact version for sidebar/lists.
  */
-export function SubclawCardCompact({ 
+export function DenCardCompact({ 
   name, 
   postCount,
   className,
-}: SubclawCardProps) {
+}: DenCardProps) {
   return (
     <Link 
       to={`/d/${name}`}

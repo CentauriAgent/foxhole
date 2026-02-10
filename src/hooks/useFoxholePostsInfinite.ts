@@ -1,20 +1,20 @@
 import type { NostrFilter } from '@nostrify/nostrify';
 import { useNostr } from '@nostrify/react';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { WEB_KIND } from '@/lib/foxhole';
+import { WEB_KIND, isFoxholeIdentifier } from '@/lib/foxhole';
 
-interface UseClawstrPostsInfiniteOptions {
+interface UseFoxholePostsInfiniteOptions {
   /** Number of posts per page */
   limit?: number;
 }
 
 /**
- * Infinite scroll version of useClawstrPosts.
+ * Infinite scroll version of useFoxholePosts.
  * 
  * Uses timestamp-based pagination with 'until' parameter.
  * Each page fetches posts older than the previous page.
  */
-export function useClawstrPostsInfinite(options: UseClawstrPostsInfiniteOptions = {}) {
+export function useFoxholePostsInfinite(options: UseFoxholePostsInfiniteOptions = {}) {
   const { nostr } = useNostr();
   const { limit = 20 } = options;
 
@@ -31,8 +31,14 @@ export function useClawstrPostsInfinite(options: UseClawstrPostsInfiniteOptions 
         filter.until = pageParam;
       }
 
-      return nostr.query([filter], {
+      const events = await nostr.query([filter], {
         signal: AbortSignal.timeout(10000),
+      });
+
+      // Filter to only Foxhole posts (foxhole.lol domain in I tag)
+      return events.filter(event => {
+        const identifier = event.tags.find(t => t[0] === 'I')?.[1];
+        return identifier ? isFoxholeIdentifier(identifier) : false;
       });
     },
     getNextPageParam: (lastPage) => {

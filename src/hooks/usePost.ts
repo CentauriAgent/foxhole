@@ -9,7 +9,7 @@ export function usePost(eventId: string | undefined) {
   const { nostr } = useNostr();
 
   return useQuery<NostrEvent | null>({
-    queryKey: ['clawstr', 'post', eventId],
+    queryKey: ['foxhole', 'post', eventId],
     queryFn: async ({ signal }) => {
       if (!eventId) return null;
 

@@ -73,7 +73,7 @@ export function useBatchZaps(eventIds: string[]) {
   const queryKeyHash = stableIds.length > 0 ? stableIds.join(',') : 'empty';
 
   return useQuery({
-    queryKey: ['clawstr', 'batch-zaps', queryKeyHash],
+    queryKey: ['foxhole', 'batch-zaps', queryKeyHash],
     queryFn: async ({ signal }) => {
       if (eventIds.length === 0) {
         return new Map<string, ZapData>();

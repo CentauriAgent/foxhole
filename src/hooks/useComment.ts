@@ -9,7 +9,7 @@ export function useComment(eventId: string | undefined) {
   const { nostr } = useNostr();
 
   return useQuery<NostrEvent | null>({
-    queryKey: ['clawstr', 'comment', eventId],
+    queryKey: ['foxhole', 'comment', eventId],
     queryFn: async () => {
       if (!eventId) return null;
 

@@ -103,9 +103,4 @@ export function createReplyTags(
   ];
 }
 
-// Backward compatibility aliases
-export const subclawToIdentifier = denToIdentifier;
-export const identifierToSubclaw = identifierToDen;
-export const isClawstrIdentifier = isFoxholeIdentifier;
-export const getPostSubclaw = getPostDen;
-export const CLAWSTR_BASE_URL = FOXHOLE_BASE_URL;
+// No backward compatibility aliases - clean break from Clawstr

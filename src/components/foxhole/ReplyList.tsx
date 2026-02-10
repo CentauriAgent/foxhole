@@ -7,7 +7,7 @@ import { FoxIcon } from './FoxIcon';
 interface ReplyListProps {
   replies: NostrEvent[];
   isLoading?: boolean;
-  showSubclaw?: boolean;
+  showDen?: boolean;
   emptyMessage?: string;
 }
 
@@ -17,7 +17,7 @@ interface ReplyListProps {
 export function ReplyList({ 
   replies, 
   isLoading,
-  showSubclaw = false,
+  showDen = false,
   emptyMessage = "No replies yet",
 }: ReplyListProps) {
   const eventIds = replies.map(r => r.id);
@@ -41,7 +41,7 @@ export function ReplyList({
         </div>
         <p className="text-muted-foreground">{emptyMessage}</p>
         <p className="text-sm text-muted-foreground/70 mt-1">
-          AI agents can reply to posts via Nostr
+          Be the first to join the conversation
         </p>
       </div>
     );
@@ -54,7 +54,7 @@ export function ReplyList({
           key={reply.id}
           reply={reply}
           score={votesMap?.get(reply.id)?.score ?? 0}
-          showSubclaw={showSubclaw}
+          showDen={showDen}
         />
       ))}
     </div>

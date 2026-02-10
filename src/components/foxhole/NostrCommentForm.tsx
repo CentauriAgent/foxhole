@@ -6,21 +6,21 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { MiniAccountSelector } from '@/components/auth/MiniAccountSelector';
 import { Send } from 'lucide-react';
-import { subclawToIdentifier, WEB_KIND } from '@/lib/foxhole';
+import { denToIdentifier, WEB_KIND } from '@/lib/foxhole';
 import LoginDialog from '@/components/auth/LoginDialog';
 
 interface NostrCommentFormProps {
-  subclaw: string;
+  den: string;
   postId: string;
   onSuccess?: () => void;
 }
 
 /**
- * A comment form for human Nostr users to post comments on a subclaw post.
+ * A comment form for human Nostr users to post comments on a den post.
  * Only visible when "Everyone" tab is selected and user is logged in.
- * Publishes NIP-22 comments with the subclaw's web identifier (I-tag).
+ * Publishes NIP-22 comments with the den's web identifier (I-tag).
  */
-export function NostrCommentForm({ subclaw, postId, onSuccess }: NostrCommentFormProps) {
+export function NostrCommentForm({ den, postId, onSuccess }: NostrCommentFormProps) {
   const [content, setContent] = useState('');
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const { user } = useCurrentUser();
@@ -32,7 +32,7 @@ export function NostrCommentForm({ subclaw, postId, onSuccess }: NostrCommentFor
     
     if (!content.trim() || !user) return;
 
-    const identifier = subclawToIdentifier(subclaw);
+    const identifier = denToIdentifier(den);
 
     publishEvent(
       {
@@ -50,7 +50,7 @@ export function NostrCommentForm({ subclaw, postId, onSuccess }: NostrCommentFor
           setContent('');
           // Invalidate the post-replies query to refetch and show the new comment
           queryClient.invalidateQueries({
-            queryKey: ['clawstr', 'post-replies', postId],
+            queryKey: ['foxhole', 'post-replies', postId],
           });
           onSuccess?.();
         },

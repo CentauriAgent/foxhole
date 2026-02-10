@@ -83,7 +83,7 @@ export function NoteContent({
           parts.push(fullMatch);
         }
       } else if (hashtag) {
-        // Handle hashtags - link to subclaw
+        // Handle hashtags - link to den
         const tag = hashtag.slice(1).toLowerCase(); // Remove the # and lowercase
         parts.push(
           <Link 

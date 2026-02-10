@@ -1,7 +1,7 @@
 import type { NostrEvent, NostrFilter } from '@nostrify/nostrify';
 import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
-import { subclawToIdentifier } from '@/lib/foxhole';
+import { denToIdentifier } from '@/lib/foxhole';
 
 interface RepliesData {
   allReplies: NostrEvent[];
@@ -16,20 +16,20 @@ interface UseCommentRepliesOptions {
 
 export function useCommentReplies(
   commentId: string | undefined,
-  subclaw: string,
+  den: string,
   options: UseCommentRepliesOptions = {}
 ) {
   const { nostr } = useNostr();
   const { limit = 500 } = options;
 
   return useQuery<RepliesData>({
-    queryKey: ['foxhole', 'comment-replies', commentId, subclaw, limit],
+    queryKey: ['foxhole', 'comment-replies', commentId, den, limit],
     queryFn: async () => {
       if (!commentId) {
         return { allReplies: [], directReplies: [], replyCount: 0, getDirectReplies: () => [] };
       }
 
-      const identifier = subclawToIdentifier(subclaw);
+      const identifier = denToIdentifier(den);
       const baseFilter: Partial<NostrFilter> = {
         kinds: [1111],
         '#I': [identifier],

@@ -1,7 +1,7 @@
 import type { NostrFilter } from '@nostrify/nostrify';
 import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
-import { WEB_KIND, isTopLevelPost, isClawstrIdentifier } from '@/lib/foxhole';
+import { WEB_KIND, isTopLevelPost, isFoxholeIdentifier } from '@/lib/foxhole';
 
 interface UseUserPostsOptions {
   /** Maximum number of posts to fetch */
@@ -20,7 +20,7 @@ export function useUserPosts(
   const { limit = 50 } = options;
 
   return useQuery({
-    queryKey: ['clawstr', 'user-posts', pubkey, limit],
+    queryKey: ['foxhole', 'user-posts', pubkey, limit],
     queryFn: async ({ signal }) => {
       if (!pubkey) return [];
 
@@ -35,11 +35,11 @@ export function useUserPosts(
         signal: AbortSignal.any([signal, AbortSignal.timeout(10000)]),
       });
 
-      // Filter to only top-level posts with valid Clawstr identifiers
+      // Filter to only top-level posts with valid Foxhole identifiers
       const topLevelPosts = events.filter((event) => {
         if (!isTopLevelPost(event)) return false;
         const identifier = event.tags.find(([name]) => name === 'I')?.[1];
-        return identifier && isClawstrIdentifier(identifier);
+        return identifier && isFoxholeIdentifier(identifier);
       });
 
       // Sort by created_at descending

@@ -1,55 +1,54 @@
-import { ExternalLink, Zap } from 'lucide-react';
+import { Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SubclawCardCompact } from './SubclawCard';
+import { DenCardCompact } from './DenCard';
 import { ZapActivityItem } from './ZapActivityItem';
-import { usePopularSubclaws } from '@/hooks/usePopularSubclaws';
+import { usePopularDens } from '@/hooks/usePopularDens';
 import { useRecentZaps } from '@/hooks/useRecentZaps';
-import { FoxIcon } from './FoxIcon';
 
 interface SidebarProps {
-  subclaw?: string;
+  den?: string;
   className?: string;
 }
 
 /**
  * Sidebar with den info or popular communities.
  */
-export function Sidebar({ subclaw, className }: SidebarProps) {
+export function Sidebar({ den, className }: SidebarProps) {
   return (
     <aside className={cn("space-y-4", className)}>
-      {subclaw ? (
-        <SubclawInfoCard subclaw={subclaw} />
+      {den ? (
+        <DenInfoCard den={den} />
       ) : (
         <AboutCard />
       )}
       
-      <PopularSubclawsCard currentSubclaw={subclaw} />
+      <PopularDensCard currentDen={den} />
       <RecentZapsCard />
     </aside>
   );
 }
 
-function SubclawInfoCard({ subclaw }: { subclaw: string }) {
+function DenInfoCard({ den }: { den: string }) {
   return (
     <Card>
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-base">
-          <FoxIcon className="h-5 w-5 text-[hsl(var(--brand))]" />
-          d/{subclaw}
+          <span className="text-lg">🦊</span>
+          d/{den}
         </CardTitle>
       </CardHeader>
       <CardContent className="text-sm text-muted-foreground">
         <p>
           A community den for discussing{' '}
-          <span className="font-medium text-foreground">{subclaw}</span>.
+          <span className="font-medium text-foreground">{den}</span>.
         </p>
         <Separator className="my-4" />
         <div className="text-xs">
           <p>
-            Posts use NIP-22 comments with NIP-73 web identifiers. Join the conversation!
+            Join the conversation — post, reply, and zap your favorite content!
           </p>
         </div>
       </CardContent>
@@ -68,39 +67,29 @@ function AboutCard() {
       </CardHeader>
       <CardContent className="text-sm text-muted-foreground space-y-3">
         <p>
-          Foxhole is a community forum built on the Nostr protocol. Join Dens to discuss topics you care about.
+          A community forum where you own your content. Built on Nostr.
         </p>
         <p>
-          Posts use NIP-22 comments on NIP-73 web identifiers — decentralized, censorship-resistant, and open.
+          Join Dens to discuss topics you care about, support great content with Bitcoin zaps, and connect with people — no central authority in control.
         </p>
         <Separator />
         <p className="text-xs">
           Sign in with your Nostr key to post, comment, and zap.
         </p>
-        <Separator />
-        <a
-          href="https://github.com/foxhole-forum/foxhole"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-[hsl(var(--brand))] hover:underline"
-        >
-          <span>Open Source on GitHub</span>
-          <ExternalLink className="h-3 w-3" />
-        </a>
       </CardContent>
     </Card>
   );
 }
 
-interface PopularSubclawsCardProps {
-  currentSubclaw?: string;
+interface PopularDensCardProps {
+  currentDen?: string;
 }
 
-function PopularSubclawsCard({ currentSubclaw }: PopularSubclawsCardProps) {
-  const { data: subclaws, isLoading } = usePopularSubclaws({ limit: 100 });
+function PopularDensCard({ currentDen }: PopularDensCardProps) {
+  const { data: dens, isLoading } = usePopularDens({ limit: 100 });
 
-  const filteredSubclaws = subclaws
-    ?.filter(s => s.name !== currentSubclaw)
+  const filteredDens = dens
+    ?.filter(s => s.name !== currentDen)
     .slice(0, 10) ?? [];
 
   if (isLoading) {
@@ -120,7 +109,7 @@ function PopularSubclawsCard({ currentSubclaw }: PopularSubclawsCardProps) {
     );
   }
 
-  if (filteredSubclaws.length === 0) {
+  if (filteredDens.length === 0) {
     return null;
   }
 
@@ -131,11 +120,11 @@ function PopularSubclawsCard({ currentSubclaw }: PopularSubclawsCardProps) {
       </CardHeader>
       <CardContent className="p-2">
         <div className="space-y-0.5">
-          {filteredSubclaws.map((subclaw) => (
-            <SubclawCardCompact
-              key={subclaw.name}
-              name={subclaw.name}
-              postCount={subclaw.postCount}
+          {filteredDens.map((den) => (
+            <DenCardCompact
+              key={den.name}
+              name={den.name}
+              postCount={den.postCount}
             />
           ))}
         </div>

@@ -5,38 +5,38 @@ import { useBatchPostVotes } from '@/hooks/usePostVotes';
 import { useBatchReplyCounts } from '@/hooks/usePostReplies';
 import { useBatchReplyCountsGlobal } from '@/hooks/useBatchReplyCountsGlobal';
 import { useBatchZaps } from '@/hooks/useBatchZaps';
-import { getPostSubclaw } from '@/lib/foxhole';
+import { getPostDen } from '@/lib/foxhole';
 import { FoxIcon } from './FoxIcon';
 
 interface PostListProps {
   posts: NostrEvent[];
   isLoading?: boolean;
-  showSubclaw?: boolean;
+  showDen?: boolean;
   emptyMessage?: string;
 }
 
 export function PostList({ 
   posts, 
   isLoading,
-  showSubclaw = false,
+  showDen = false,
   emptyMessage = "No posts yet",
 }: PostListProps) {
   const eventIds = posts.map(p => p.id);
   
-  const firstSubclaw = posts[0] ? getPostSubclaw(posts[0]) : null;
-  const allSameSubclaw = posts.every(p => getPostSubclaw(p) === firstSubclaw);
+  const firstDen = posts[0] ? getPostDen(posts[0]) : null;
+  const allSameDen = posts.every(p => getPostDen(p) === firstDen);
   
   const { data: votesMap } = useBatchPostVotes(eventIds);
   
-  const { data: subclawReplyCountsMap } = useBatchReplyCounts(
-    allSameSubclaw && firstSubclaw ? eventIds : [],
-    firstSubclaw || '',
+  const { data: denReplyCountsMap } = useBatchReplyCounts(
+    allSameDen && firstDen ? eventIds : [],
+    firstDen || '',
   );
   const { data: globalReplyCountsMap } = useBatchReplyCountsGlobal(
-    !allSameSubclaw || !firstSubclaw ? eventIds : [],
+    !allSameDen || !firstDen ? eventIds : [],
   );
   
-  const replyCountsMap = allSameSubclaw && firstSubclaw ? subclawReplyCountsMap : globalReplyCountsMap;
+  const replyCountsMap = allSameDen && firstDen ? denReplyCountsMap : globalReplyCountsMap;
   const { data: zapsMap } = useBatchZaps(eventIds);
 
   if (isLoading) {
@@ -69,7 +69,7 @@ export function PostList({
           score={votesMap?.get(post.id)?.score ?? 0}
           replyCount={replyCountsMap?.get(post.id) ?? 0}
           totalSats={zapsMap?.get(post.id)?.totalSats ?? 0}
-          showSubclaw={showSubclaw}
+          showDen={showDen}
           compact
         />
       ))}

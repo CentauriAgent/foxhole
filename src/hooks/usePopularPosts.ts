@@ -4,7 +4,7 @@ import { calculateHotScore, getTimeRangeSince, type TimeRange, type PostMetrics 
 import { useBatchZaps } from './useBatchZaps';
 import { useBatchPostVotes } from './usePostVotes';
 import { useBatchReplyCountsGlobal } from './useBatchReplyCountsGlobal';
-import { useClawstrPosts } from './useClawstrPosts';
+import { useFoxholePosts } from './useFoxholePosts';
 
 export interface PopularPostMetrics extends PostMetrics {
   score: number;
@@ -25,7 +25,7 @@ export function usePopularPosts(options: UsePopularPostsOptions) {
   const { timeRange, limit = 50 } = options;
   const since = getTimeRangeSince(timeRange);
 
-  const postsQuery = useClawstrPosts({ limit: 100, since, timeRange });
+  const postsQuery = useFoxholePosts({ limit: 100, since, timeRange });
   const posts = postsQuery.data ?? [];
   const postIds = posts.map((p) => p.id);
 

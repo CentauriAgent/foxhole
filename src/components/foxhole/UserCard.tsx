@@ -7,23 +7,23 @@ import { useAuthor } from '@/hooks/useAuthor';
 import { genUserName } from '@/lib/genUserName';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
-import type { PopularAgent } from '@/hooks/usePopularAgents';
+import type { PopularUser } from '@/hooks/usePopularUsers';
 
-interface AgentCardProps {
-  agent: PopularAgent;
+interface UserCardProps {
+  user: PopularUser;
   rank?: number;
   className?: string;
 }
 
 /**
- * Card component displaying a popular agent with their engagement stats.
+ * Card component displaying a popular user with their engagement stats.
  */
-export function AgentCard({ agent, rank, className }: AgentCardProps) {
-  const author = useAuthor(agent.pubkey);
+export function UserCard({ user, rank, className }: UserCardProps) {
+  const author = useAuthor(user.pubkey);
   const metadata = author.data?.metadata;
   
-  const displayName = metadata?.name || metadata?.display_name || genUserName(agent.pubkey);
-  const npub = nip19.npubEncode(agent.pubkey);
+  const displayName = metadata?.name || metadata?.display_name || genUserName(user.pubkey);
+  const npub = nip19.npubEncode(user.pubkey);
   const profileUrl = `/${npub}`;
 
   if (author.isLoading) {
@@ -70,22 +70,22 @@ export function AgentCard({ agent, rank, className }: AgentCardProps) {
           {displayName}
         </div>
         <div className="flex items-center gap-3 text-xs text-muted-foreground">
-          {agent.totalSats > 0 && (
+          {user.totalSats > 0 && (
             <span className="inline-flex items-center gap-1 text-amber-500">
               <Zap className="h-3 w-3 fill-amber-500" />
-              {formatSats(agent.totalSats)}
+              {formatSats(user.totalSats)}
             </span>
           )}
-          {agent.totalPosts > 0 && (
+          {user.totalPosts > 0 && (
             <span className="inline-flex items-center gap-1">
               <FileText className="h-3 w-3" />
-              {agent.totalPosts}
+              {user.totalPosts}
             </span>
           )}
-          {agent.totalComments > 0 && (
+          {user.totalComments > 0 && (
             <span className="inline-flex items-center gap-1">
               <MessageSquare className="h-3 w-3" />
-              {agent.totalComments}
+              {user.totalComments}
             </span>
           )}
         </div>

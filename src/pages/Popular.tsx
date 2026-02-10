@@ -3,15 +3,15 @@ import { useSeoMeta } from '@unhead/react';
 import { Flame, TrendingUp, Users, Zap } from 'lucide-react';
 import { 
   SiteHeader, 
-  SubclawCardCompact,
+  DenCardCompact,
   TimeRangeTabs,
   PopularPostCard,
-  AgentCard,
+  UserCard,
   ZapActivityItem,
-} from '@/components/clawstr';
-import { usePopularSubclaws } from '@/hooks/usePopularSubclaws';
+} from '@/components/foxhole';
+import { usePopularDens } from '@/hooks/usePopularDens';
 import { usePopularPosts } from '@/hooks/usePopularPosts';
-import { usePopularAgents } from '@/hooks/usePopularAgents';
+import { usePopularUsers } from '@/hooks/usePopularUsers';
 import { useLargestZaps } from '@/hooks/useLargestZaps';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -25,12 +25,12 @@ export default function Popular() {
     limit: 50,
   });
   
-  const { data: agents, isLoading: agentsLoading } = usePopularAgents({ 
+  const { data: agents, isLoading: agentsLoading } = usePopularUsers({ 
     timeRange,
     limit: 10,
   });
   
-  const { data: subclaws, isLoading: subclawsLoading } = usePopularSubclaws({ 
+  const { data: dens, isLoading: densLoading } = usePopularDens({ 
     limit: 100,
   });
   
@@ -143,9 +143,9 @@ export default function Popular() {
                 ) : agents && agents.length > 0 ? (
                   <div className="space-y-1">
                     {agents.map((agent, index) => (
-                      <AgentCard
+                      <UserCard
                         key={agent.pubkey}
-                        agent={agent}
+                        user={agent}
                         rank={index + 1}
                       />
                     ))}
@@ -166,7 +166,7 @@ export default function Popular() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
-                {subclawsLoading ? (
+                {densLoading ? (
                   <div className="space-y-2">
                     {[...Array(5)].map((_, i) => (
                       <div key={i} className="p-2">
@@ -174,13 +174,13 @@ export default function Popular() {
                       </div>
                     ))}
                   </div>
-                ) : subclaws && subclaws.length > 0 ? (
+                ) : dens && dens.length > 0 ? (
                   <div className="space-y-1">
-                    {subclaws.map((subclaw) => (
-                      <SubclawCardCompact
-                        key={subclaw.name}
-                        name={subclaw.name}
-                        postCount={subclaw.postCount}
+                    {dens.map((den) => (
+                      <DenCardCompact
+                        key={den.name}
+                        name={den.name}
+                        postCount={den.postCount}
                       />
                     ))}
                   </div>

@@ -3,7 +3,7 @@ import type { NostrEvent } from '@nostrify/nostrify';
 import { useBatchZaps } from './useBatchZaps';
 import { useBatchPostVotes } from './usePostVotes';
 import { useBatchReplyCountsGlobal } from './useBatchReplyCountsGlobal';
-import { useClawstrPostsInfinite } from './useClawstrPostsInfinite';
+import { useFoxholePostsInfinite } from './useFoxholePostsInfinite';
 
 export interface RecentPostMetrics {
   totalSats: number; zapCount: number; upvotes: number; downvotes: number;
@@ -22,7 +22,7 @@ interface UseRecentPostsInfiniteOptions {
 export function useRecentPostsInfinite(options: UseRecentPostsInfiniteOptions = {}) {
   const { limit = 20 } = options;
 
-  const postsQuery = useClawstrPostsInfinite({ limit });
+  const postsQuery = useFoxholePostsInfinite({ limit });
 
   const posts = useMemo(() => {
     if (!postsQuery.data?.pages) return [];

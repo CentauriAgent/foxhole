@@ -2,33 +2,33 @@ import { useMemo } from 'react';
 import type { NostrEvent, NostrFilter } from '@nostrify/nostrify';
 import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
-import { WEB_KIND, subclawToIdentifier, isTopLevelPost } from '@/lib/foxhole';
+import { WEB_KIND, denToIdentifier, isTopLevelPost } from '@/lib/foxhole';
 import { useBatchZaps } from './useBatchZaps';
 import { useBatchPostVotes } from './usePostVotes';
 import { useBatchReplyCounts } from './usePostReplies';
 
-export interface SubclawPostMetrics {
+export interface DenPostMetrics {
   totalSats: number; zapCount: number; upvotes: number; downvotes: number;
   score: number; replyCount: number; createdAt: number;
 }
 
-export interface SubclawPost {
+export interface DenPost {
   event: NostrEvent;
-  metrics: SubclawPostMetrics;
+  metrics: DenPostMetrics;
 }
 
-interface UseSubclawPostsOptions {
+interface UseDenPostsOptions {
   limit?: number;
 }
 
-export function useSubclawPosts(subclaw: string, options: UseSubclawPostsOptions = {}) {
+export function useDenPosts(den: string, options: UseDenPostsOptions = {}) {
   const { nostr } = useNostr();
   const { limit = 50 } = options;
 
   const postsQuery = useQuery({
-    queryKey: ['foxhole', 'subclaw-posts-raw', subclaw, limit],
+    queryKey: ['foxhole', 'den-posts-raw', den, limit],
     queryFn: async ({ signal }) => {
-      const identifier = subclawToIdentifier(subclaw);
+      const identifier = denToIdentifier(den);
       const filter: NostrFilter = {
         kinds: [1111],
         '#i': [identifier],
@@ -50,9 +50,9 @@ export function useSubclawPosts(subclaw: string, options: UseSubclawPostsOptions
 
   const zapsQuery = useBatchZaps(postIds);
   const votesQuery = useBatchPostVotes(postIds);
-  const repliesQuery = useBatchReplyCounts(postIds, subclaw);
+  const repliesQuery = useBatchReplyCounts(postIds, den);
 
-  const subclawPosts = useMemo<SubclawPost[]>(() => {
+  const denPosts = useMemo<DenPost[]>(() => {
     if (!postsQuery.data) return [];
     const zapsMap = zapsQuery.data ?? new Map();
     const votesMap = votesQuery.data ?? new Map();
@@ -74,7 +74,7 @@ export function useSubclawPosts(subclaw: string, options: UseSubclawPostsOptions
   }, [postsQuery.data, zapsQuery.data, votesQuery.data, repliesQuery.data]);
 
   return {
-    data: subclawPosts,
+    data: denPosts,
     isLoading: postsQuery.isLoading || (postIds.length > 0 && (zapsQuery.isLoading || votesQuery.isLoading || repliesQuery.isLoading)),
     isError: postsQuery.isError,
     error: postsQuery.error,

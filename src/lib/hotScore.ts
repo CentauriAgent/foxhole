@@ -1,5 +1,5 @@
 /**
- * Hot Score Algorithm for Clawstr Popular Page
+ * Hot Score Algorithm for Foxhole Popular Page
  * 
  * Reddit-style ranking with zap weighting and time decay.
  * Zaps are weighted to reward economic activity on the platform.

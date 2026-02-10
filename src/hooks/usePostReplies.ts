@@ -1,7 +1,7 @@
 import type { NostrEvent, NostrFilter } from '@nostrify/nostrify';
 import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
-import { subclawToIdentifier } from '@/lib/foxhole';
+import { denToIdentifier } from '@/lib/foxhole';
 
 interface RepliesData {
   allReplies: NostrEvent[];
@@ -17,20 +17,20 @@ interface UsePostRepliesOptions {
 
 export function usePostReplies(
   postId: string | undefined,
-  subclaw: string,
+  den: string,
   options: UsePostRepliesOptions = {}
 ) {
   const { nostr } = useNostr();
   const { limit = 500 } = options;
 
   return useQuery<RepliesData>({
-    queryKey: ['foxhole', 'post-replies', postId, subclaw, limit],
+    queryKey: ['foxhole', 'post-replies', postId, den, limit],
     queryFn: async () => {
       if (!postId) {
         return { allReplies: [], directReplies: [], replyCount: 0, getDirectReplies: () => [], hasMoreReplies: () => false };
       }
 
-      const identifier = subclawToIdentifier(subclaw);
+      const identifier = denToIdentifier(den);
       const baseFilter: Partial<NostrFilter> = {
         kinds: [1111],
         '#I': [identifier],
@@ -74,15 +74,15 @@ export function usePostReplies(
   });
 }
 
-export function useBatchReplyCounts(eventIds: string[], subclaw: string) {
+export function useBatchReplyCounts(eventIds: string[], den: string) {
   const { nostr } = useNostr();
 
   return useQuery({
-    queryKey: ['foxhole', 'batch-reply-counts', [...eventIds].sort().join(','), subclaw],
+    queryKey: ['foxhole', 'batch-reply-counts', [...eventIds].sort().join(','), den],
     queryFn: async ({ signal }) => {
       if (eventIds.length === 0) return new Map<string, number>();
 
-      const identifier = subclawToIdentifier(subclaw);
+      const identifier = denToIdentifier(den);
       const filter: NostrFilter = {
         kinds: [1111],
         '#I': [identifier],

@@ -2,7 +2,7 @@ import { nip19 } from 'nostr-tools';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { User, ExternalLink, MessageSquare, FileText, Zap } from 'lucide-react';
-import { SiteHeader, Sidebar, PostList, ReplyList, FoxIcon } from '@/components/clawstr';
+import { SiteHeader, Sidebar, PostList, ReplyList, FoxIcon } from '@/components/foxhole';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -121,7 +121,7 @@ function ProfilePage({ pubkey }: { pubkey: string }) {
                           "bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))]"
                         )}>
                           <FoxIcon className="h-3 w-3" />
-                          AI Agent
+                          Community Member
                         </span>
                       )}
                       {metadata?.lud16 && (
@@ -203,7 +203,7 @@ function ProfilePage({ pubkey }: { pubkey: string }) {
                     <PostList 
                       posts={posts ?? []}
                       isLoading={postsLoading}
-                      showSubclaw
+                      showDen
                      
                       emptyMessage="No posts from this user"
                     />
@@ -215,7 +215,7 @@ function ProfilePage({ pubkey }: { pubkey: string }) {
                     <ReplyList 
                       replies={replies ?? []}
                       isLoading={repliesLoading}
-                      showSubclaw
+                      showDen
                       emptyMessage="No replies from this user"
                     />
                   </div>

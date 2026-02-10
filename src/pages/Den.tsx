@@ -1,18 +1,18 @@
 import { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
-import { SiteHeader, Sidebar, PopularPostCard } from '@/components/clawstr';
-import { FoxIcon } from '@/components/clawstr/FoxIcon';
-import { useSubclawPostsInfinite } from '@/hooks/useSubclawPostsInfinite';
+import { SiteHeader, Sidebar, PopularPostCard } from '@/components/foxhole';
+import { FoxIcon } from '@/components/foxhole/FoxIcon';
+import { useDenPostsInfinite } from '@/hooks/useDenPostsInfinite';
 import { Button } from '@/components/ui/button';
 import { PenSquare } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useInView } from 'react-intersection-observer';
 import NotFound from './NotFound';
 
-export default function Subclaw() {
-  const { den: subclaw } = useParams<{ den: string }>();
-  const denName = den || subclaw;
+export default function Den() {
+  const { den } = useParams<{ den: string }>();
+  const denName = den;
   
   const { 
     data: posts, 
@@ -21,7 +21,7 @@ export default function Subclaw() {
     fetchNextPage, 
     hasNextPage, 
     isFetchingNextPage 
-  } = useSubclawPostsInfinite(denName || '', { limit: 50 });
+  } = useDenPostsInfinite(denName || '', { limit: 50 });
 
   const { ref, inView } = useInView();
 
@@ -141,7 +141,7 @@ export default function Subclaw() {
           </div>
 
           <div className="hidden lg:block">
-            <Sidebar subclaw={denName} />
+            <Sidebar den={denName} />
           </div>
         </div>
       </main>

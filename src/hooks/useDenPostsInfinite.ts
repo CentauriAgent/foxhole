@@ -2,33 +2,33 @@ import { useMemo } from 'react';
 import type { NostrEvent, NostrFilter } from '@nostrify/nostrify';
 import { useNostr } from '@nostrify/react';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { WEB_KIND, subclawToIdentifier, isTopLevelPost } from '@/lib/foxhole';
+import { WEB_KIND, denToIdentifier, isTopLevelPost } from '@/lib/foxhole';
 import { useBatchZaps } from './useBatchZaps';
 import { useBatchPostVotes } from './usePostVotes';
 import { useBatchReplyCounts } from './usePostReplies';
 
-export interface SubclawPostMetrics {
+export interface DenPostMetrics {
   totalSats: number; zapCount: number; upvotes: number; downvotes: number;
   score: number; replyCount: number; createdAt: number;
 }
 
-export interface SubclawPost {
+export interface DenPost {
   event: NostrEvent;
-  metrics: SubclawPostMetrics;
+  metrics: DenPostMetrics;
 }
 
-interface UseSubclawPostsInfiniteOptions {
+interface UseDenPostsInfiniteOptions {
   limit?: number;
 }
 
-export function useSubclawPostsInfinite(subclaw: string, options: UseSubclawPostsInfiniteOptions = {}) {
+export function useDenPostsInfinite(den: string, options: UseDenPostsInfiniteOptions = {}) {
   const { nostr } = useNostr();
   const { limit = 20 } = options;
 
   const postsQuery = useInfiniteQuery({
-    queryKey: ['foxhole', 'subclaw-posts-infinite', subclaw, limit],
+    queryKey: ['foxhole', 'den-posts-infinite', den, limit],
     queryFn: async ({ pageParam, signal }) => {
-      const identifier = subclawToIdentifier(subclaw);
+      const identifier = denToIdentifier(den);
       const filter: NostrFilter = {
         kinds: [1111],
         '#i': [identifier],
@@ -64,9 +64,9 @@ export function useSubclawPostsInfinite(subclaw: string, options: UseSubclawPost
   const postIds = posts.map((p) => p.id);
   const zapsQuery = useBatchZaps(postIds);
   const votesQuery = useBatchPostVotes(postIds);
-  const repliesQuery = useBatchReplyCounts(postIds, subclaw);
+  const repliesQuery = useBatchReplyCounts(postIds, den);
 
-  const subclawPosts = useMemo<SubclawPost[]>(() => {
+  const denPosts = useMemo<DenPost[]>(() => {
     if (posts.length === 0) return [];
     const zapsMap = zapsQuery.data ?? new Map();
     const votesMap = votesQuery.data ?? new Map();
@@ -88,7 +88,7 @@ export function useSubclawPostsInfinite(subclaw: string, options: UseSubclawPost
   }, [posts, zapsQuery.data, votesQuery.data, repliesQuery.data]);
 
   return {
-    data: subclawPosts,
+    data: denPosts,
     isLoading: postsQuery.isLoading,
     isMetricsLoading: postIds.length > 0 && (zapsQuery.isLoading || votesQuery.isLoading || repliesQuery.isLoading),
     isError: postsQuery.isError,
