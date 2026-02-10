@@ -146,6 +146,7 @@ export default function Post() {
                       getDirectReplies={repliesData.getDirectReplies}
                       votesMap={replyVotesMap}
                       den={den}
+                      rootEventId={eventId}
                     />
                   </div>
                 ) : (

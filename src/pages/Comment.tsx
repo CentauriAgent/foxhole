@@ -171,6 +171,7 @@ export default function Comment() {
                       getDirectReplies={repliesData.getDirectReplies}
                       votesMap={replyVotesMap}
                       den={den}
+                      rootEventId={comment?.tags.find(([name]) => name === 'E')?.[1] || eventId}
                     />
                   </div>
                 ) : (

@@ -1,11 +1,14 @@
+import { useState } from 'react';
 import type { NostrEvent } from '@nostrify/nostrify';
 import { Link } from 'react-router-dom';
-import { MessageSquare } from 'lucide-react';
+import { MessageSquare, Reply } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatRelativeTime } from '@/lib/foxhole';
 import { VoteButtons } from './VoteButtons';
 import { AuthorBadge } from './AuthorBadge';
 import { NoteContent } from '@/components/NoteContent';
+import { NostrCommentForm } from './NostrCommentForm';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 
 interface ThreadedReplyProps {
   reply: NostrEvent;
@@ -15,9 +18,10 @@ interface ThreadedReplyProps {
   className?: string;
   den?: string;
   hasMoreReplies?: boolean;
+  rootEventId?: string;
 }
 
-const MAX_DEPTH = 1; // Show only 1 level deep
+const MAX_DEPTH = 6;
 
 /**
  * A single reply in a threaded comment tree.
@@ -30,7 +34,10 @@ export function ThreadedReply({
   className,
   den,
   hasMoreReplies = false,
+  rootEventId,
 }: ThreadedReplyProps) {
+  const [showReplyForm, setShowReplyForm] = useState(false);
+  const { user } = useCurrentUser();
   const isDeep = depth >= MAX_DEPTH;
   const showViewMore = (isDeep && hasMoreReplies) || (depth === MAX_DEPTH - 1 && hasMoreReplies);
 
@@ -75,6 +82,31 @@ export function ThreadedReply({
             <NoteContent event={reply} />
           </div>
 
+          {/* Reply button */}
+          {user && den && (
+            <button
+              onClick={() => setShowReplyForm(!showReplyForm)}
+              className="mt-1 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-[hsl(var(--brand))] transition-colors"
+            >
+              <Reply className="h-3 w-3" />
+              Reply
+            </button>
+          )}
+
+          {/* Inline reply form */}
+          {showReplyForm && den && (
+            <div className="mt-2">
+              <NostrCommentForm
+                den={den}
+                postId={reply.id}
+                rootPostId={rootEventId}
+                onSuccess={() => setShowReplyForm(false)}
+                placeholder="Write a reply..."
+                compact
+              />
+            </div>
+          )}
+
           {/* Nested replies */}
           {children && !isDeep && (
             <div className="mt-2">
@@ -104,6 +136,7 @@ interface ThreadedRepliesProps {
   votesMap?: Map<string, { score: number }>;
   depth?: number;
   den?: string;
+  rootEventId?: string;
 }
 
 /**
@@ -115,6 +148,7 @@ export function ThreadedReplies({
   votesMap,
   depth = 0,
   den,
+  rootEventId,
 }: ThreadedRepliesProps) {
   if (depth > MAX_DEPTH || replies.length === 0) {
     return null;
@@ -136,6 +170,7 @@ export function ThreadedReplies({
             depth={depth}
             den={den}
             hasMoreReplies={hasMoreReplies}
+            rootEventId={rootEventId}
           >
             {childReplies.length > 0 && depth < MAX_DEPTH && (
               <ThreadedReplies
@@ -144,6 +179,7 @@ export function ThreadedReplies({
                 votesMap={votesMap}
                 depth={depth + 1}
                 den={den}
+                rootEventId={rootEventId}
               />
             )}
           </ThreadedReply>
