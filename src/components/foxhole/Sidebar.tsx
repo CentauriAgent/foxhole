@@ -87,10 +87,11 @@ function AboutCard() {
 function YourDensCard({ currentDen }: { currentDen?: string }) {
   const { user } = useCurrentUser();
   const { data: dens, isLoading } = useSubscribedDens();
+  const { data: popularDens } = usePopularDens({ limit: 100 });
 
   if (!user) return null;
 
-  const filteredDens = (dens ?? []).filter(d => d !== currentDen);
+  const allDens = dens ?? [];
 
   if (isLoading) {
     return (
@@ -109,7 +110,7 @@ function YourDensCard({ currentDen }: { currentDen?: string }) {
     );
   }
 
-  if (filteredDens.length === 0) {
+  if (allDens.length === 0) {
     return (
       <Card>
         <CardHeader className="pb-3">
@@ -124,6 +125,9 @@ function YourDensCard({ currentDen }: { currentDen?: string }) {
     );
   }
 
+  // Look up post counts from popular dens data
+  const denCountMap = new Map(popularDens?.map(d => [d.name, d.postCount]) ?? []);
+
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -131,8 +135,8 @@ function YourDensCard({ currentDen }: { currentDen?: string }) {
       </CardHeader>
       <CardContent className="p-2">
         <div className="space-y-0.5">
-          {filteredDens.map((den) => (
-            <DenCardCompact key={den} name={den} postCount={0} />
+          {allDens.map((den) => (
+            <DenCardCompact key={den} name={den} postCount={denCountMap.get(den) ?? 0} />
           ))}
         </div>
       </CardContent>
