@@ -47,7 +47,7 @@ export function ReplyCard({
     )}>
       {/* Vote Column */}
       <div className="flex-shrink-0 pt-0.5">
-        <VoteButtons score={score} size="sm" />
+        <VoteButtons eventId={reply.id} score={score} size="sm" />
       </div>
 
       {/* Content Column */}

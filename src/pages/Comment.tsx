@@ -81,7 +81,7 @@ export default function Comment() {
                     <div className="flex gap-3">
                       {/* Vote Column (compact) */}
                       <div className="flex-shrink-0">
-                        <VoteButtons score={parentVotes?.score ?? 0} size="sm" />
+                        <VoteButtons eventId={parentPostId!} score={parentVotes?.score ?? 0} size="sm" />
                       </div>
 
                       {/* Content Column */}
@@ -122,7 +122,7 @@ export default function Comment() {
                 <div className="flex gap-4">
                   {/* Vote Column */}
                   <div className="flex-shrink-0">
-                    <VoteButtons score={votes?.score ?? 0} />
+                    <VoteButtons eventId={eventId!} score={votes?.score ?? 0} />
                   </div>
 
                   {/* Content Column */}

@@ -52,7 +52,7 @@ export function PopularPostCard({
             {rank}
           </span>
         )}
-        <VoteButtons score={metrics.score} size="sm" />
+        <VoteButtons eventId={post.id} score={metrics.score} size="sm" />
       </div>
 
       {/* Content Column */}

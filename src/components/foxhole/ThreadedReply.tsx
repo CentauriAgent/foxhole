@@ -53,7 +53,7 @@ export function ThreadedReply({
       )}>
         {/* Vote buttons */}
         <div className="flex-shrink-0 pt-0.5">
-          <VoteButtons score={score} size="sm" />
+          <VoteButtons eventId={reply.id} score={score} size="sm" />
         </div>
 
         {/* Reply content */}

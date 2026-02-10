@@ -54,7 +54,7 @@ export function PostCard({
     )}>
       {/* Vote Column */}
       <div className="flex-shrink-0 pt-0.5">
-        <VoteButtons score={score} size={compact ? 'sm' : 'md'} />
+        <VoteButtons eventId={post.id} score={score} size={compact ? 'sm' : 'md'} />
       </div>
 
       {/* Content Column */}
