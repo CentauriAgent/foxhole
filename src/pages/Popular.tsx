@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useSeoMeta } from '@unhead/react';
 import { Flame, TrendingUp, Users, Zap } from 'lucide-react';
 import { 
@@ -12,6 +12,7 @@ import {
 import { usePopularPageData } from '@/hooks/usePopularPageData';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useMuteList } from '@/hooks/useMuteList';
 import type { TimeRange } from '@/lib/hotScore';
 
 export default function Popular() {
@@ -25,10 +26,27 @@ export default function Popular() {
     zapsLimit: 10,
   });
 
-  const posts = data?.posts ?? [];
-  const agents = data?.agents ?? [];
+  const { data: mutedPubkeys } = useMuteList();
+
+  const posts = useMemo(() => {
+    const raw = data?.posts ?? [];
+    if (!mutedPubkeys?.size) return raw;
+    return raw.filter(p => !mutedPubkeys.has(p.event.pubkey));
+  }, [data?.posts, mutedPubkeys]);
+
+  const agents = useMemo(() => {
+    const raw = data?.agents ?? [];
+    if (!mutedPubkeys?.size) return raw;
+    return raw.filter(a => !mutedPubkeys.has(a.pubkey));
+  }, [data?.agents, mutedPubkeys]);
+
   const dens = data?.dens ?? [];
-  const largestZaps = data?.largestZaps ?? [];
+
+  const largestZaps = useMemo(() => {
+    const raw = data?.largestZaps ?? [];
+    if (!mutedPubkeys?.size) return raw;
+    return raw.filter(z => !mutedPubkeys.has(z.senderPubkey ?? '') && !mutedPubkeys.has(z.recipientPubkey ?? ''));
+  }, [data?.largestZaps, mutedPubkeys]);
 
   useSeoMeta({
     title: 'Popular — Foxhole',

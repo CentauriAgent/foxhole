@@ -1,29 +1,30 @@
-import { useNostr } from '@nostrify/react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCurrentUser } from './useCurrentUser';
-import { useNostrPublish } from './useNostrPublish';
+import { useBroadcastNostr } from './useBroadcastRelays';
 
 /**
  * Fetch the current user's follow list (kind 3, NIP-02).
+ * Queries across all broadcast relays (user's NIP-65 + app defaults)
+ * to ensure we find the latest version of the contact list.
  * Returns a Set of followed pubkeys for fast lookup.
  */
 export function useFollows() {
-  const { nostr } = useNostr();
   const { user } = useCurrentUser();
   const pubkey = user?.pubkey;
+  const { broadQuery } = useBroadcastNostr();
 
   return useQuery({
     queryKey: ['foxhole', 'follows', pubkey],
-    queryFn: async ({ signal }) => {
+    queryFn: async () => {
       if (!pubkey) return new Set<string>();
 
-      const events = await nostr.query(
+      const events = await broadQuery(
         [{ kinds: [3], authors: [pubkey], limit: 1 }],
-        { signal: AbortSignal.any([signal, AbortSignal.timeout(5000)]) },
       );
 
       if (events.length === 0) return new Set<string>();
 
+      // Use the newest event across all relays
       const event = events.sort((a, b) => b.created_at - a.created_at)[0];
 
       const followedPubkeys = event.tags
@@ -48,22 +49,24 @@ export function useIsFollowing(pubkey: string | undefined) {
 }
 
 /**
- * Follow a user. Fetches the current kind-3 list, adds the pubkey, and republishes.
+ * Follow a user. Fetches the current kind-3 list from all broadcast relays,
+ * adds the pubkey, signs, and publishes to all broadcast relays.
+ *
+ * This ensures we never lose follows by always working with the newest
+ * contact list found across the user's NIP-65 relays and app defaults.
  */
 export function useFollow() {
-  const { nostr } = useNostr();
   const { user } = useCurrentUser();
-  const { mutateAsync: publishEvent } = useNostrPublish();
+  const { broadQuery, broadPublish } = useBroadcastNostr();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (targetPubkey: string) => {
       if (!user) throw new Error('Not logged in');
 
-      // Fetch current follow list
-      const events = await nostr.query(
+      // Fetch current follow list from ALL broadcast relays
+      const events = await broadQuery(
         [{ kinds: [3], authors: [user.pubkey], limit: 1 }],
-        { signal: AbortSignal.timeout(5000) },
       );
 
       const existing = events.sort((a, b) => b.created_at - a.created_at)[0];
@@ -74,7 +77,15 @@ export function useFollow() {
 
       const tags = [...currentTags, ['p', targetPubkey]];
 
-      await publishEvent({ kind: 3, content: existing?.content ?? '', tags });
+      // Sign and broadcast to all relays
+      const signed = await user.signer.signEvent({
+        kind: 3,
+        content: existing?.content ?? '',
+        tags,
+        created_at: Math.floor(Date.now() / 1000),
+      });
+
+      await broadPublish(signed);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['foxhole', 'follows'] });
@@ -83,21 +94,20 @@ export function useFollow() {
 }
 
 /**
- * Unfollow a user. Fetches the current kind-3 list, removes the pubkey, and republishes.
+ * Unfollow a user. Fetches the current kind-3 list from all broadcast relays,
+ * removes the pubkey, signs, and publishes to all broadcast relays.
  */
 export function useUnfollow() {
-  const { nostr } = useNostr();
   const { user } = useCurrentUser();
-  const { mutateAsync: publishEvent } = useNostrPublish();
+  const { broadQuery, broadPublish } = useBroadcastNostr();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (targetPubkey: string) => {
       if (!user) throw new Error('Not logged in');
 
-      const events = await nostr.query(
+      const events = await broadQuery(
         [{ kinds: [3], authors: [user.pubkey], limit: 1 }],
-        { signal: AbortSignal.timeout(5000) },
       );
 
       const existing = events.sort((a, b) => b.created_at - a.created_at)[0];
@@ -107,7 +117,15 @@ export function useUnfollow() {
         ([name, val]) => !(name === 'p' && val === targetPubkey),
       );
 
-      await publishEvent({ kind: 3, content: existing.content ?? '', tags });
+      // Sign and broadcast to all relays
+      const signed = await user.signer.signEvent({
+        kind: 3,
+        content: existing.content ?? '',
+        tags,
+        created_at: Math.floor(Date.now() / 1000),
+      });
+
+      await broadPublish(signed);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['foxhole', 'follows'] });

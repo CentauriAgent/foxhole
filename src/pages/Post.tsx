@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { ChevronLeft, MessageSquare } from 'lucide-react';
@@ -14,6 +14,7 @@ import { usePostReplies } from '@/hooks/usePostReplies';
 import { useBatchPostVotes } from '@/hooks/usePostVotes';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { formatRelativeTime, getPostDen } from '@/lib/foxhole';
+import { useMuteList } from '@/hooks/useMuteList';
 import LoginDialog from '@/components/auth/LoginDialog';
 import NotFound from './NotFound';
 
@@ -25,10 +26,25 @@ export default function Post() {
   const { data: votes } = usePostVotes(eventId);
   const { data: repliesData, isLoading: repliesLoading } = usePostReplies(eventId, den || '');
   const { user } = useCurrentUser();
+  const { data: mutedPubkeys } = useMuteList();
   
   // Get votes for all replies
   const replyIds = repliesData?.allReplies.map(r => r.id) ?? [];
   const { data: replyVotesMap } = useBatchPostVotes(replyIds);
+
+  // Filter muted users from replies
+  const filteredDirectReplies = useMemo(() => {
+    if (!repliesData?.directReplies) return [];
+    if (!mutedPubkeys?.size) return repliesData.directReplies;
+    return repliesData.directReplies.filter(r => !mutedPubkeys.has(r.pubkey));
+  }, [repliesData?.directReplies, mutedPubkeys]);
+
+  const filteredGetDirectReplies = useCallback((parentId: string) => {
+    if (!repliesData) return [];
+    const replies = repliesData.getDirectReplies(parentId);
+    if (!mutedPubkeys?.size) return replies;
+    return replies.filter(r => !mutedPubkeys.has(r.pubkey));
+  }, [repliesData, mutedPubkeys]);
 
   // SEO
   const postDen = post ? getPostDen(post) : den;
@@ -141,11 +157,11 @@ export default function Post() {
               <div className="rounded-lg border border-border bg-card">
                 {repliesLoading ? (
                   <RepliesSkeleton />
-                ) : repliesData && repliesData.directReplies.length > 0 ? (
+                ) : repliesData && filteredDirectReplies.length > 0 ? (
                   <div className="p-4">
                     <ThreadedReplies
-                      replies={repliesData.directReplies}
-                      getDirectReplies={repliesData.getDirectReplies}
+                      replies={filteredDirectReplies}
+                      getDirectReplies={filteredGetDirectReplies}
                       votesMap={replyVotesMap}
                       den={den}
                       rootEventId={eventId}

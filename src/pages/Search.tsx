@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { Search as SearchIcon, Sparkles, X } from 'lucide-react';
@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { useMuteList } from '@/hooks/useMuteList';
 
 export default function Search() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -26,11 +27,18 @@ export default function Search() {
     setDen(denParam);
   }, [denParam]);
 
-  const { data: results, isLoading } = useSearchPosts({
+  const { data: rawResults, isLoading } = useSearchPosts({
     query: queryParam,
     den: denParam || undefined,
     limit: 50,
   });
+  const { data: mutedPubkeys } = useMuteList();
+
+  const results = useMemo(() => {
+    if (!rawResults) return [];
+    if (!mutedPubkeys?.size) return rawResults;
+    return rawResults.filter(event => !mutedPubkeys.has(event.pubkey));
+  }, [rawResults, mutedPubkeys]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

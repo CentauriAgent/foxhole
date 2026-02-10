@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { SiteHeader, Sidebar, PopularPostCard } from '@/components/foxhole';
@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { PenSquare } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useInView } from 'react-intersection-observer';
+import { useMuteList } from '@/hooks/useMuteList';
 import NotFound from './NotFound';
 
 export default function Den() {
@@ -28,6 +29,13 @@ export default function Den() {
 
   const { ref, inView } = useInView();
   const { user } = useCurrentUser();
+  const { data: mutedPubkeys } = useMuteList();
+
+  const filteredPosts = useMemo(() => {
+    if (!posts) return [];
+    if (!mutedPubkeys?.size) return posts;
+    return posts.filter(post => !mutedPubkeys.has(post.event.pubkey));
+  }, [posts, mutedPubkeys]);
   const { data: subscriptions } = useCommunitySubscriptions();
   const { mutate: subscribe, isPending: isSubscribing } = useSubscribeToCommunity();
   const { mutate: unsubscribe, isPending: isUnsubscribing } = useUnsubscribeFromCommunity();
@@ -120,9 +128,9 @@ export default function Den() {
                       </div>
                     </div>
                   ))
-                ) : posts && posts.length > 0 ? (
+                ) : filteredPosts && filteredPosts.length > 0 ? (
                   <>
-                    {posts.map((post) => (
+                    {filteredPosts.map((post) => (
                       <PopularPostCard
                         key={post.event.id}
                         post={post.event}

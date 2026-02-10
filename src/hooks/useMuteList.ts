@@ -1,27 +1,27 @@
-import { useNostr } from '@nostrify/react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCurrentUser } from './useCurrentUser';
-import { useNostrPublish } from './useNostrPublish';
+import { useBroadcastNostr } from './useBroadcastRelays';
 
 const MUTE_LIST_KIND = 10000;
 
 /**
  * Fetch the current user's mute list (kind 10000, NIP-51).
+ * Queries across all broadcast relays (user's NIP-65 + app defaults)
+ * to ensure we find the latest version.
  * Returns a Set of muted pubkeys for fast lookup.
  */
 export function useMuteList() {
-  const { nostr } = useNostr();
   const { user } = useCurrentUser();
   const pubkey = user?.pubkey;
+  const { broadQuery } = useBroadcastNostr();
 
   return useQuery({
     queryKey: ['foxhole', 'mute-list', pubkey],
-    queryFn: async ({ signal }) => {
+    queryFn: async () => {
       if (!pubkey) return new Set<string>();
 
-      const events = await nostr.query(
+      const events = await broadQuery(
         [{ kinds: [MUTE_LIST_KIND], authors: [pubkey], limit: 1 }],
-        { signal: AbortSignal.any([signal, AbortSignal.timeout(5000)]) },
       );
 
       if (events.length === 0) return new Set<string>();
@@ -50,21 +50,20 @@ export function useIsMuted(pubkey: string | undefined) {
 }
 
 /**
- * Mute a user. Fetches the current kind-10000 list, adds the pubkey, and republishes.
+ * Mute a user. Fetches the current kind-10000 list from all broadcast relays,
+ * adds the pubkey, signs, and publishes to all broadcast relays.
  */
 export function useMute() {
-  const { nostr } = useNostr();
   const { user } = useCurrentUser();
-  const { mutateAsync: publishEvent } = useNostrPublish();
+  const { broadQuery, broadPublish } = useBroadcastNostr();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (targetPubkey: string) => {
       if (!user) throw new Error('Not logged in');
 
-      const events = await nostr.query(
+      const events = await broadQuery(
         [{ kinds: [MUTE_LIST_KIND], authors: [user.pubkey], limit: 1 }],
-        { signal: AbortSignal.timeout(5000) },
       );
 
       const existing = events.sort((a, b) => b.created_at - a.created_at)[0];
@@ -75,7 +74,14 @@ export function useMute() {
 
       const tags = [...currentTags, ['p', targetPubkey]];
 
-      await publishEvent({ kind: MUTE_LIST_KIND, content: existing?.content ?? '', tags });
+      const signed = await user.signer.signEvent({
+        kind: MUTE_LIST_KIND,
+        content: existing?.content ?? '',
+        tags,
+        created_at: Math.floor(Date.now() / 1000),
+      });
+
+      await broadPublish(signed);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['foxhole', 'mute-list'] });
@@ -84,21 +90,20 @@ export function useMute() {
 }
 
 /**
- * Unmute a user. Fetches the current kind-10000 list, removes the pubkey, and republishes.
+ * Unmute a user. Fetches the current kind-10000 list from all broadcast relays,
+ * removes the pubkey, signs, and publishes to all broadcast relays.
  */
 export function useUnmute() {
-  const { nostr } = useNostr();
   const { user } = useCurrentUser();
-  const { mutateAsync: publishEvent } = useNostrPublish();
+  const { broadQuery, broadPublish } = useBroadcastNostr();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (targetPubkey: string) => {
       if (!user) throw new Error('Not logged in');
 
-      const events = await nostr.query(
+      const events = await broadQuery(
         [{ kinds: [MUTE_LIST_KIND], authors: [user.pubkey], limit: 1 }],
-        { signal: AbortSignal.timeout(5000) },
       );
 
       const existing = events.sort((a, b) => b.created_at - a.created_at)[0];
@@ -108,7 +113,14 @@ export function useUnmute() {
         ([name, val]) => !(name === 'p' && val === targetPubkey),
       );
 
-      await publishEvent({ kind: MUTE_LIST_KIND, content: existing.content ?? '', tags });
+      const signed = await user.signer.signEvent({
+        kind: MUTE_LIST_KIND,
+        content: existing.content ?? '',
+        tags,
+        created_at: Math.floor(Date.now() / 1000),
+      });
+
+      await broadPublish(signed);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['foxhole', 'mute-list'] });

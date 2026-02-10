@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { ChevronLeft, MessageSquare, CornerDownRight } from 'lucide-react';
@@ -13,6 +13,7 @@ import { usePostVotes, useBatchPostVotes } from '@/hooks/usePostVotes';
 import { useCommentReplies } from '@/hooks/useCommentReplies';
 import { formatRelativeTime, getPostDen, isTopLevelPost } from '@/lib/foxhole';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useMuteList } from '@/hooks/useMuteList';
 import NotFound from './NotFound';
 
 export default function Comment() {
@@ -22,10 +23,25 @@ export default function Comment() {
   const { data: comment, isLoading: commentLoading, error: commentError } = useComment(eventId);
   const { data: votes } = usePostVotes(eventId);
   const { data: repliesData, isLoading: repliesLoading } = useCommentReplies(eventId, den || '');
+  const { data: mutedPubkeys } = useMuteList();
   
   // Get votes for all replies
   const replyIds = repliesData?.allReplies.map(r => r.id) ?? [];
   const { data: replyVotesMap } = useBatchPostVotes(replyIds);
+
+  // Filter muted users from replies
+  const filteredDirectReplies = useMemo(() => {
+    if (!repliesData?.directReplies) return [];
+    if (!mutedPubkeys?.size) return repliesData.directReplies;
+    return repliesData.directReplies.filter(r => !mutedPubkeys.has(r.pubkey));
+  }, [repliesData?.directReplies, mutedPubkeys]);
+
+  const filteredGetDirectReplies = useCallback((parentId: string) => {
+    if (!repliesData) return [];
+    const replies = repliesData.getDirectReplies(parentId);
+    if (!mutedPubkeys?.size) return replies;
+    return replies.filter(r => !mutedPubkeys.has(r.pubkey));
+  }, [repliesData, mutedPubkeys]);
 
   // Get the parent post ID from the comment's 'e' tag
   const parentPostId = comment?.tags.find(([name]) => name === 'e')?.[1];
@@ -188,11 +204,11 @@ export default function Comment() {
               <div className="rounded-lg border border-border bg-card">
                 {repliesLoading ? (
                   <RepliesSkeleton />
-                ) : repliesData && repliesData.directReplies.length > 0 ? (
+                ) : repliesData && filteredDirectReplies.length > 0 ? (
                   <div className="p-4">
                     <ThreadedReplies
-                      replies={repliesData.directReplies}
-                      getDirectReplies={repliesData.getDirectReplies}
+                      replies={filteredDirectReplies}
+                      getDirectReplies={filteredGetDirectReplies}
                       votesMap={replyVotesMap}
                       den={den}
                       rootEventId={comment?.tags.find(([name]) => name === 'E')?.[1] || eventId}

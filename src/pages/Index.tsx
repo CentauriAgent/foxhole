@@ -6,6 +6,7 @@ import { FoxIcon } from '@/components/foxhole/FoxIcon';
 import { useRecentPostsInfinite } from '@/hooks/useRecentPostsInfinite';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useCommunitySubscriptions } from '@/hooks/useCommunitySubscriptions';
+import { useMuteList } from '@/hooks/useMuteList';
 import { getPostIdentifier } from '@/lib/foxhole';
 import { Button } from '@/components/ui/button';
 import { PenSquare } from 'lucide-react';
@@ -16,6 +17,7 @@ const Index = () => {
   const [feedTab, setFeedTab] = useState<'all' | 'yours'>('all');
   const { user } = useCurrentUser();
   const { data: subscriptions } = useCommunitySubscriptions();
+  const { data: mutedPubkeys } = useMuteList();
 
   const { 
     data: posts, 
@@ -29,12 +31,20 @@ const Index = () => {
 
   const filteredPosts = useMemo(() => {
     if (!posts) return [];
-    if (feedTab !== 'yours' || !subscriptions?.length) return posts;
-    return posts.filter(post => {
-      const id = getPostIdentifier(post.event);
-      return id ? subscriptions.includes(id) : false;
-    });
-  }, [posts, feedTab, subscriptions]);
+    let filtered = posts;
+    // Filter out muted users
+    if (mutedPubkeys?.size) {
+      filtered = filtered.filter(post => !mutedPubkeys.has(post.event.pubkey));
+    }
+    // Filter by subscription if "Your Feed" tab is active
+    if (feedTab === 'yours' && subscriptions?.length) {
+      filtered = filtered.filter(post => {
+        const id = getPostIdentifier(post.event);
+        return id ? subscriptions.includes(id) : false;
+      });
+    }
+    return filtered;
+  }, [posts, feedTab, subscriptions, mutedPubkeys]);
 
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
