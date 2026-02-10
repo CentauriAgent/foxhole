@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -97,7 +98,7 @@ export function SiteHeader() {
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="right" className="w-[280px] sm:w-[320px]">
+          <SheetContent side="right" className="w-[280px] sm:w-[320px] overflow-y-auto">
             <SheetHeader className="text-left">
               <SheetTitle className="flex items-center gap-2">
                 <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[hsl(var(--brand))] text-[hsl(var(--brand-foreground))]">
@@ -105,6 +106,7 @@ export function SiteHeader() {
                 </div>
                 <span className="text-[hsl(var(--brand))]">Foxhole</span>
               </SheetTitle>
+              <SheetDescription className="sr-only">Site navigation menu</SheetDescription>
             </SheetHeader>
             
             <nav className="flex flex-col gap-2 mt-8">
