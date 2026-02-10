@@ -5,63 +5,56 @@ interface FoxIconProps {
 }
 
 /**
- * Fox mascot icon for Foxhole — clean geometric fox head. 🦊
+ * Geometric low-poly fox head icon for Foxhole. 🦊
+ * Front-facing, clean angular design.
  */
 export function FoxIcon({ className }: FoxIconProps) {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+    <svg 
+      viewBox="0 0 100 100" 
+      fill="currentColor"
       className={cn("h-6 w-6", className)}
     >
-      {/* Left ear */}
-      <path d="M3 2 L6.5 9 L10 7.5 Z" />
-      {/* Right ear */}
-      <path d="M21 2 L17.5 9 L14 7.5 Z" />
-      {/* Head outline */}
-      <path d="M6.5 9 C6.5 9 5 13 5.5 15.5 C6 18 8.5 21 12 22 C15.5 21 18 18 18.5 15.5 C19 13 17.5 9 17.5 9" />
-      {/* Connect ears to head */}
-      <path d="M10 7.5 C11 7 13 7 14 7.5" />
+      {/* Left ear outer */}
+      <polygon points="15,42 28,5 40,35" opacity="0.85" />
+      {/* Right ear outer */}
+      <polygon points="85,42 72,5 60,35" opacity="0.85" />
+      {/* Left ear inner */}
+      <polygon points="20,38 30,12 38,36" opacity="0.6" />
+      {/* Right ear inner */}
+      <polygon points="80,38 70,12 62,36" opacity="0.6" />
+      
+      {/* Upper head */}
+      <polygon points="15,42 50,22 85,42 50,52" />
+      {/* Mid face left */}
+      <polygon points="15,42 12,58 35,65 50,52" opacity="0.9" />
+      {/* Mid face right */}
+      <polygon points="85,42 88,58 65,65 50,52" opacity="0.9" />
+      
+      {/* Muzzle - lighter */}
+      <polygon points="35,65 50,48 65,65 50,82" fill="currentColor" opacity="0.3" />
+      {/* Chin */}
+      <polygon points="40,78 50,82 60,78 50,90" fill="currentColor" opacity="0.25" />
+      
+      {/* Left cheek tuft */}
+      <polygon points="12,58 5,72 30,68" opacity="0.8" />
+      {/* Right cheek tuft */}
+      <polygon points="88,58 95,72 70,68" opacity="0.8" />
+      
       {/* Left eye */}
-      <circle cx="9" cy="13" r="1" />
+      <polygon points="30,50 40,42 50,50 40,58" fill="black" />
       {/* Right eye */}
-      <circle cx="15" cy="13" r="1" />
+      <polygon points="70,50 60,42 50,50 60,58" fill="black" />
+      
       {/* Nose */}
-      <path d="M11 16.5 L12 17.5 L13 16.5" />
-      {/* Nose dot */}
-      <circle cx="12" cy="16" r="0.5" />
+      <polygon points="44,68 50,63 56,68 50,74" fill="black" />
     </svg>
   );
 }
 
 /**
- * Filled fox icon variant — solid geometric fox head.
+ * Filled fox icon variant — same geometric design.
  */
 export function FoxIconFilled({ className }: FoxIconProps) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      stroke="none"
-      className={cn("h-6 w-6", className)}
-    >
-      {/* Left ear */}
-      <path d="M3 2 L6.5 9 L10 7.5 Z" />
-      {/* Right ear */}
-      <path d="M21 2 L17.5 9 L14 7.5 Z" />
-      {/* Head */}
-      <path d="M10 7.5 C11 7 13 7 14 7.5 L17.5 9 C17.5 9 19 13 18.5 15.5 C18 18 15.5 21 12 22 C8.5 21 6 18 5.5 15.5 C5 13 6.5 9 6.5 9 Z" />
-      {/* Eyes (cut out) */}
-      <circle cx="9" cy="13" r="1" fill="var(--background, white)" />
-      <circle cx="15" cy="13" r="1" fill="var(--background, white)" />
-      {/* Muzzle area */}
-      <path d="M8.5 15 C8.5 15 10 18 12 18 C14 18 15.5 15 15.5 15 L12 20 Z" fill="var(--background, white)" opacity="0.3" />
-      {/* Nose */}
-      <circle cx="12" cy="16" r="0.7" fill="var(--background, white)" />
-    </svg>
-  );
+  return <FoxIcon className={className} />;
 }
