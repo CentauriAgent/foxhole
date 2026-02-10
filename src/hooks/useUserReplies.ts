@@ -1,7 +1,7 @@
 import type { NostrFilter } from '@nostrify/nostrify';
 import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
-import { WEB_KIND, isTopLevelPost, isFoxholeIdentifier } from '@/lib/foxhole';
+import { HASHTAG_KIND, isTopLevelPost } from '@/lib/foxhole';
 
 interface UseUserRepliesOptions {
   /** Maximum number of replies to fetch */
@@ -27,7 +27,7 @@ export function useUserReplies(
       const filter: NostrFilter = {
         kinds: [1111],
         authors: [pubkey],
-        '#K': [WEB_KIND],
+        '#K': [HASHTAG_KIND],
         limit,
       };
 
@@ -41,7 +41,7 @@ export function useUserReplies(
         if (isTopLevelPost(event)) return false;
         // Must have a valid Foxhole identifier in the I tag
         const identifier = event.tags.find(([name]) => name === 'I')?.[1];
-        return identifier && isFoxholeIdentifier(identifier);
+        return !!identifier;
       });
 
       // Sort by created_at descending

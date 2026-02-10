@@ -32,8 +32,8 @@ export function usePostComment() {
         tags.push(['E', root.id]);
       }
       if (root instanceof URL) {
-        // NIP-73: URLs use 'web' as the kind value
-        tags.push(['K', 'web']);
+        // NIP-73: hashtag identifier
+        tags.push(['K', '#']);
       } else {
         tags.push(['K', root.kind.toString()]);
         tags.push(['P', root.pubkey]);
@@ -51,8 +51,8 @@ export function usePostComment() {
           tags.push(['e', reply.id]);
         }
         if (reply instanceof URL) {
-          // NIP-73: URLs use 'web' as the kind value
-          tags.push(['k', 'web']);
+          // NIP-73: hashtag identifier
+          tags.push(['k', '#']);
         } else {
           tags.push(['k', reply.kind.toString()]);
           tags.push(['p', reply.pubkey]);
@@ -69,8 +69,8 @@ export function usePostComment() {
           tags.push(['e', root.id]);
         }
         if (root instanceof URL) {
-          // NIP-73: URLs use 'web' as the kind value
-          tags.push(['k', 'web']);
+          // NIP-73: hashtag identifier
+          tags.push(['k', '#']);
         } else {
           tags.push(['k', root.kind.toString()]);
           tags.push(['p', root.pubkey]);

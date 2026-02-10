@@ -3,36 +3,28 @@ import type { NostrEvent } from '@nostrify/nostrify';
 /**
  * Foxhole Constants and Helpers
  * 
- * Foxhole uses NIP-22 comments on NIP-73 web URL identifiers.
- * Dens map to URLs: /d/videogames -> ["I", "https://foxhole.lol/d/videogames"]
+ * Foxhole uses NIP-22 comments on NIP-73 hashtag identifiers.
+ * Dens map to hashtags: /d/gaming -> ["I", "#gaming"]
  */
 
-/** Base URL for Foxhole identifiers */
-export const FOXHOLE_BASE_URL = 'https://foxhole.lol';
+/** NIP-73 kind value for hashtags */
+export const HASHTAG_KIND = '#';
 
-/** NIP-73 kind value for web URLs */
-export const WEB_KIND = 'web';
-
-/** Convert a den name to NIP-73 web URL identifier */
+/** Convert a den name to NIP-73 hashtag identifier */
 export function denToIdentifier(den: string): string {
-  return `${FOXHOLE_BASE_URL}/d/${den.toLowerCase()}`;
+  return `#${den.toLowerCase()}`;
 }
 
-/** Extract den name from NIP-73 web URL identifier */
+/** Extract den name from NIP-73 hashtag identifier */
 export function identifierToDen(identifier: string): string | null {
-  const pattern = new RegExp(`^${escapeRegExp(FOXHOLE_BASE_URL)}/d/([a-z0-9_-]+)$`, 'i');
-  const match = identifier.match(pattern);
-  return match?.[1]?.toLowerCase() ?? null;
+  if (!identifier.startsWith('#')) return null;
+  const den = identifier.slice(1).toLowerCase();
+  return /^[a-z0-9_-]+$/.test(den) ? den : null;
 }
 
-/** Check if an identifier is a valid Foxhole den URL */
+/** Check if an identifier is a valid hashtag identifier */
 export function isFoxholeIdentifier(identifier: string): boolean {
   return identifierToDen(identifier) !== null;
-}
-
-/** Escape special regex characters in a string */
-function escapeRegExp(string: string): string {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 /** Get the NIP-73 identifier from a post (the I tag value) */
@@ -53,7 +45,7 @@ export function isTopLevelPost(event: NostrEvent): boolean {
   const iTag = event.tags.find(([name]) => name === 'i')?.[1];
   const kTag = event.tags.find(([name]) => name === 'k')?.[1];
   
-  return ITag === iTag && kTag === WEB_KIND;
+  return ITag === iTag && kTag === HASHTAG_KIND;
 }
 
 /** Format a timestamp as relative time (e.g., "2h ago", "3d ago") */
@@ -82,9 +74,9 @@ export function createPostTags(den: string): string[][] {
   const identifier = denToIdentifier(den);
   return [
     ['I', identifier],
-    ['K', WEB_KIND],
+    ['K', HASHTAG_KIND],
     ['i', identifier],
-    ['k', WEB_KIND],
+    ['k', HASHTAG_KIND],
   ];
 }
 
@@ -96,7 +88,7 @@ export function createReplyTags(
   const identifier = denToIdentifier(den);
   return [
     ['I', identifier],
-    ['K', WEB_KIND],
+    ['K', HASHTAG_KIND],
     ['e', parentEvent.id, '', parentEvent.pubkey],
     ['k', '1111'],
     ['p', parentEvent.pubkey],

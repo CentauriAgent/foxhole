@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import type { NostrEvent, NostrFilter } from '@nostrify/nostrify';
 import { useNostr } from '@nostrify/react';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { WEB_KIND, denToIdentifier, isTopLevelPost } from '@/lib/foxhole';
+import { HASHTAG_KIND, denToIdentifier, isTopLevelPost } from '@/lib/foxhole';
 import { useBatchZaps } from './useBatchZaps';
 import { useBatchPostVotes } from './usePostVotes';
 import { useBatchReplyCounts } from './usePostReplies';
@@ -32,7 +32,7 @@ export function useDenPostsInfinite(den: string, options: UseDenPostsInfiniteOpt
       const filter: NostrFilter = {
         kinds: [1111],
         '#i': [identifier],
-        '#k': [WEB_KIND],
+        '#k': [HASHTAG_KIND],
         limit,
       };
       if (pageParam) filter.until = pageParam;

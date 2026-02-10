@@ -2,7 +2,7 @@ import type { NostrEvent, NostrFilter } from '@nostrify/nostrify';
 import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
 import { extractSatsFromZap, getZapSender, getZapRecipient } from './useBatchZaps';
-import { WEB_KIND, isTopLevelPost, isFoxholeIdentifier } from '@/lib/foxhole';
+import { HASHTAG_KIND, isTopLevelPost } from '@/lib/foxhole';
 
 export interface RecentZap {
   zapReceipt: NostrEvent;
@@ -26,7 +26,7 @@ export function useRecentZaps(options: UseRecentZapsOptions = {}) {
     queryFn: async ({ signal }) => {
       const postFilter: NostrFilter = {
         kinds: [1111],
-        '#K': [WEB_KIND],
+        '#K': [HASHTAG_KIND],
         limit: 50,
       };
 
@@ -37,7 +37,7 @@ export function useRecentZaps(options: UseRecentZapsOptions = {}) {
       const validPosts = posts.filter((event) => {
         if (!isTopLevelPost(event)) return false;
         const identifier = event.tags.find(([name]) => name === 'I')?.[1];
-        return identifier && isFoxholeIdentifier(identifier);
+        return !!identifier;
       });
 
       if (validPosts.length === 0) return [];

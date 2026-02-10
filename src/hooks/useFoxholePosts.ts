@@ -1,7 +1,7 @@
 import type { NostrEvent, NostrFilter } from '@nostrify/nostrify';
 import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
-import { WEB_KIND, isFoxholeIdentifier } from '@/lib/foxhole';
+import { HASHTAG_KIND } from '@/lib/foxhole';
 import type { TimeRange } from '@/lib/hotScore';
 
 interface UseFoxholePostsOptions {
@@ -30,7 +30,7 @@ export function useFoxholePosts(options: UseFoxholePostsOptions = {}) {
     queryFn: async () => {
       const filter: NostrFilter = {
         kinds: [1111],
-        '#k': [WEB_KIND],
+        '#k': [HASHTAG_KIND],
         limit,
       };
 
@@ -42,11 +42,7 @@ export function useFoxholePosts(options: UseFoxholePostsOptions = {}) {
         signal: AbortSignal.timeout(10000),
       });
 
-      // Filter to only Foxhole posts (foxhole.lol domain in I tag)
-      return events.filter(event => {
-        const identifier = event.tags.find(t => t[0] === 'I')?.[1];
-        return identifier ? isFoxholeIdentifier(identifier) : false;
-      });
+      return events;
     },
     staleTime: 30 * 1000,
   });

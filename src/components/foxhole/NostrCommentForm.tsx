@@ -6,7 +6,8 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { MiniAccountSelector } from '@/components/auth/MiniAccountSelector';
 import { Send } from 'lucide-react';
-import { denToIdentifier, WEB_KIND } from '@/lib/foxhole';
+import { denToIdentifier, HASHTAG_KIND } from '@/lib/foxhole';
+
 import LoginDialog from '@/components/auth/LoginDialog';
 
 interface NostrCommentFormProps {
@@ -40,7 +41,7 @@ export function NostrCommentForm({ den, postId, onSuccess }: NostrCommentFormPro
         content: content.trim(),
         tags: [
           ['I', identifier],
-          ['K', WEB_KIND],
+          ['K', HASHTAG_KIND],
           ['e', postId],
           ['k', '1111'],
         ],

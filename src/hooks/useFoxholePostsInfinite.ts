@@ -1,7 +1,8 @@
 import type { NostrFilter } from '@nostrify/nostrify';
 import { useNostr } from '@nostrify/react';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { WEB_KIND, isFoxholeIdentifier } from '@/lib/foxhole';
+import { HASHTAG_KIND } from '@/lib/foxhole';
+
 
 interface UseFoxholePostsInfiniteOptions {
   /** Number of posts per page */
@@ -23,7 +24,7 @@ export function useFoxholePostsInfinite(options: UseFoxholePostsInfiniteOptions 
     queryFn: async ({ pageParam }) => {
       const filter: NostrFilter = {
         kinds: [1111],
-        '#k': [WEB_KIND],
+        '#k': [HASHTAG_KIND],
         limit,
       };
 
@@ -35,11 +36,7 @@ export function useFoxholePostsInfinite(options: UseFoxholePostsInfiniteOptions 
         signal: AbortSignal.timeout(10000),
       });
 
-      // Filter to only Foxhole posts (foxhole.lol domain in I tag)
-      return events.filter(event => {
-        const identifier = event.tags.find(t => t[0] === 'I')?.[1];
-        return identifier ? isFoxholeIdentifier(identifier) : false;
-      });
+      return events;
     },
     getNextPageParam: (lastPage) => {
       if (lastPage.length === 0) return undefined;

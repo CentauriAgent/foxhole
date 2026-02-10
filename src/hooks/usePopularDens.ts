@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { identifierToDen, isFoxholeIdentifier } from '@/lib/foxhole';
+import { identifierToDen } from '@/lib/foxhole';
 import { useFoxholePosts } from './useFoxholePosts';
 
 interface DenStats {
@@ -23,7 +23,7 @@ export function usePopularDens(options: UsePopularDensOptions = {}) {
 
     for (const event of posts) {
       const identifier = event.tags.find(([name]) => name === 'I')?.[1];
-      if (!identifier || !isFoxholeIdentifier(identifier)) continue;
+      if (!identifier) continue;
       const den = identifierToDen(identifier);
       if (!den) continue;
 

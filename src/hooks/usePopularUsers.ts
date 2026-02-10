@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import type { NostrFilter } from '@nostrify/nostrify';
 import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
-import { WEB_KIND, isFoxholeIdentifier } from '@/lib/foxhole';
+import { HASHTAG_KIND } from '@/lib/foxhole';
 import { getTimeRangeSince, type TimeRange } from '@/lib/hotScore';
 import { useBatchZaps } from './useBatchZaps';
 import { useBatchPostVotes } from './usePostVotes';
@@ -30,7 +30,7 @@ export function usePopularUsers(options: UsePopularUsersOptions) {
       const since = getTimeRangeSince(timeRange);
       const filter: NostrFilter = {
         kinds: [1111],
-        '#K': [WEB_KIND],
+        '#K': [HASHTAG_KIND],
         since,
         limit: 150,
       };
@@ -41,7 +41,7 @@ export function usePopularUsers(options: UsePopularUsersOptions) {
 
       return events.filter((event) => {
         const identifier = event.tags.find(([name]) => name === 'I')?.[1];
-        return identifier && isFoxholeIdentifier(identifier);
+        return !!identifier;
       });
     },
     staleTime: 30 * 1000,
@@ -67,7 +67,7 @@ export function usePopularUsers(options: UsePopularUsersOptions) {
       const { pubkey } = event;
       const existing = userMap.get(pubkey) ?? { totalSats: 0, totalPosts: 0, totalComments: 0, totalEngagement: 0 };
       const kTag = event.tags.find(([name]) => name === 'k')?.[1];
-      const isTopLevel = kTag === WEB_KIND;
+      const isTopLevel = kTag === HASHTAG_KIND;
       const zapData = zapsMap.get(event.id) ?? { zapCount: 0, totalSats: 0, zaps: [] };
       const voteData = votesMap.get(event.id) ?? { upvotes: 0, downvotes: 0, score: 0, reactions: [] };
       const engagement = zapData.totalSats * 0.1 + voteData.score;
