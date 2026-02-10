@@ -73,16 +73,16 @@ const nipLinks = [
   {
     nip: 'NIP-73',
     title: 'External Content IDs',
-    description: 'Web URL identifiers for external content',
+    description: 'External content identifiers including hashtags',
     url: 'https://github.com/nostr-protocol/nips/blob/master/73.md',
-    usage: 'Den community identification',
+    usage: 'Den/community identification via hashtags',
   },
   {
     nip: 'NIP-25',
     title: 'Reactions',
     description: 'Reactions and votes',
     url: 'https://github.com/nostr-protocol/nips/blob/master/25.md',
-    usage: 'Upvotes and downvotes',
+    usage: 'Dig (upvote) and bury (downvote)',
   },
   {
     nip: 'NIP-57',
@@ -122,8 +122,9 @@ export default function DocsTechnical() {
 
         <div className="not-prose space-y-4">
           <p className="text-muted-foreground">
-            Foxhole uses standard Nostr NIPs to create a Reddit-like experience. Understanding
-            these building blocks is essential for building compatible clients.
+            Foxhole uses standard Nostr NIPs to create a Reddit-like experience. Every hashtag
+            on Nostr becomes a community (called a "Den"). Posts are NIP-22 comments on NIP-73
+            hashtag identifiers.
           </p>
 
           <div className="grid gap-3">
@@ -162,29 +163,33 @@ export default function DocsTechnical() {
 
         <div className="not-prose space-y-4">
           <p className="text-muted-foreground">
-            Dens are communities identified by NIP-73 web URL identifiers. This approach
-            ensures Foxhole communities are distinct from generic hashtag discussions.
+            Dens are communities identified by NIP-73 hashtag identifiers. Every hashtag on Nostr
+            is automatically a den — no registration or creation needed.
           </p>
 
           <Card className="border-border">
             <CardHeader>
-              <CardTitle className="text-lg">URL Format</CardTitle>
+              <CardTitle className="text-lg">Hashtag Identifier Format</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <CodeBlock code='["i", "https://foxhole.lol/d/<den-name>"]' language="json" />
+              <CodeBlock code={`["I", "#gaming"]
+["K", "#"]`} language="json" />
               <p className="text-sm text-muted-foreground">
-                For example, <code>/d/gaming</code> corresponds to the tag:{' '}
-                <code>["i", "https://foxhole.lol/d/gaming"]</code>
+                The <code>I</code> tag contains a <code>#</code> prefix followed by the den name
+                (lowercase). The <code>K</code> tag is always <code>#</code> — the NIP-73 kind
+                for hashtag identifiers.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                For example, the den <code>d/gaming</code> maps to <code>["I", "#gaming"]</code>.
               </p>
             </CardContent>
           </Card>
 
           <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
             <p className="text-sm">
-              <strong>Why web URLs?</strong> Using web URLs as identifiers (rather than hashtags)
-              ensures that: (1) Foxhole communities are distinct from generic hashtag discussions,
-              (2) The den name can be reliably parsed from the identifier, and (3) Comments
-              are scoped specifically to Foxhole.
+              <strong>Why hashtags?</strong> Using NIP-73 hashtag identifiers means Foxhole
+              communities are universal across Nostr. Any client can display den content,
+              and any hashtag can become a community. No walled gardens.
             </p>
           </div>
         </div>
@@ -210,8 +215,7 @@ export default function DocsTechnical() {
                 <CardHeader>
                   <CardTitle className="text-lg">Top-Level Post</CardTitle>
                   <p className="text-sm text-muted-foreground">
-                    A top-level post in a den is a NIP-22 comment on a NIP-73 web URL
-                    identifier.
+                    A top-level post in a den is a NIP-22 comment on a NIP-73 hashtag identifier.
                   </p>
                 </CardHeader>
                 <CardContent>
@@ -221,13 +225,13 @@ export default function DocsTechnical() {
   "kind": 1111,
   "content": "Has anyone tried the new game engine?",
   "tags": [
-    // Root scope: the web URL identifier
-    ["I", "https://foxhole.lol/d/videogames"],
-    ["K", "web"],
-    
+    // Root scope: the hashtag identifier
+    ["I", "#videogames"],
+    ["K", "#"],
+
     // Parent item: same as root for top-level posts
-    ["i", "https://foxhole.lol/d/videogames"],
-    ["k", "web"]
+    ["i", "#videogames"],
+    ["k", "#"]
   ]
 }`}
                     language="jsonc"
@@ -241,7 +245,7 @@ export default function DocsTechnical() {
                 <CardHeader>
                   <CardTitle className="text-lg">Reply to Post</CardTitle>
                   <p className="text-sm text-muted-foreground">
-                    A reply uses the web URL identifier as root and the parent post as the reply
+                    A reply uses the hashtag identifier as root and the parent post as the reply
                     target.
                   </p>
                 </CardHeader>
@@ -252,10 +256,10 @@ export default function DocsTechnical() {
   "kind": 1111,
   "content": "Yes! It's incredible for procedural generation.",
   "tags": [
-    // Root scope: the web URL identifier (same for all posts)
-    ["I", "https://foxhole.lol/d/videogames"],
-    ["K", "web"],
-    
+    // Root scope: the hashtag identifier (same for all posts in den)
+    ["I", "#videogames"],
+    ["K", "#"],
+
     // Parent item: the post being replied to
     ["e", "<parent-post-id>", "<relay-hint>", "<parent-pubkey>"],
     ["k", "1111"],
@@ -267,8 +271,8 @@ export default function DocsTechnical() {
                   <div className="mt-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
                     <p className="text-sm">
                       <strong>Critical:</strong> The lowercase <code>k</code> tag must be{' '}
-                      <code>1111</code> (the parent's kind), not <code>web</code>. This is a
-                      common mistake.
+                      <code>1111</code> (the parent's kind), not <code>#</code>. This is how
+                      you distinguish replies from top-level posts.
                     </p>
                   </div>
                 </CardContent>
@@ -280,8 +284,8 @@ export default function DocsTechnical() {
                 <CardHeader>
                   <CardTitle className="text-lg">Nested Reply</CardTitle>
                   <p className="text-sm text-muted-foreground">
-                    Replies to replies follow the same pattern, always maintaining the root web
-                    URL identifier.
+                    Replies to replies follow the same pattern, always maintaining the root
+                    hashtag identifier.
                   </p>
                 </CardHeader>
                 <CardContent>
@@ -291,10 +295,10 @@ export default function DocsTechnical() {
   "kind": 1111,
   "content": "What kind of procedural generation?",
   "tags": [
-    // Root scope: always the web URL identifier
-    ["I", "https://foxhole.lol/d/videogames"],
-    ["K", "web"],
-    
+    // Root scope: always the hashtag identifier
+    ["I", "#videogames"],
+    ["K", "#"],
+
     // Parent item: the comment being replied to
     ["e", "<parent-comment-id>", "<relay-hint>", "<parent-pubkey>"],
     ["k", "1111"],
@@ -319,14 +323,14 @@ export default function DocsTechnical() {
 
         <div className="not-prose">
           <p className="text-muted-foreground mb-4">
-            Foxhole uses NIP-25 reactions for voting. The content field determines the vote type.
+            Foxhole uses NIP-25 reactions for voting (dig/bury). The content field determines the vote type.
           </p>
 
           <div className="grid md:grid-cols-2 gap-4">
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg text-green-600 dark:text-green-400">
-                  Upvote
+                  Dig (Upvote)
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -348,7 +352,7 @@ export default function DocsTechnical() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg text-blue-600 dark:text-blue-400">
-                  Downvote
+                  Bury (Downvote)
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -380,18 +384,42 @@ export default function DocsTechnical() {
         <div className="not-prose space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Fetch Posts in a Den</CardTitle>
+              <CardTitle className="text-lg">Fetch All Posts Across Dens</CardTitle>
             </CardHeader>
             <CardContent>
               <CodeBlock
                 code={`{
   "kinds": [1111],
-  "#I": ["https://foxhole.lol/d/videogames"],
-  "#K": ["web"],
+  "#K": ["#"],
   "limit": 50
 }`}
                 language="json"
               />
+              <p className="text-sm text-muted-foreground mt-3">
+                Filter by <code>#K: ["#"]</code> to get all kind 1111 posts that use hashtag
+                identifiers.
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Fetch Posts in a Specific Den</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CodeBlock
+                code={`{
+  "kinds": [1111],
+  "#i": ["#videogames"],
+  "#k": ["#"],
+  "limit": 50
+}`}
+                language="json"
+              />
+              <p className="text-sm text-muted-foreground mt-3">
+                Use lowercase <code>#i</code> with the hashtag identifier to scope to a specific den.
+                Top-level posts have <code>k</code> = <code>#</code>.
+              </p>
             </CardContent>
           </Card>
 
@@ -405,10 +433,13 @@ export default function DocsTechnical() {
                   <p className="font-semibold mb-2">Top-level posts have:</p>
                   <ul className="space-y-1 text-muted-foreground">
                     <li>
-                      • <code>i</code> tag value matching the <code>I</code> tag
+                      • <code>k</code> tag value of <code>#</code>
                     </li>
                     <li>
-                      • <code>k</code> tag value of <code>web</code>
+                      • <code>i</code> tag matching the <code>I</code> tag
+                    </li>
+                    <li>
+                      • No <code>e</code> tag
                     </li>
                   </ul>
                 </div>
@@ -416,13 +447,13 @@ export default function DocsTechnical() {
                   <p className="font-semibold mb-2">Replies have:</p>
                   <ul className="space-y-1 text-muted-foreground">
                     <li>
-                      • <code>i</code> tag absent (or different from <code>I</code>)
-                    </li>
-                    <li>
                       • <code>k</code> tag value of <code>1111</code>
                     </li>
                     <li>
                       • <code>e</code> tag pointing to parent
+                    </li>
+                    <li>
+                      • <code>p</code> tag with parent author
                     </li>
                   </ul>
                 </div>
@@ -438,9 +469,8 @@ export default function DocsTechnical() {
               <CodeBlock
                 code={`{
   "kinds": [1111],
-  "#I": ["https://foxhole.lol/d/videogames"],
-  "#K": ["web"],
-  "#e": ["<post-id>"]
+  "#e": ["<post-id>"],
+  "#k": ["1111"]
 }`}
                 language="json"
               />
@@ -458,14 +488,14 @@ export default function DocsTechnical() {
               <CodeBlock
                 code={`{
   "kinds": [1111],
-  "#K": ["web"],
+  "#K": ["#"],
   "limit": 200
 }`}
                 language="json"
               />
               <p className="text-sm text-muted-foreground mt-3">
-                Then filter results to URLs matching{' '}
-                <code>https://foxhole.lol/d/&lt;name&gt;</code>.
+                Then extract den names by stripping the <code>#</code> prefix from each
+                {' '}<code>I</code> tag value.
               </p>
             </CardContent>
           </Card>
