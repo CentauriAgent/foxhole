@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useLocation } from 'react-router-dom';
-import { Flame, Home, BookOpen, Menu, Search, PenSquare, X, LayoutGrid, User, Settings, LogOut } from 'lucide-react';
+import { Flame, Home, BookOpen, Menu, Search, PenSquare, X, LayoutGrid, User, Settings, LogOut, UserPlus, ArrowRightLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { nip19 } from 'nostr-tools';
 import { FoxIcon } from './FoxIcon';
 import { Button } from '@/components/ui/button';
 import { LoginArea } from '@/components/auth/LoginArea';
+import LoginDialog from '@/components/auth/LoginDialog';
 import { useLoggedInAccounts } from '@/hooks/useLoggedInAccounts';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { genUserName } from '@/lib/genUserName';
@@ -25,7 +26,8 @@ const navItems = [
 export function SiteHeader() {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { currentUser, removeLogin } = useLoggedInAccounts();
+  const [mobileLoginOpen, setMobileLoginOpen] = useState(false);
+  const { currentUser, otherUsers, setLogin, removeLogin } = useLoggedInAccounts();
 
   // Close menu on route change
   useEffect(() => {
@@ -204,6 +206,33 @@ export function SiteHeader() {
                     <Settings className="h-5 w-5" />
                     <span>Settings</span>
                   </Link>
+                  {/* Other accounts */}
+                  {otherUsers.length > 0 && (
+                    <div className="pt-2 border-t border-border/50">
+                      <p className="px-4 py-1 text-xs font-medium text-muted-foreground uppercase tracking-wider">Switch Account</p>
+                      {otherUsers.map((account) => (
+                        <button
+                          key={account.id}
+                          onClick={() => { setLogin(account.id); setMobileMenuOpen(false); }}
+                          className="flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors w-full text-left"
+                        >
+                          <Avatar className="w-8 h-8">
+                            <AvatarImage src={account.metadata.picture} alt={account.metadata.name ?? ''} />
+                            <AvatarFallback>{(account.metadata.name ?? genUserName(account.pubkey)).charAt(0)}</AvatarFallback>
+                          </Avatar>
+                          <span className="truncate">{account.metadata.name ?? genUserName(account.pubkey)}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {/* Add account */}
+                  <button
+                    onClick={() => { setMobileMenuOpen(false); setMobileLoginOpen(true); }}
+                    className="flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors w-full text-left"
+                  >
+                    <UserPlus className="h-5 w-5" />
+                    <span>Add another account</span>
+                  </button>
                   {/* Logout */}
                   <button
                     onClick={() => { removeLogin(currentUser.id); setMobileMenuOpen(false); }}
@@ -229,6 +258,13 @@ export function SiteHeader() {
         </div>,
         document.body
       )}
+
+      {/* Login dialog for mobile "Add account" */}
+      <LoginDialog
+        isOpen={mobileLoginOpen}
+        onClose={() => setMobileLoginOpen(false)}
+        onLogin={() => setMobileLoginOpen(false)}
+      />
     </>
   );
 }
