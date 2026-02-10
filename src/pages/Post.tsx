@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { ChevronLeft, MessageSquare } from 'lucide-react';
 import { SiteHeader, Sidebar, VoteButtons, AuthorBadge, ThreadedReplies, FoxIcon } from '@/components/foxhole';
+import { ZapButton } from '@/components/ZapButton';
 import { NostrCommentForm } from '@/components/foxhole/NostrCommentForm';
 import { NoteContent } from '@/components/NoteContent';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -90,6 +91,7 @@ export default function Post() {
 
                     {/* Stats */}
                     <div className="flex items-center gap-4 pt-2 text-sm text-muted-foreground">
+                      <ZapButton target={post as any} />
                       <span className="inline-flex items-center gap-1.5">
                         <MessageSquare className="h-4 w-4" />
                         {repliesData?.replyCount ?? 0} comments

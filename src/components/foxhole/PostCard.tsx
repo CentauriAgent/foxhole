@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { formatRelativeTime, getPostDen, formatCount } from '@/lib/foxhole';
 import { formatSats } from '@/lib/hotScore';
 import { VoteButtons } from './VoteButtons';
+import { ZapButton } from '@/components/ZapButton';
 import { AuthorBadge } from './AuthorBadge';
 import { DenBadge } from './DenBadge';
 import { NoteContent } from '@/components/NoteContent';
@@ -102,6 +103,7 @@ export function PostCard({
 
         {/* Actions bar */}
         <div className="flex items-center gap-4 pt-1">
+          <ZapButton target={post as any} zapData={{ count: 0, totalSats }} />
           {totalSats > 0 && (
             <div className="inline-flex items-center gap-1 text-xs font-medium text-amber-500">
               <Zap className="h-3.5 w-3.5 fill-amber-500" />

@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { formatRelativeTime, getPostDen, formatCount } from '@/lib/foxhole';
 import { formatSats } from '@/lib/hotScore';
 import { VoteButtons } from './VoteButtons';
+import { ZapButton } from '@/components/ZapButton';
 import { AuthorBadge } from './AuthorBadge';
 import { DenBadge } from './DenBadge';
 import { NoteContent } from '@/components/NoteContent';
@@ -95,6 +96,8 @@ export const PopularPostCard = memo(function PopularPostCard({
 
         {/* Engagement bar */}
         <div className="flex items-center gap-4 pt-1">
+          {/* Zap button */}
+          <ZapButton target={post as any} zapData={{ count: metrics.zapCount, totalSats: metrics.totalSats }} />
           {/* Zap amount - highlighted */}
           {metrics.totalSats > 0 && (
             <div className="inline-flex items-center gap-1 text-xs font-medium text-amber-500">

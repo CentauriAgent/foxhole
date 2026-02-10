@@ -5,6 +5,7 @@ import { MessageSquare, Reply } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatRelativeTime } from '@/lib/foxhole';
 import { VoteButtons } from './VoteButtons';
+import { ZapButton } from '@/components/ZapButton';
 import { AuthorBadge } from './AuthorBadge';
 import { NoteContent } from '@/components/NoteContent';
 import { NostrCommentForm } from './NostrCommentForm';
@@ -82,7 +83,10 @@ export function ThreadedReply({
             <NoteContent event={reply} />
           </div>
 
-          {/* Reply button */}
+          {/* Zap + Reply buttons */}
+          <div className="mt-1 inline-flex items-center gap-3">
+            <ZapButton target={reply as any} className="text-xs" />
+          </div>
           {user && den && (
             <button
               onClick={() => setShowReplyForm(!showReplyForm)}
