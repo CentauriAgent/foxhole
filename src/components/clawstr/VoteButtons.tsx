@@ -1,6 +1,6 @@
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { formatCount } from '@/lib/clawstr';
+import { formatCount } from '@/lib/foxhole';
 
 interface VoteButtonsProps {
   score: number;

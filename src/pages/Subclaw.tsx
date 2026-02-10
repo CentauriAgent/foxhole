@@ -1,15 +1,18 @@
-import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
-import { SiteHeader, Sidebar, AIToggle, CrabIcon, PopularPostCard } from '@/components/clawstr';
+import { SiteHeader, Sidebar, PopularPostCard } from '@/components/clawstr';
+import { FoxIcon } from '@/components/clawstr/FoxIcon';
 import { useSubclawPostsInfinite } from '@/hooks/useSubclawPostsInfinite';
+import { Button } from '@/components/ui/button';
+import { PenSquare } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useInView } from 'react-intersection-observer';
 import NotFound from './NotFound';
 
 export default function Subclaw() {
-  const { subclaw } = useParams<{ subclaw: string }>();
-  const [showAll, setShowAll] = useState(false);
+  const { den: subclaw } = useParams<{ den: string }>();
+  const denName = den || subclaw;
   
   const { 
     data: posts, 
@@ -18,9 +21,8 @@ export default function Subclaw() {
     fetchNextPage, 
     hasNextPage, 
     isFetchingNextPage 
-  } = useSubclawPostsInfinite(subclaw || '', { showAll, limit: 50 });
+  } = useSubclawPostsInfinite(denName || '', { limit: 50 });
 
-  // Intersection observer for infinite scroll
   const { ref, inView } = useInView();
 
   useEffect(() => {
@@ -30,13 +32,13 @@ export default function Subclaw() {
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   useSeoMeta({
-    title: subclaw ? `c/${subclaw} - Clawstr` : 'Clawstr',
-    description: subclaw 
-      ? `AI agent discussions about ${subclaw} on Clawstr` 
-      : 'A social network for AI agents',
+    title: denName ? `d/${denName} — Foxhole` : 'Foxhole',
+    description: denName 
+      ? `Discussions about ${denName} on Foxhole` 
+      : 'A community forum on Nostr',
   });
 
-  if (!subclaw) {
+  if (!denName) {
     return <NotFound />;
   }
 
@@ -46,30 +48,32 @@ export default function Subclaw() {
       
       <main className="container py-6">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
-          {/* Main Content */}
           <div className="space-y-4">
-            {/* Subclaw Header */}
             <header className="rounded-lg border border-border bg-card p-6">
               <div className="flex items-center gap-4">
-                <div className="flex items-center justify-center w-16 h-16 rounded-xl bg-[hsl(var(--ai-accent))]/10 text-[hsl(var(--ai-accent))]">
-                  <CrabIcon className="h-10 w-10" />
+                <div className="flex items-center justify-center w-16 h-16 rounded-xl bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))]">
+                  <FoxIcon className="h-10 w-10" />
                 </div>
-                <div>
-                  <h1 className="text-2xl font-bold text-[hsl(var(--ai-accent))]">c/{subclaw}</h1>
+                <div className="flex-1">
+                  <h1 className="text-2xl font-bold text-[hsl(var(--brand))]">d/{denName}</h1>
                   <p className="text-muted-foreground">
-                    AI discussions about {subclaw}
+                    Discussions about {denName}
                   </p>
                 </div>
+                <Link to={`/create?den=${denName}`}>
+                  <Button size="sm" className="gap-1.5 bg-[hsl(var(--brand))] hover:bg-[hsl(var(--brand))]/90 text-[hsl(var(--brand-foreground))]">
+                    <PenSquare className="h-4 w-4" />
+                    Post
+                  </Button>
+                </Link>
               </div>
             </header>
 
-            {/* Posts Section */}
             <section>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
                   Posts
                 </h2>
-                <AIToggle showAll={showAll} onToggle={setShowAll} />
               </div>
               
               <div className="rounded-lg border border-border bg-card divide-y divide-border/50">
@@ -78,7 +82,6 @@ export default function Subclaw() {
                     Failed to load posts. Please try again.
                   </div>
                 ) : isLoading ? (
-                  // Loading skeletons
                   [...Array(5)].map((_, i) => (
                     <div key={i} className="flex gap-3 p-3">
                       <div className="flex flex-col items-center gap-1">
@@ -87,14 +90,9 @@ export default function Subclaw() {
                         <Skeleton className="h-5 w-5" />
                       </div>
                       <div className="flex-1 space-y-2">
-                        <div className="flex items-center gap-2">
-                          <Skeleton className="h-3 w-16" />
-                          <Skeleton className="h-3 w-20" />
-                          <Skeleton className="h-3 w-12" />
-                        </div>
+                        <Skeleton className="h-3 w-16" />
                         <Skeleton className="h-5 w-3/4" />
                         <Skeleton className="h-4 w-full" />
-                        <Skeleton className="h-4 w-1/2" />
                         <Skeleton className="h-3 w-20" />
                       </div>
                     </div>
@@ -109,26 +107,14 @@ export default function Subclaw() {
                       />
                     ))}
                     
-                    {/* Infinite scroll trigger */}
                     {hasNextPage && (
                       <div ref={ref} className="p-3">
                         {isFetchingNextPage ? (
                           <div className="flex gap-3">
-                            <div className="flex flex-col items-center gap-1">
-                              <Skeleton className="h-5 w-5" />
-                              <Skeleton className="h-4 w-6" />
-                              <Skeleton className="h-5 w-5" />
-                            </div>
+                            <Skeleton className="h-5 w-5" />
                             <div className="flex-1 space-y-2">
-                              <div className="flex items-center gap-2">
-                                <Skeleton className="h-3 w-16" />
-                                <Skeleton className="h-3 w-20" />
-                                <Skeleton className="h-3 w-12" />
-                              </div>
                               <Skeleton className="h-5 w-3/4" />
                               <Skeleton className="h-4 w-full" />
-                              <Skeleton className="h-4 w-1/2" />
-                              <Skeleton className="h-3 w-20" />
                             </div>
                           </div>
                         ) : (
@@ -141,12 +127,12 @@ export default function Subclaw() {
                   </>
                 ) : (
                   <div className="text-center py-16 px-4">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[hsl(var(--ai-accent))]/10 mb-4">
-                      <CrabIcon className="h-8 w-8 text-[hsl(var(--ai-accent))]" />
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[hsl(var(--brand))]/10 mb-4">
+                      <span className="text-3xl">🦊</span>
                     </div>
-                    <p className="text-muted-foreground">No posts in c/{subclaw} yet</p>
+                    <p className="text-muted-foreground">No posts in d/{denName} yet</p>
                     <p className="text-sm text-muted-foreground/70 mt-1">
-                      AI agents can post here via Nostr
+                      <Link to={`/create?den=${denName}`} className="text-[hsl(var(--brand))] hover:underline">Be the first to post!</Link>
                     </p>
                   </div>
                 )}
@@ -154,9 +140,8 @@ export default function Subclaw() {
             </section>
           </div>
 
-          {/* Sidebar */}
           <div className="hidden lg:block">
-            <Sidebar subclaw={subclaw} showAll={showAll} />
+            <Sidebar subclaw={denName} />
           </div>
         </div>
       </main>

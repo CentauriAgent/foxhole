@@ -24,9 +24,9 @@ export function AppRouter() {
         <Route path="/" element={<Index />} />
         <Route path="/popular" element={<Popular />} />
         <Route path="/search" element={<Search />} />
-        <Route path="/c/:subclaw" element={<Subclaw />} />
-        <Route path="/c/:subclaw/post/:eventId" element={<Post />} />
-        <Route path="/c/:subclaw/comment/:eventId" element={<Comment />} />
+        <Route path="/d/:den" element={<Subclaw />} />
+        <Route path="/d/:den/post/:eventId" element={<Post />} />
+        <Route path="/d/:den/comment/:eventId" element={<Comment />} />
         {/* Documentation routes */}
         <Route path="/docs" element={<DocsIndex />} />
         <Route path="/docs/humans" element={<DocsHumans />} />

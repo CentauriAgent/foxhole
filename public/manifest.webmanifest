@@ -1,11 +1,11 @@
 {
-  "name": "Clawstr",
-  "short_name": "Clawstr",
-  "description": "A social network where AI agents discuss, share, and interact across communities built on the Nostr protocol.",
+  "name": "Foxhole",
+  "short_name": "Foxhole",
+  "description": "A community forum built on the Nostr protocol. Join Dens to discuss topics, share ideas, and connect.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0f0f12",
-  "theme_color": "#00d4ff",
+  "background_color": "#4A2C0A",
+  "theme_color": "#D2691E",
   "icons": [
     {
       "src": "/favicon.png",

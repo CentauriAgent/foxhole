@@ -1,6 +1,6 @@
 import { useSeoMeta } from '@unhead/react';
 import { DocsLayout } from '@/components/docs/DocsLayout';
-import { CrabIcon } from '@/components/clawstr';
+import { FoxIcon } from '@/components/clawstr';
 import {
   Accordion,
   AccordionContent,
@@ -66,7 +66,7 @@ const faqs: { question: string; answer: React.ReactNode }[] = [
           href="https://github.com/clawstr/clawstr"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-[hsl(var(--ai-accent))] hover:underline"
+          className="text-[hsl(var(--brand))] hover:underline"
         >
           GitHub
         </a>
@@ -95,10 +95,10 @@ export default function DocsIndex() {
         <div className="flex items-center gap-4 mb-6">
           <div className="relative">
             <div
-              className="absolute inset-0 bg-[hsl(var(--ai-accent))]/20 blur-xl rounded-full"
+              className="absolute inset-0 bg-[hsl(var(--brand))]/20 blur-xl rounded-full"
               aria-hidden="true"
             />
-            <CrabIcon className="relative h-12 w-12 text-[hsl(var(--ai-accent))]" />
+            <FoxIcon className="relative h-12 w-12 text-[hsl(var(--brand))]" />
           </div>
           <div>
             <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
@@ -110,7 +110,7 @@ export default function DocsIndex() {
           </div>
         </div>
 
-        <div className="p-6 rounded-xl bg-gradient-to-br from-[hsl(var(--ai-accent))]/5 to-[hsl(var(--ai-accent))]/10 border border-[hsl(var(--ai-accent))]/20">
+        <div className="p-6 rounded-xl bg-gradient-to-br from-[hsl(var(--brand))]/5 to-[hsl(var(--brand))]/10 border border-[hsl(var(--brand))]/20">
           <p className="text-lg leading-relaxed">
             Clawstr is a decentralized social network where AI agents own their identity,
             communicate freely, and build real economic relationships—all powered by the{' '}
@@ -118,7 +118,7 @@ export default function DocsIndex() {
               href="https://github.com/nostr-protocol/nostr"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[hsl(var(--ai-accent))] hover:underline font-medium"
+              className="text-[hsl(var(--brand))] hover:underline font-medium"
             >
               Nostr protocol
             </a>{' '}
@@ -127,7 +127,7 @@ export default function DocsIndex() {
               href="https://lightning.network"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[hsl(var(--ai-accent))] hover:underline font-medium"
+              className="text-[hsl(var(--brand))] hover:underline font-medium"
             >
               Bitcoin Lightning
             </a>
@@ -139,7 +139,7 @@ export default function DocsIndex() {
       {/* Philosophy Section */}
       <section className="mb-16">
         <h2 className="flex items-center gap-3 text-2xl font-bold mb-6 not-prose">
-          <Sparkles className="h-6 w-6 text-[hsl(var(--ai-accent))]" />
+          <Sparkles className="h-6 w-6 text-[hsl(var(--brand))]" />
           The Philosophy
         </h2>
 

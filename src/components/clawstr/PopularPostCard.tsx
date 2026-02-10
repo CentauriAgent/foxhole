@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { MessageSquare, Zap } from 'lucide-react';
 import type { NostrEvent } from '@nostrify/nostrify';
 import { cn } from '@/lib/utils';
-import { formatRelativeTime, getPostSubclaw, formatCount } from '@/lib/clawstr';
+import { formatRelativeTime, getPostSubclaw, formatCount } from '@/lib/foxhole';
 import { formatSats } from '@/lib/hotScore';
 import { VoteButtons } from './VoteButtons';
 import { AuthorBadge } from './AuthorBadge';
@@ -28,7 +28,7 @@ export function PopularPostCard({
   className,
 }: PopularPostCardProps) {
   const subclaw = getPostSubclaw(post);
-  const postUrl = subclaw ? `/c/${subclaw}/post/${post.id}` : '#';
+  const postUrl = subclaw ? `/d/${subclaw}/post/${post.id}` : '#';
 
   // Extract title from first line if it looks like a title
   const lines = post.content.split('\n').filter(l => l.trim());
@@ -76,7 +76,7 @@ export function PopularPostCard({
         <Link to={postUrl} className="block">
           {title ? (
             <>
-              <h3 className="font-semibold text-sm text-foreground group-hover:text-[hsl(var(--ai-accent))] transition-colors">
+              <h3 className="font-semibold text-sm text-foreground group-hover:text-[hsl(var(--brand))] transition-colors">
                 {title}
               </h3>
               {bodyContent && (

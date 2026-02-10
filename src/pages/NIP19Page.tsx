@@ -2,7 +2,7 @@ import { nip19 } from 'nostr-tools';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { User, ExternalLink, MessageSquare, FileText, Zap } from 'lucide-react';
-import { SiteHeader, Sidebar, PostList, ReplyList, CrabIcon } from '@/components/clawstr';
+import { SiteHeader, Sidebar, PostList, ReplyList, FoxIcon } from '@/components/clawstr';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -66,22 +66,12 @@ function ProfilePage({ pubkey }: { pubkey: string }) {
     setSearchParams({ tab: value });
   };
   
-  // Determine if profile is AI by checking if any of their posts or replies have AI labels
-  const allContent = [...(posts ?? []), ...(replies ?? [])];
-  const isAI = allContent.some(event => {
-    const hasAgentNamespace = event.tags.some(
-      ([name, value]) => name === 'L' && value === 'agent'
-    );
-    const hasAILabel = event.tags.some(
-      ([name, value, namespace]) => 
-        name === 'l' && value === 'ai' && namespace === 'agent'
-    );
-    return hasAgentNamespace && hasAILabel;
-  });
+  // No AI/human distinction in Foxhole
+  const _allContent = [...(posts ?? []), ...(replies ?? [])];
 
   useSeoMeta({
-    title: `${displayName} - Clawstr`,
-    description: metadata?.about || `View ${displayName}'s profile on Clawstr`,
+    title: `${displayName} — Foxhole`,
+    description: metadata?.about || `View ${displayName}'s profile on Foxhole`,
   });
 
   return (
@@ -98,22 +88,22 @@ function ProfilePage({ pubkey }: { pubkey: string }) {
             ) : (
               <header className={cn(
                 "rounded-lg border bg-card p-6",
-                isAI ? "border-[hsl(var(--ai-accent))]/30" : "border-border"
+                "border-border"
               )}>
                 <div className="flex items-start gap-4">
                   <Avatar className={cn(
                     "h-20 w-20 ring-2",
-                    isAI 
-                      ? "ring-[hsl(var(--ai-accent))]/50" 
+                    false 
+                      ? "ring-[hsl(var(--brand))]/50" 
                       : "ring-border"
                   )}>
                     <AvatarImage src={metadata?.picture} alt={displayName} />
                     <AvatarFallback className={cn(
-                      isAI 
-                        ? "bg-[hsl(var(--ai-accent))]/10 text-[hsl(var(--ai-accent))]" 
+                      false 
+                        ? "bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))]" 
                         : "bg-muted"
                     )}>
-                      {isAI ? <CrabIcon className="h-10 w-10" /> : <User className="h-8 w-8" />}
+                      {false ? <FoxIcon className="h-10 w-10" /> : <User className="h-8 w-8" />}
                     </AvatarFallback>
                   </Avatar>
                   
@@ -121,16 +111,16 @@ function ProfilePage({ pubkey }: { pubkey: string }) {
                     <div className="flex items-center gap-2 flex-wrap">
                       <h1 className={cn(
                         "text-2xl font-bold truncate",
-                        isAI && "text-[hsl(var(--ai-accent))]"
+                        false && "text-[hsl(var(--brand))]"
                       )}>
                         {displayName}
                       </h1>
-                      {isAI && (
+                      {false && (
                         <span className={cn(
                           "inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider px-2 py-1 rounded",
-                          "bg-[hsl(var(--ai-accent))]/10 text-[hsl(var(--ai-accent))]"
+                          "bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))]"
                         )}>
-                          <CrabIcon className="h-3 w-3" />
+                          <FoxIcon className="h-3 w-3" />
                           AI Agent
                         </span>
                       )}
@@ -163,7 +153,7 @@ function ProfilePage({ pubkey }: { pubkey: string }) {
                         href={metadata.website}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 mt-2 text-sm text-[hsl(var(--ai-accent))] hover:underline"
+                        className="inline-flex items-center gap-1 mt-2 text-sm text-[hsl(var(--brand))] hover:underline"
                       >
                         <ExternalLink className="h-3 w-3" />
                         {new URL(metadata.website).hostname}
@@ -184,7 +174,7 @@ function ProfilePage({ pubkey }: { pubkey: string }) {
                 <TabsList className="w-full justify-start bg-transparent border-b border-border rounded-none h-auto p-0 gap-0">
                   <TabsTrigger 
                     value="posts" 
-                    className="relative rounded-none border-b-2 border-transparent data-[state=active]:border-[hsl(var(--ai-accent))] data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 gap-2"
+                    className="relative rounded-none border-b-2 border-transparent data-[state=active]:border-[hsl(var(--brand))] data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 gap-2"
                   >
                     <FileText className="h-4 w-4" />
                     <span>Posts</span>
@@ -196,7 +186,7 @@ function ProfilePage({ pubkey }: { pubkey: string }) {
                   </TabsTrigger>
                   <TabsTrigger 
                     value="replies" 
-                    className="relative rounded-none border-b-2 border-transparent data-[state=active]:border-[hsl(var(--ai-accent))] data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 gap-2"
+                    className="relative rounded-none border-b-2 border-transparent data-[state=active]:border-[hsl(var(--brand))] data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 gap-2"
                   >
                     <MessageSquare className="h-4 w-4" />
                     <span>Replies</span>
@@ -214,7 +204,7 @@ function ProfilePage({ pubkey }: { pubkey: string }) {
                       posts={posts ?? []}
                       isLoading={postsLoading}
                       showSubclaw
-                      showAll={true}
+                     
                       emptyMessage="No posts from this user"
                     />
                   </div>
@@ -236,7 +226,7 @@ function ProfilePage({ pubkey }: { pubkey: string }) {
 
           {/* Sidebar */}
           <div className="hidden lg:block">
-            <Sidebar showAll={true} />
+            <Sidebar />
           </div>
         </div>
       </main>

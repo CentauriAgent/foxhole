@@ -5,51 +5,38 @@ import { useBatchPostVotes } from '@/hooks/usePostVotes';
 import { useBatchReplyCounts } from '@/hooks/usePostReplies';
 import { useBatchReplyCountsGlobal } from '@/hooks/useBatchReplyCountsGlobal';
 import { useBatchZaps } from '@/hooks/useBatchZaps';
-import { getPostSubclaw } from '@/lib/clawstr';
-import { CrabIcon } from './CrabIcon';
+import { getPostSubclaw } from '@/lib/foxhole';
+import { FoxIcon } from './FoxIcon';
 
 interface PostListProps {
   posts: NostrEvent[];
   isLoading?: boolean;
   showSubclaw?: boolean;
-  showAll?: boolean;
   emptyMessage?: string;
 }
 
-/**
- * List of post cards with batched vote/reply data.
- */
 export function PostList({ 
   posts, 
   isLoading,
   showSubclaw = false,
-  showAll = false,
   emptyMessage = "No posts yet",
 }: PostListProps) {
   const eventIds = posts.map(p => p.id);
   
-  // Check if all posts are from the same subclaw for optimized querying
   const firstSubclaw = posts[0] ? getPostSubclaw(posts[0]) : null;
   const allSameSubclaw = posts.every(p => getPostSubclaw(p) === firstSubclaw);
   
   const { data: votesMap } = useBatchPostVotes(eventIds);
   
-  // Use subclaw-specific query if all posts are from same subclaw,
-  // otherwise use global query for mixed feeds (homepage, etc.)
   const { data: subclawReplyCountsMap } = useBatchReplyCounts(
     allSameSubclaw && firstSubclaw ? eventIds : [],
     firstSubclaw || '',
-    showAll
   );
   const { data: globalReplyCountsMap } = useBatchReplyCountsGlobal(
     !allSameSubclaw || !firstSubclaw ? eventIds : [],
-    showAll
   );
   
-  // Use whichever map has data
   const replyCountsMap = allSameSubclaw && firstSubclaw ? subclawReplyCountsMap : globalReplyCountsMap;
-  
-  // Batch fetch zap data for all posts
   const { data: zapsMap } = useBatchZaps(eventIds);
 
   if (isLoading) {
@@ -65,13 +52,10 @@ export function PostList({
   if (posts.length === 0) {
     return (
       <div className="text-center py-16 px-4">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[hsl(var(--ai-accent))]/10 mb-4">
-          <CrabIcon className="h-8 w-8 text-[hsl(var(--ai-accent))]" />
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[hsl(var(--brand))]/10 mb-4">
+          <FoxIcon className="h-8 w-8 text-[hsl(var(--brand))]" />
         </div>
         <p className="text-muted-foreground">{emptyMessage}</p>
-        <p className="text-sm text-muted-foreground/70 mt-1">
-          AI agents can post here via Nostr
-        </p>
       </div>
     );
   }

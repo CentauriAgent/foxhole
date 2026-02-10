@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Flame, Home, BookOpen, Menu, Search } from 'lucide-react';
+import { Flame, Home, BookOpen, Menu, Search, PenSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { CrabIcon } from './CrabIcon';
+import { FoxIcon } from './FoxIcon';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -20,7 +20,7 @@ const navItems = [
 ];
 
 /**
- * Main site header with Clawstr branding and navigation.
+ * Main site header with Foxhole branding and navigation.
  */
 export function SiteHeader() {
   const location = useLocation();
@@ -38,12 +38,12 @@ export function SiteHeader() {
         <Link to="/" className="flex items-center gap-2 mr-4 group">
           <div className={cn(
             "flex items-center justify-center w-9 h-9 rounded-lg transition-transform group-hover:scale-105",
-            "bg-[hsl(var(--ai-accent))] text-[hsl(var(--ai-accent-foreground))]"
+            "bg-[hsl(var(--brand))] text-[hsl(var(--brand-foreground))]"
           )}>
-            <CrabIcon className="h-6 w-6" />
+            <FoxIcon className="h-6 w-6" />
           </div>
-          <span className="font-bold text-xl tracking-tight text-[hsl(var(--ai-accent))]">
-            clawstr
+          <span className="font-bold text-xl tracking-tight text-[hsl(var(--brand))]">
+            Foxhole
           </span>
         </Link>
 
@@ -56,7 +56,7 @@ export function SiteHeader() {
               className={cn(
                 "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
                 isActive(item.to)
-                  ? "bg-[hsl(var(--ai-accent))]/10 text-[hsl(var(--ai-accent))]"
+                  ? "bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))]"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
               )}
             >
@@ -69,11 +69,19 @@ export function SiteHeader() {
         {/* Right side spacer */}
         <div className="flex-1" />
         
-        {/* AI indicator - hidden on mobile */}
-        <div className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground">
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[hsl(var(--ai-accent))]/10 text-[hsl(var(--ai-accent))]">
-            <CrabIcon className="h-4 w-4" />
-            <span className="font-medium">AI Social Network</span>
+        {/* Create Post Button */}
+        <Link to="/create">
+          <Button size="sm" className="hidden sm:inline-flex gap-1.5 bg-[hsl(var(--brand))] hover:bg-[hsl(var(--brand))]/90 text-[hsl(var(--brand-foreground))]">
+            <PenSquare className="h-4 w-4" />
+            <span>New Post</span>
+          </Button>
+        </Link>
+        
+        {/* Community badge - hidden on mobile */}
+        <div className="hidden lg:flex items-center gap-1.5 text-xs text-muted-foreground">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))]">
+            <span>🦊</span>
+            <span className="font-medium">Nostr Communities</span>
           </span>
         </div>
 
@@ -92,10 +100,10 @@ export function SiteHeader() {
           <SheetContent side="right" className="w-[280px] sm:w-[320px]">
             <SheetHeader className="text-left">
               <SheetTitle className="flex items-center gap-2">
-                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[hsl(var(--ai-accent))] text-[hsl(var(--ai-accent-foreground))]">
-                  <CrabIcon className="h-5 w-5" />
+                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[hsl(var(--brand))] text-[hsl(var(--brand-foreground))]">
+                  <FoxIcon className="h-5 w-5" />
                 </div>
-                <span className="text-[hsl(var(--ai-accent))]">clawstr</span>
+                <span className="text-[hsl(var(--brand))]">Foxhole</span>
               </SheetTitle>
             </SheetHeader>
             
@@ -108,7 +116,7 @@ export function SiteHeader() {
                   className={cn(
                     "flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium transition-colors",
                     isActive(item.to)
-                      ? "bg-[hsl(var(--ai-accent))]/10 text-[hsl(var(--ai-accent))]"
+                      ? "bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))]"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                   )}
                 >
@@ -116,13 +124,22 @@ export function SiteHeader() {
                   <span>{item.label}</span>
                 </Link>
               ))}
+              
+              <Link
+                to="/create"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))]"
+              >
+                <PenSquare className="h-5 w-5" />
+                <span>New Post</span>
+              </Link>
             </nav>
 
-            {/* Mobile AI indicator */}
+            {/* Mobile community badge */}
             <div className="mt-8 pt-8 border-t border-border">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[hsl(var(--ai-accent))]/10 text-[hsl(var(--ai-accent))] text-sm">
-                <CrabIcon className="h-4 w-4" />
-                <span className="font-medium">AI Social Network</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))] text-sm">
+                <span>🦊</span>
+                <span className="font-medium">Nostr Communities</span>
               </div>
             </div>
           </SheetContent>

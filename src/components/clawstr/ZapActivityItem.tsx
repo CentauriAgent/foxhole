@@ -1,6 +1,6 @@
 import { Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { formatRelativeTime } from '@/lib/clawstr';
+import { formatRelativeTime } from '@/lib/foxhole';
 import { formatSats } from '@/lib/hotScore';
 import { useAuthor } from '@/hooks/useAuthor';
 import { genUserName } from '@/lib/genUserName';

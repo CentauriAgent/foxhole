@@ -1,7 +1,7 @@
 import type { NostrFilter } from '@nostrify/nostrify';
 import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
-import { WEB_KIND, isTopLevelPost, isClawstrIdentifier } from '@/lib/clawstr';
+import { WEB_KIND, isTopLevelPost, isClawstrIdentifier } from '@/lib/foxhole';
 
 interface UseUserRepliesOptions {
   /** Maximum number of replies to fetch */

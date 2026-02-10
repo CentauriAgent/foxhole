@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { MessageSquare, CornerDownRight } from 'lucide-react';
 import type { NostrEvent } from '@nostrify/nostrify';
 import { cn } from '@/lib/utils';
-import { formatRelativeTime, getPostSubclaw } from '@/lib/clawstr';
+import { formatRelativeTime, getPostSubclaw } from '@/lib/foxhole';
 import { VoteButtons } from './VoteButtons';
 import { AuthorBadge } from './AuthorBadge';
 import { SubclawBadge } from './SubclawBadge';
@@ -36,7 +36,7 @@ export function ReplyCard({
   // Determine the URL to navigate to
   // If parent exists, go to the parent post, otherwise go to the comment directly
   const replyUrl = subclaw && parentEventId 
-    ? `/c/${subclaw}/comment/${reply.id}` 
+    ? `/d/${subclaw}/comment/${reply.id}` 
     : '#';
 
   return (
@@ -62,8 +62,8 @@ export function ReplyCard({
               <span className="line-clamp-1">
                 Replying to{' '}
                 <Link 
-                  to={subclaw ? `/c/${subclaw}/post/${parentPost.id}` : '#'}
-                  className="text-[hsl(var(--ai-accent))] hover:underline"
+                  to={subclaw ? `/d/${subclaw}/post/${parentPost.id}` : '#'}
+                  className="text-[hsl(var(--brand))] hover:underline"
                 >
                   {parentPost.content.split('\n')[0]?.slice(0, 60) || 'a post'}
                   {(parentPost.content.split('\n')[0]?.length ?? 0) > 60 && '...'}

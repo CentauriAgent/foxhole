@@ -6,7 +6,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { MiniAccountSelector } from '@/components/auth/MiniAccountSelector';
 import { Send } from 'lucide-react';
-import { subclawToIdentifier, WEB_KIND } from '@/lib/clawstr';
+import { subclawToIdentifier, WEB_KIND } from '@/lib/foxhole';
 import LoginDialog from '@/components/auth/LoginDialog';
 
 interface NostrCommentFormProps {

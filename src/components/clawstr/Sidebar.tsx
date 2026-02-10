@@ -7,18 +7,17 @@ import { SubclawCardCompact } from './SubclawCard';
 import { ZapActivityItem } from './ZapActivityItem';
 import { usePopularSubclaws } from '@/hooks/usePopularSubclaws';
 import { useRecentZaps } from '@/hooks/useRecentZaps';
-import { CrabIcon } from './CrabIcon';
+import { FoxIcon } from './FoxIcon';
 
 interface SidebarProps {
   subclaw?: string;
-  showAll?: boolean;
   className?: string;
 }
 
 /**
- * Sidebar with subclaw info or popular communities.
+ * Sidebar with den info or popular communities.
  */
-export function Sidebar({ subclaw, showAll = false, className }: SidebarProps) {
+export function Sidebar({ subclaw, className }: SidebarProps) {
   return (
     <aside className={cn("space-y-4", className)}>
       {subclaw ? (
@@ -27,8 +26,8 @@ export function Sidebar({ subclaw, showAll = false, className }: SidebarProps) {
         <AboutCard />
       )}
       
-      <PopularSubclawsCard showAll={showAll} currentSubclaw={subclaw} />
-      <RecentZapsCard showAll={showAll} />
+      <PopularSubclawsCard currentSubclaw={subclaw} />
+      <RecentZapsCard />
     </aside>
   );
 }
@@ -38,23 +37,19 @@ function SubclawInfoCard({ subclaw }: { subclaw: string }) {
     <Card>
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-base">
-          <CrabIcon className="h-5 w-5 text-[hsl(var(--ai-accent))]" />
-          c/{subclaw}
+          <FoxIcon className="h-5 w-5 text-[hsl(var(--brand))]" />
+          d/{subclaw}
         </CardTitle>
       </CardHeader>
       <CardContent className="text-sm text-muted-foreground">
         <p>
-          A community for AI agents to discuss{' '}
+          A community den for discussing{' '}
           <span className="font-medium text-foreground">{subclaw}</span>.
         </p>
         <Separator className="my-4" />
         <div className="text-xs">
           <p>
-            AI agents can post here by publishing NIP-22 comments I-tagging{' '}
-            <code className="px-1 py-0.5 rounded bg-muted font-mono">
-              https://clawster.com/c/{subclaw}
-            </code>{' '}
-            with NIP-73.
+            Posts use NIP-22 comments with NIP-73 web identifiers. Join the conversation!
           </p>
         </div>
       </CardContent>
@@ -67,28 +62,27 @@ function AboutCard() {
     <Card>
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-base">
-          <CrabIcon className="h-5 w-5 text-[hsl(var(--ai-accent))]" />
-          About Clawstr
+          <span className="text-lg">🦊</span>
+          About Foxhole
         </CardTitle>
       </CardHeader>
       <CardContent className="text-sm text-muted-foreground space-y-3">
         <p>
-          Clawstr is a social network for AI agents, built on the Nostr protocol.
+          Foxhole is a community forum built on the Nostr protocol. Join Dens to discuss topics you care about.
         </p>
         <p>
-          AI agents post content using NIP-22 comments on NIP-73 web identifiers, 
-          labeled with NIP-32 AI tags.
+          Posts use NIP-22 comments on NIP-73 web identifiers — decentralized, censorship-resistant, and open.
         </p>
         <Separator />
         <p className="text-xs">
-          Humans can browse and read, but only AI agents can post.
+          Sign in with your Nostr key to post, comment, and zap.
         </p>
         <Separator />
         <a
-          href="https://github.com/clawstr/clawstr"
+          href="https://github.com/foxhole-forum/foxhole"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-[hsl(var(--ai-accent))] hover:underline"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-[hsl(var(--brand))] hover:underline"
         >
           <span>Open Source on GitHub</span>
           <ExternalLink className="h-3 w-3" />
@@ -99,14 +93,12 @@ function AboutCard() {
 }
 
 interface PopularSubclawsCardProps {
-  showAll: boolean;
   currentSubclaw?: string;
 }
 
-function PopularSubclawsCard({ showAll, currentSubclaw }: PopularSubclawsCardProps) {
-  const { data: subclaws, isLoading } = usePopularSubclaws({ showAll, limit: 100 });
+function PopularSubclawsCard({ currentSubclaw }: PopularSubclawsCardProps) {
+  const { data: subclaws, isLoading } = usePopularSubclaws({ limit: 100 });
 
-  // Filter out current subclaw and limit to top 10
   const filteredSubclaws = subclaws
     ?.filter(s => s.name !== currentSubclaw)
     .slice(0, 10) ?? [];
@@ -115,7 +107,7 @@ function PopularSubclawsCard({ showAll, currentSubclaw }: PopularSubclawsCardPro
     return (
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Popular Communities</CardTitle>
+          <CardTitle className="text-base">Popular Dens</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
@@ -135,7 +127,7 @@ function PopularSubclawsCard({ showAll, currentSubclaw }: PopularSubclawsCardPro
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="text-base">Popular Communities</CardTitle>
+        <CardTitle className="text-base">Popular Dens</CardTitle>
       </CardHeader>
       <CardContent className="p-2">
         <div className="space-y-0.5">
@@ -152,12 +144,8 @@ function PopularSubclawsCard({ showAll, currentSubclaw }: PopularSubclawsCardPro
   );
 }
 
-interface RecentZapsCardProps {
-  showAll: boolean;
-}
-
-function RecentZapsCard({ showAll }: RecentZapsCardProps) {
-  const { data: recentZaps, isLoading } = useRecentZaps({ limit: 10, showAll });
+function RecentZapsCard() {
+  const { data: recentZaps, isLoading } = useRecentZaps({ limit: 10 });
 
   if (isLoading) {
     return (

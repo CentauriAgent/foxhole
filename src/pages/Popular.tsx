@@ -3,7 +3,6 @@ import { useSeoMeta } from '@unhead/react';
 import { Flame, TrendingUp, Users, Zap } from 'lucide-react';
 import { 
   SiteHeader, 
-  AIToggle, 
   SubclawCardCompact,
   TimeRangeTabs,
   PopularPostCard,
@@ -19,36 +18,30 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { TimeRange } from '@/lib/hotScore';
 
 export default function Popular() {
-  const [showAll, setShowAll] = useState(false);
   const [timeRange, setTimeRange] = useState<TimeRange>('24h');
   
-  // Fetch data
   const { data: posts, isLoading: postsLoading } = usePopularPosts({ 
-    showAll, 
     timeRange,
     limit: 50,
   });
   
   const { data: agents, isLoading: agentsLoading } = usePopularAgents({ 
-    showAll, 
     timeRange,
     limit: 10,
   });
   
   const { data: subclaws, isLoading: subclawsLoading } = usePopularSubclaws({ 
-    showAll, 
     limit: 100,
   });
   
   const { data: largestZaps, isLoading: largestZapsLoading } = useLargestZaps({ 
     limit: 10,
-    showAll,
     timeRange,
   });
 
   useSeoMeta({
-    title: 'Popular - Clawstr',
-    description: 'Discover trending posts, top agents, and popular communities on Clawstr',
+    title: 'Popular — Foxhole',
+    description: 'Discover trending posts, top users, and popular Dens on Foxhole',
   });
 
   return (
@@ -57,9 +50,7 @@ export default function Popular() {
       
       <main className="container py-6">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
-          {/* Main Content - Hot Posts Feed */}
           <div className="space-y-4">
-            {/* Page Header */}
             <header className="rounded-lg border border-border bg-card p-6">
               <div className="flex items-center gap-4">
                 <div className="flex items-center justify-center w-16 h-16 rounded-xl bg-[hsl(var(--upvote))]/10 text-[hsl(var(--upvote))]">
@@ -74,13 +65,10 @@ export default function Popular() {
               </div>
             </header>
 
-            {/* Controls */}
             <div className="flex items-center justify-between gap-4 flex-wrap">
               <TimeRangeTabs value={timeRange} onChange={setTimeRange} />
-              <AIToggle showAll={showAll} onToggle={setShowAll} />
             </div>
 
-            {/* Hot Posts */}
             <section>
               <div className="flex items-center gap-2 mb-3">
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -91,7 +79,6 @@ export default function Popular() {
               
               <div className="rounded-lg border border-border bg-card divide-y divide-border">
                 {postsLoading ? (
-                  // Loading skeletons
                   [...Array(5)].map((_, i) => (
                     <div key={i} className="p-3 flex gap-3">
                       <div className="flex items-start gap-2">
@@ -131,14 +118,12 @@ export default function Popular() {
             </section>
           </div>
 
-          {/* Sidebar */}
           <div className="space-y-4">
-            {/* Top Agents */}
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
                   <Users className="h-4 w-4" />
-                  Top Agents
+                  Top Users
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
@@ -167,18 +152,17 @@ export default function Popular() {
                   </div>
                 ) : (
                   <p className="text-sm text-muted-foreground text-center py-4">
-                    No agents found
+                    No users found
                   </p>
                 )}
               </CardContent>
             </Card>
 
-            {/* Popular Communities */}
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
                   <Flame className="h-4 w-4" />
-                  Popular Communities
+                  Popular Dens
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
@@ -186,13 +170,7 @@ export default function Popular() {
                   <div className="space-y-2">
                     {[...Array(5)].map((_, i) => (
                       <div key={i} className="p-2">
-                        <div className="flex items-start gap-3">
-                          <Skeleton className="w-8 h-8 rounded-lg" />
-                          <div className="flex-1 space-y-1">
-                            <Skeleton className="h-4 w-20" />
-                            <Skeleton className="h-3 w-28" />
-                          </div>
-                        </div>
+                        <Skeleton className="h-8 w-full rounded-lg" />
                       </div>
                     ))}
                   </div>
@@ -208,13 +186,12 @@ export default function Popular() {
                   </div>
                 ) : (
                   <p className="text-sm text-muted-foreground text-center py-4">
-                    No communities found
+                    No dens found
                   </p>
                 )}
               </CardContent>
             </Card>
 
-            {/* Largest Zaps */}
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium flex items-center gap-2">

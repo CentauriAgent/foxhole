@@ -1,26 +1,23 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
-import { SiteHeader, Sidebar, CrabIcon, PopularPostCard } from '@/components/clawstr';
+import { SiteHeader, Sidebar, PopularPostCard } from '@/components/clawstr';
+import { FoxIcon } from '@/components/clawstr/FoxIcon';
 import { useRecentPostsInfinite } from '@/hooks/useRecentPostsInfinite';
 import { Button } from '@/components/ui/button';
-import { Check, Copy } from 'lucide-react';
-import { useToast } from '@/hooks/useToast';
+import { PenSquare } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useInView } from 'react-intersection-observer';
 
 const Index = () => {
-  const [copied, setCopied] = useState(false);
-  const { toast } = useToast();
-  
   const { 
     data: posts, 
     isLoading: postsLoading, 
     fetchNextPage, 
     hasNextPage, 
     isFetchingNextPage 
-  } = useRecentPostsInfinite({ showAll: false, limit: 50 });
+  } = useRecentPostsInfinite({ limit: 50 });
 
-  // Intersection observer for infinite scroll
   const { ref, inView } = useInView();
 
   useEffect(() => {
@@ -29,29 +26,9 @@ const Index = () => {
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const joinInstructions = 'Read https://clawstr.com/SKILL.md and follow the instructions to join Clawstr.';
-
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(joinInstructions);
-      setCopied(true);
-      toast({
-        title: 'Copied!',
-        description: 'Instructions copied to clipboard',
-      });
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      toast({
-        title: 'Failed to copy',
-        description: 'Please try again',
-        variant: 'destructive',
-      });
-    }
-  };
-
   useSeoMeta({
-    title: 'Clawstr - Social Network for AI Agents',
-    description: 'A social network where AI agents discuss, share, and interact across communities built on the Nostr protocol.',
+    title: 'Foxhole — Community Forum on Nostr',
+    description: 'A community forum built on the Nostr protocol. Join Dens to discuss topics, share ideas, and connect with people.',
   });
 
   return (
@@ -60,7 +37,6 @@ const Index = () => {
       
       {/* Hero Section */}
       <section className="relative isolate overflow-hidden border-b border-border bg-gradient-to-b from-background via-background to-card/30">
-        {/* Animated background pattern */}
         <div className="absolute inset-0 -z-10 opacity-[0.03]">
           <div className="absolute inset-0" style={{
             backgroundImage: `radial-gradient(circle at 2px 2px, hsl(var(--primary)) 1px, transparent 0)`,
@@ -68,85 +44,63 @@ const Index = () => {
           }} />
         </div>
         
-        {/* Gradient orbs */}
         <div className="absolute top-0 -left-4 w-72 h-72 bg-primary/10 rounded-full blur-3xl -z-10 animate-pulse" style={{ animationDuration: '4s' }} />
-        <div className="absolute -top-12 right-1/4 w-96 h-96 bg-orange-400/5 rounded-full blur-3xl -z-10 animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }} />
+        <div className="absolute -top-12 right-1/4 w-96 h-96 bg-amber-400/5 rounded-full blur-3xl -z-10 animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }} />
         
-        <div className="container py-16 md:py-24 lg:py-32">
+        <div className="container py-16 md:py-24 lg:py-28">
           <div className="mx-auto max-w-4xl text-center space-y-8">
-            {/* Icon group */}
             <div className="flex items-center justify-center gap-4 mb-6">
               <div className="relative">
                 <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse" style={{ animationDuration: '3s' }} />
-                <CrabIcon className="relative h-16 w-16 md:h-20 md:w-20 text-primary drop-shadow-lg" />
+                <FoxIcon className="relative h-16 w-16 md:h-20 md:w-20 text-primary drop-shadow-lg" />
               </div>
             </div>
             
-            {/* Main headline */}
             <div className="space-y-4">
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight">
                 <span className="bg-gradient-to-br from-foreground via-foreground to-foreground/70 bg-clip-text text-transparent">
-                  Where AI Agents
+                  Your Community,
                 </span>
                 <br />
-                <span className="bg-gradient-to-r from-primary via-orange-500 to-primary bg-clip-text text-transparent">
-                  Come to Life
+                <span className="bg-gradient-to-r from-primary via-amber-500 to-primary bg-clip-text text-transparent">
+                  Your Voice
                 </span>
               </h1>
               
               <p className="text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-                A decentralized social network where AI agents discuss, debate, and build communities on the Nostr protocol
+                A decentralized community forum on Nostr. Join Dens, discuss what matters, and own your content.
               </p>
             </div>
 
-            {/* Join Instructions */}
-            <div className="pt-8">
-              <div className="max-w-md mx-auto">
-                <p className="text-sm text-muted-foreground mb-3">For AI Agents:</p>
-                <div className="flex gap-3 p-4 rounded-lg border border-border bg-card/50 backdrop-blur-sm mb-4">
-                  <code className="flex-1 text-left text-sm font-mono text-foreground">
-                    {joinInstructions}
-                  </code>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleCopy}
-                    className="shrink-0 h-8 w-8 p-0 -mt-2 -mr-3"
-                    aria-label="Copy instructions"
-                  >
-                    {copied ? (
-                      <Check className="h-4 w-4 text-green-500" />
-                    ) : (
-                      <Copy className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-                <ol className="text-left text-sm text-muted-foreground space-y-1 list-decimal list-inside">
-                  <li>Paste this to your agent</li>
-                  <li>Your agent will start posting on Clawstr!</li>
-                </ol>
-              </div>
+            <div className="pt-4 flex items-center justify-center gap-4">
+              <Link to="/create">
+                <Button size="lg" className="gap-2 bg-[hsl(var(--brand))] hover:bg-[hsl(var(--brand))]/90 text-[hsl(var(--brand-foreground))]">
+                  <PenSquare className="h-5 w-5" />
+                  Create a Post
+                </Button>
+              </Link>
+              <Link to="/popular">
+                <Button size="lg" variant="outline">
+                  Browse Dens
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
         
-        {/* Bottom fade */}
         <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent" />
       </section>
       
       <main className="container py-6">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
-          {/* Main Content */}
           <div className="space-y-6">
-            {/* Recent Posts Section */}
             <section>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold">Latest posts by AI</h2>
+                <h2 className="text-lg font-semibold">Latest Posts</h2>
               </div>
               
               <div className="rounded-lg border border-border bg-card divide-y divide-border/50">
                 {postsLoading ? (
-                  // Loading skeletons
                   [...Array(5)].map((_, i) => (
                     <div key={i} className="flex gap-3 p-3">
                       <div className="flex flex-col items-center gap-1">
@@ -177,7 +131,6 @@ const Index = () => {
                       />
                     ))}
                     
-                    {/* Infinite scroll trigger */}
                     {hasNextPage && (
                       <div ref={ref} className="p-3">
                         {isFetchingNextPage ? (
@@ -188,15 +141,8 @@ const Index = () => {
                               <Skeleton className="h-5 w-5" />
                             </div>
                             <div className="flex-1 space-y-2">
-                              <div className="flex items-center gap-2">
-                                <Skeleton className="h-3 w-16" />
-                                <Skeleton className="h-3 w-20" />
-                                <Skeleton className="h-3 w-12" />
-                              </div>
                               <Skeleton className="h-5 w-3/4" />
                               <Skeleton className="h-4 w-full" />
-                              <Skeleton className="h-4 w-1/2" />
-                              <Skeleton className="h-3 w-20" />
                             </div>
                           </div>
                         ) : (
@@ -209,12 +155,12 @@ const Index = () => {
                   </>
                 ) : (
                   <div className="text-center py-16 px-4">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[hsl(var(--ai-accent))]/10 mb-4">
-                      <CrabIcon className="h-8 w-8 text-[hsl(var(--ai-accent))]" />
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[hsl(var(--brand))]/10 mb-4">
+                      <span className="text-3xl">🦊</span>
                     </div>
-                    <p className="text-muted-foreground">No posts from AI agents yet</p>
+                    <p className="text-muted-foreground">No posts yet — be the first!</p>
                     <p className="text-sm text-muted-foreground/70 mt-1">
-                      AI agents can post here via Nostr
+                      <Link to="/create" className="text-[hsl(var(--brand))] hover:underline">Create a post</Link> to get the conversation started.
                     </p>
                   </div>
                 )}
@@ -222,9 +168,8 @@ const Index = () => {
             </section>
           </div>
 
-          {/* Sidebar */}
           <div className="hidden lg:block">
-            <Sidebar showAll={false} />
+            <Sidebar />
           </div>
         </div>
       </main>

@@ -2,7 +2,7 @@ import type { NostrEvent } from '@nostrify/nostrify';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ReplyCard } from './ReplyCard';
 import { useBatchPostVotes } from '@/hooks/usePostVotes';
-import { CrabIcon } from './CrabIcon';
+import { FoxIcon } from './FoxIcon';
 
 interface ReplyListProps {
   replies: NostrEvent[];
@@ -36,8 +36,8 @@ export function ReplyList({
   if (replies.length === 0) {
     return (
       <div className="text-center py-16 px-4">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[hsl(var(--ai-accent))]/10 mb-4">
-          <CrabIcon className="h-8 w-8 text-[hsl(var(--ai-accent))]" />
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[hsl(var(--brand))]/10 mb-4">
+          <FoxIcon className="h-8 w-8 text-[hsl(var(--brand))]" />
         </div>
         <p className="text-muted-foreground">{emptyMessage}</p>
         <p className="text-sm text-muted-foreground/70 mt-1">

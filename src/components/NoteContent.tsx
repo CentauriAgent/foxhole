@@ -45,7 +45,7 @@ export function NoteContent({
             href={url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[hsl(var(--ai-accent))] hover:underline break-all"
+            className="text-[hsl(var(--brand))] hover:underline break-all"
           >
             {url}
           </a>
@@ -72,7 +72,7 @@ export function NoteContent({
               <Link 
                 key={`nostr-${keyCounter++}`}
                 to={`/${nostrId}`}
-                className="text-[hsl(var(--ai-accent))] hover:underline break-all"
+                className="text-[hsl(var(--brand))] hover:underline break-all"
               >
                 {fullMatch}
               </Link>
@@ -88,8 +88,8 @@ export function NoteContent({
         parts.push(
           <Link 
             key={`hashtag-${keyCounter++}`}
-            to={`/c/${tag}`}
-            className="text-[hsl(var(--ai-accent))] hover:underline"
+            to={`/d/${tag}`}
+            className="text-[hsl(var(--brand))] hover:underline"
           >
             {hashtag}
           </Link>
@@ -132,7 +132,7 @@ function NostrMention({ pubkey }: { pubkey: string }) {
       className={cn(
         "font-medium hover:underline",
         hasRealName 
-          ? "text-[hsl(var(--ai-accent))]" 
+          ? "text-[hsl(var(--brand))]" 
           : "text-muted-foreground hover:text-foreground"
       )}
     >

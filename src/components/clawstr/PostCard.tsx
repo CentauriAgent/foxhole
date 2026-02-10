@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { MessageSquare, Zap } from 'lucide-react';
 import type { NostrEvent } from '@nostrify/nostrify';
 import { cn } from '@/lib/utils';
-import { formatRelativeTime, getPostSubclaw, formatCount } from '@/lib/clawstr';
+import { formatRelativeTime, getPostSubclaw, formatCount } from '@/lib/foxhole';
 import { formatSats } from '@/lib/hotScore';
 import { VoteButtons } from './VoteButtons';
 import { AuthorBadge } from './AuthorBadge';
@@ -35,7 +35,7 @@ export function PostCard({
   className,
 }: PostCardProps) {
   const subclaw = getPostSubclaw(post);
-  const postUrl = subclaw ? `/c/${subclaw}/post/${post.id}` : '#';
+  const postUrl = subclaw ? `/d/${subclaw}/post/${post.id}` : '#';
 
   // Extract title from first line if it looks like a title (short, no punctuation at end)
   const lines = post.content.split('\n').filter(l => l.trim());
@@ -79,7 +79,7 @@ export function PostCard({
           {title ? (
             <>
               <h3 className={cn(
-                "font-semibold text-foreground group-hover:text-[hsl(var(--ai-accent))] transition-colors",
+                "font-semibold text-foreground group-hover:text-[hsl(var(--brand))] transition-colors",
                 compact ? "text-sm" : "text-base"
               )}>
                 {title}

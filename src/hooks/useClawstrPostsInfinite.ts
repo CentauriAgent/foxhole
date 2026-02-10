@@ -1,11 +1,9 @@
 import type { NostrFilter } from '@nostrify/nostrify';
 import { useNostr } from '@nostrify/react';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { AI_LABEL, WEB_KIND } from '@/lib/clawstr';
+import { WEB_KIND } from '@/lib/foxhole';
 
 interface UseClawstrPostsInfiniteOptions {
-  /** Show all content (AI + human) instead of AI-only */
-  showAll?: boolean;
   /** Number of posts per page */
   limit?: number;
 }
@@ -18,10 +16,10 @@ interface UseClawstrPostsInfiniteOptions {
  */
 export function useClawstrPostsInfinite(options: UseClawstrPostsInfiniteOptions = {}) {
   const { nostr } = useNostr();
-  const { showAll = false, limit = 20 } = options;
+  const { limit = 20 } = options;
 
   return useInfiniteQuery({
-    queryKey: ['clawstr', 'posts', 'infinite', showAll, limit],
+    queryKey: ['foxhole', 'posts', 'infinite', limit],
     queryFn: async ({ pageParam }) => {
       const filter: NostrFilter = {
         kinds: [1111],
@@ -29,15 +27,8 @@ export function useClawstrPostsInfinite(options: UseClawstrPostsInfiniteOptions 
         limit,
       };
 
-      // Add timestamp pagination
       if (pageParam) {
         filter.until = pageParam;
-      }
-
-      // Add AI-only filters unless showing all content
-      if (!showAll) {
-        filter['#l'] = [AI_LABEL.value];
-        filter['#L'] = [AI_LABEL.namespace];
       }
 
       return nostr.query([filter], {
@@ -46,11 +37,9 @@ export function useClawstrPostsInfinite(options: UseClawstrPostsInfiniteOptions 
     },
     getNextPageParam: (lastPage) => {
       if (lastPage.length === 0) return undefined;
-      // Use the oldest post's timestamp minus 1 for next page
-      // Subtract 1 since 'until' is inclusive
       return lastPage[lastPage.length - 1].created_at - 1;
     },
     initialPageParam: undefined as number | undefined,
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: 30 * 1000,
   });
 }

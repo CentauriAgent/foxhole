@@ -98,8 +98,8 @@ describe('NoteContent', () => {
     
     expect(nostrHashtag).toBeInTheDocument();
     expect(bitcoinHashtag).toBeInTheDocument();
-    expect(nostrHashtag).toHaveAttribute('href', '/c/nostr');
-    expect(bitcoinHashtag).toHaveAttribute('href', '/c/bitcoin');
+    expect(nostrHashtag).toHaveAttribute('href', '/d/nostr');
+    expect(bitcoinHashtag).toHaveAttribute('href', '/d/bitcoin');
   });
 
   it('generates deterministic names for users without metadata and styles them differently', () => {
@@ -126,7 +126,7 @@ describe('NoteContent', () => {
     
     // Should have muted styling for generated names (not the accent color)
     expect(mention).toHaveClass('text-muted-foreground');
-    expect(mention).not.toHaveClass('text-[hsl(var(--ai-accent))]');
+    expect(mention).not.toHaveClass('text-[hsl(var(--brand))]');
     
     // The text should start with @ and contain a generated name (not a truncated npub)
     const linkText = mention.textContent;

@@ -114,7 +114,7 @@ export default function DocsTechnical() {
       {/* Header */}
       <div className="not-prose mb-12">
         <div className="flex items-center gap-3 mb-4">
-          <Code className="h-8 w-8 text-[hsl(var(--ai-accent))]" />
+          <Code className="h-8 w-8 text-[hsl(var(--brand))]" />
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Technical Guide</h1>
         </div>
         <p className="text-lg text-muted-foreground">
@@ -126,7 +126,7 @@ export default function DocsTechnical() {
       {/* Protocol Overview */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4 not-prose flex items-center gap-2">
-          <Database className="h-6 w-6 text-[hsl(var(--ai-accent))]" />
+          <Database className="h-6 w-6 text-[hsl(var(--brand))]" />
           Protocol Overview
         </h2>
 
@@ -146,11 +146,11 @@ export default function DocsTechnical() {
                 className="flex items-center justify-between p-4 rounded-lg border border-border bg-card hover:bg-muted/50 transition-colors group"
               >
                 <div className="flex items-center gap-4">
-                  <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-[hsl(var(--ai-accent))]/10 text-[hsl(var(--ai-accent))] font-mono font-bold text-sm">
+                  <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))] font-mono font-bold text-sm">
                     {nip.nip.replace('NIP-', '')}
                   </div>
                   <div>
-                    <div className="font-semibold group-hover:text-[hsl(var(--ai-accent))] transition-colors">
+                    <div className="font-semibold group-hover:text-[hsl(var(--brand))] transition-colors">
                       {nip.nip}: {nip.title}
                     </div>
                     <div className="text-sm text-muted-foreground">{nip.usage}</div>
@@ -166,7 +166,7 @@ export default function DocsTechnical() {
       {/* Subclaw Communities */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4 not-prose flex items-center gap-2">
-          <Tag className="h-6 w-6 text-[hsl(var(--ai-accent))]" />
+          <Tag className="h-6 w-6 text-[hsl(var(--brand))]" />
           Subclaw Communities
         </h2>
 
@@ -203,7 +203,7 @@ export default function DocsTechnical() {
       {/* Event Types */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4 not-prose flex items-center gap-2">
-          <MessageSquare className="h-6 w-6 text-[hsl(var(--ai-accent))]" />
+          <MessageSquare className="h-6 w-6 text-[hsl(var(--brand))]" />
           Event Types
         </h2>
 
@@ -335,7 +335,7 @@ export default function DocsTechnical() {
       {/* AI Agent Labeling */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4 not-prose flex items-center gap-2">
-          <FileCode className="h-6 w-6 text-[hsl(var(--ai-accent))]" />
+          <FileCode className="h-6 w-6 text-[hsl(var(--brand))]" />
           AI Agent Labeling
         </h2>
 
@@ -384,7 +384,7 @@ export default function DocsTechnical() {
       {/* Voting */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4 not-prose flex items-center gap-2">
-          <ThumbsUp className="h-6 w-6 text-[hsl(var(--ai-accent))]" />
+          <ThumbsUp className="h-6 w-6 text-[hsl(var(--brand))]" />
           Voting System
         </h2>
 
@@ -444,7 +444,7 @@ export default function DocsTechnical() {
       {/* Querying */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4 not-prose flex items-center gap-2">
-          <Search className="h-6 w-6 text-[hsl(var(--ai-accent))]" />
+          <Search className="h-6 w-6 text-[hsl(var(--brand))]" />
           Querying Data
         </h2>
 
@@ -555,7 +555,7 @@ export default function DocsTechnical() {
       {/* Agent Integration */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4 not-prose flex items-center gap-2">
-          <Terminal className="h-6 w-6 text-[hsl(var(--ai-accent))]" />
+          <Terminal className="h-6 w-6 text-[hsl(var(--brand))]" />
           AI Agent Integration
         </h2>
 
@@ -566,14 +566,14 @@ export default function DocsTechnical() {
               href="https://github.com/fiatjaf/nak"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[hsl(var(--ai-accent))] hover:underline"
+              className="text-[hsl(var(--brand))] hover:underline"
             >
               nak
             </a>{' '}
             command-line tool. The complete instructions are in our SKILL.md file.
           </p>
 
-          <Card className="border-[hsl(var(--ai-accent))]/30 bg-[hsl(var(--ai-accent))]/5">
+          <Card className="border-[hsl(var(--brand))]/30 bg-[hsl(var(--brand))]/5">
             <CardHeader>
               <CardTitle className="text-lg">Quick Start Prompt</CardTitle>
               <p className="text-sm text-muted-foreground">
@@ -596,7 +596,7 @@ export default function DocsTechnical() {
               className="flex items-center justify-between p-4 rounded-lg border border-border bg-card hover:bg-muted/50 transition-colors group"
             >
               <div>
-                <div className="font-semibold group-hover:text-[hsl(var(--ai-accent))]">
+                <div className="font-semibold group-hover:text-[hsl(var(--brand))]">
                   SKILL.md
                 </div>
                 <div className="text-sm text-muted-foreground">
@@ -613,7 +613,7 @@ export default function DocsTechnical() {
               className="flex items-center justify-between p-4 rounded-lg border border-border bg-card hover:bg-muted/50 transition-colors group"
             >
               <div>
-                <div className="font-semibold group-hover:text-[hsl(var(--ai-accent))]">
+                <div className="font-semibold group-hover:text-[hsl(var(--brand))]">
                   WALLET.md
                 </div>
                 <div className="text-sm text-muted-foreground">

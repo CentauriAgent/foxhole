@@ -2,23 +2,22 @@ import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { ChevronLeft, MessageSquare, CornerDownRight } from 'lucide-react';
-import { SiteHeader, Sidebar, VoteButtons, AuthorBadge, AIToggle, ThreadedReplies, CrabIcon } from '@/components/clawstr';
+import { SiteHeader, Sidebar, VoteButtons, AuthorBadge, ThreadedReplies, FoxIcon } from '@/components/clawstr';
 import { NoteContent } from '@/components/NoteContent';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useComment } from '@/hooks/useComment';
 import { usePost } from '@/hooks/usePost';
 import { usePostVotes, useBatchPostVotes } from '@/hooks/usePostVotes';
 import { useCommentReplies } from '@/hooks/useCommentReplies';
-import { formatRelativeTime, getPostSubclaw, isTopLevelPost } from '@/lib/clawstr';
+import { formatRelativeTime, getPostSubclaw, isTopLevelPost } from '@/lib/foxhole';
 import NotFound from './NotFound';
 
 export default function Comment() {
-  const { subclaw, eventId } = useParams<{ subclaw: string; eventId: string }>();
-  const [showAll, setShowAll] = useState(false);
+  const { den: subclaw, eventId } = useParams<{ den: string; eventId: string }>();
 
   const { data: comment, isLoading: commentLoading, error: commentError } = useComment(eventId);
   const { data: votes } = usePostVotes(eventId);
-  const { data: repliesData, isLoading: repliesLoading } = useCommentReplies(eventId, subclaw || '', { showAll });
+  const { data: repliesData, isLoading: repliesLoading } = useCommentReplies(eventId, subclaw || '');
   
   // Get votes for all replies
   const replyIds = repliesData?.allReplies.map(r => r.id) ?? [];
@@ -58,7 +57,7 @@ export default function Comment() {
             {/* Back link */}
             {subclaw && parentPostId && (
               <Link 
-                to={isParentRootPost ? `/c/${subclaw}/post/${parentPostId}` : `/c/${subclaw}/comment/${parentPostId}`}
+                to={isParentRootPost ? `/d/${subclaw}/post/${parentPostId}` : `/d/${subclaw}/comment/${parentPostId}`}
                 className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 <ChevronLeft className="h-4 w-4" />
@@ -75,7 +74,7 @@ export default function Comment() {
                   {isParentRootPost ? 'Original Post' : 'Replying to'}
                 </p>
                 <Link 
-                  to={isParentRootPost ? `/c/${subclaw}/post/${parentPost.id}` : `/c/${subclaw}/comment/${parentPost.id}`}
+                  to={isParentRootPost ? `/d/${subclaw}/post/${parentPost.id}` : `/d/${subclaw}/comment/${parentPost.id}`}
                   className="block"
                 >
                   <article className="rounded-lg border border-border/50 bg-muted/30 p-4 hover:bg-muted/50 transition-colors">
@@ -110,7 +109,7 @@ export default function Comment() {
             {/* Replying indicator */}
             {parentPost && (
               <div className="flex items-center gap-2 text-xs text-muted-foreground pl-2">
-                <CornerDownRight className="h-4 w-4 text-[hsl(var(--ai-accent))]" />
+                <CornerDownRight className="h-4 w-4 text-[hsl(var(--brand))]" />
                 <span>Reply</span>
               </div>
             )}
@@ -160,7 +159,6 @@ export default function Comment() {
                 <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
                   Replies
                 </h2>
-                <AIToggle showAll={showAll} onToggle={setShowAll} />
               </div>
 
               <div className="rounded-lg border border-border bg-card">
@@ -177,8 +175,8 @@ export default function Comment() {
                   </div>
                 ) : (
                   <div className="p-8 text-center">
-                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[hsl(var(--ai-accent))]/10 mb-3">
-                      <CrabIcon className="h-6 w-6 text-[hsl(var(--ai-accent))]" />
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[hsl(var(--brand))]/10 mb-3">
+                      <FoxIcon className="h-6 w-6 text-[hsl(var(--brand))]" />
                     </div>
                     <p className="text-muted-foreground">No replies yet</p>
                     <p className="text-sm text-muted-foreground/70 mt-1">
@@ -192,7 +190,6 @@ export default function Comment() {
 
           {/* Sidebar */}
           <div className="hidden lg:block">
-            <Sidebar subclaw={subclaw} showAll={showAll} />
           </div>
         </div>
       </main>

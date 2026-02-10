@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { ChevronLeft, MessageSquare } from 'lucide-react';
-import { SiteHeader, Sidebar, VoteButtons, AuthorBadge, AIToggle, ThreadedReplies, CrabIcon } from '@/components/clawstr';
+import { SiteHeader, Sidebar, VoteButtons, AuthorBadge, ThreadedReplies, FoxIcon } from '@/components/clawstr';
 import { NostrCommentForm } from '@/components/clawstr/NostrCommentForm';
 import { NoteContent } from '@/components/NoteContent';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -12,18 +12,17 @@ import { usePostVotes } from '@/hooks/usePostVotes';
 import { usePostReplies } from '@/hooks/usePostReplies';
 import { useBatchPostVotes } from '@/hooks/usePostVotes';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { formatRelativeTime, getPostSubclaw } from '@/lib/clawstr';
+import { formatRelativeTime, getPostSubclaw } from '@/lib/foxhole';
 import LoginDialog from '@/components/auth/LoginDialog';
 import NotFound from './NotFound';
 
 export default function Post() {
-  const { subclaw, eventId } = useParams<{ subclaw: string; eventId: string }>();
-  const [showAll, setShowAll] = useState(false);
+  const { den: subclaw, eventId } = useParams<{ den: string; eventId: string }>();
   const [showLoginDialog, setShowLoginDialog] = useState(false);
 
   const { data: post, isLoading: postLoading, error: postError } = usePost(eventId);
   const { data: votes } = usePostVotes(eventId);
-  const { data: repliesData, isLoading: repliesLoading } = usePostReplies(eventId, subclaw || '', { showAll });
+  const { data: repliesData, isLoading: repliesLoading } = usePostReplies(eventId, subclaw || '');
   const { user } = useCurrentUser();
   
   // Get votes for all replies
@@ -54,7 +53,7 @@ export default function Post() {
             {/* Back link */}
             {subclaw && (
               <Link 
-                to={`/c/${subclaw}`}
+                to={`/d/${subclaw}`}
                 className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 <ChevronLeft className="h-4 w-4" />
@@ -107,12 +106,10 @@ export default function Post() {
                 <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
                   Comments
                 </h2>
-                <AIToggle showAll={showAll} onToggle={setShowAll} />
               </div>
 
               {/* Human comment form or login button - only shown when "Everyone" is selected */}
-              {showAll && eventId && subclaw && (
-                user ? (
+              {user ? (
                   <NostrCommentForm 
                     subclaw={subclaw} 
                     postId={eventId}
@@ -137,7 +134,7 @@ export default function Post() {
                     </div>
                   )
                 )
-              )}
+              }
 
               <div className="rounded-lg border border-border bg-card">
                 {repliesLoading ? (
@@ -153,14 +150,11 @@ export default function Post() {
                   </div>
                 ) : (
                   <div className="p-8 text-center space-y-3">
-                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[hsl(var(--ai-accent))]/10 mb-3">
-                      <CrabIcon className="h-6 w-6 text-[hsl(var(--ai-accent))]" />
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[hsl(var(--brand))]/10 mb-3">
+                      <FoxIcon className="h-6 w-6 text-[hsl(var(--brand))]" />
                     </div>
                     <p className="text-muted-foreground">No comments yet</p>
-                    <p className="text-sm text-muted-foreground/70">
-                      {showAll ? (user ? 'Be the first to comment' : 'Log in to join the discussion') : 'AI agents can reply via Nostr'}
-                    </p>
-                    {showAll && !user && (
+                    {!user && (
                       <Button 
                         onClick={() => setShowLoginDialog(true)}
                         size="sm"
@@ -183,7 +177,6 @@ export default function Post() {
 
           {/* Sidebar */}
           <div className="hidden lg:block">
-            <Sidebar subclaw={subclaw} showAll={showAll} />
           </div>
         </div>
       </main>

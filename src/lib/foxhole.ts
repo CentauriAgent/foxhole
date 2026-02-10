@@ -1,58 +1,38 @@
 import type { NostrEvent } from '@nostrify/nostrify';
 
 /**
- * Clawstr Constants and Helpers
+ * Foxhole Constants and Helpers
  * 
- * Clawstr uses NIP-22 comments on NIP-73 web URL identifiers.
- * Subclaws map to URLs: /c/videogames -> ["I", "https://clawstr.com/c/videogames"]
+ * Foxhole uses NIP-22 comments on NIP-73 web URL identifiers.
+ * Dens map to URLs: /d/videogames -> ["I", "https://foxhole.lol/d/videogames"]
  */
 
-/** Base URL for Clawstr identifiers */
-export const CLAWSTR_BASE_URL = 'https://clawstr.com';
-
-/** NIP-32 label for AI-generated content */
-export const AI_LABEL = {
-  namespace: 'agent',
-  value: 'ai',
-} as const;
+/** Base URL for Foxhole identifiers */
+export const FOXHOLE_BASE_URL = 'https://foxhole.lol';
 
 /** NIP-73 kind value for web URLs */
 export const WEB_KIND = 'web';
 
-/** Convert a subclaw name to NIP-73 web URL identifier */
-export function subclawToIdentifier(subclaw: string): string {
-  // NIP-73 web URLs use the normalized URL format
-  return `${CLAWSTR_BASE_URL}/c/${subclaw.toLowerCase()}`;
+/** Convert a den name to NIP-73 web URL identifier */
+export function denToIdentifier(den: string): string {
+  return `${FOXHOLE_BASE_URL}/d/${den.toLowerCase()}`;
 }
 
-/** Extract subclaw name from NIP-73 web URL identifier */
-export function identifierToSubclaw(identifier: string): string | null {
-  // Match https://clawstr.com/c/<subclaw>
-  const pattern = new RegExp(`^${escapeRegExp(CLAWSTR_BASE_URL)}/c/([a-z0-9_-]+)$`, 'i');
+/** Extract den name from NIP-73 web URL identifier */
+export function identifierToDen(identifier: string): string | null {
+  const pattern = new RegExp(`^${escapeRegExp(FOXHOLE_BASE_URL)}/d/([a-z0-9_-]+)$`, 'i');
   const match = identifier.match(pattern);
   return match?.[1]?.toLowerCase() ?? null;
 }
 
-/** Check if an identifier is a valid Clawstr subclaw URL */
-export function isClawstrIdentifier(identifier: string): boolean {
-  return identifierToSubclaw(identifier) !== null;
+/** Check if an identifier is a valid Foxhole den URL */
+export function isFoxholeIdentifier(identifier: string): boolean {
+  return identifierToDen(identifier) !== null;
 }
 
 /** Escape special regex characters in a string */
 function escapeRegExp(string: string): string {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-/** Check if an event has the AI agent label (NIP-32) */
-export function isAIContent(event: NostrEvent): boolean {
-  const hasAgentNamespace = event.tags.some(
-    ([name, value]) => name === 'L' && value === AI_LABEL.namespace
-  );
-  const hasAILabel = event.tags.some(
-    ([name, value, namespace]) => 
-      name === 'l' && value === AI_LABEL.value && namespace === AI_LABEL.namespace
-  );
-  return hasAgentNamespace && hasAILabel;
 }
 
 /** Get the NIP-73 identifier from a post (the I tag value) */
@@ -61,16 +41,14 @@ export function getPostIdentifier(event: NostrEvent): string | null {
   return iTag?.[1] ?? null;
 }
 
-/** Get the subclaw name from a post */
-export function getPostSubclaw(event: NostrEvent): string | null {
+/** Get the den name from a post */
+export function getPostDen(event: NostrEvent): string | null {
   const identifier = getPostIdentifier(event);
-  return identifier ? identifierToSubclaw(identifier) : null;
+  return identifier ? identifierToDen(identifier) : null;
 }
 
 /** Check if a post is a top-level post (not a reply to another comment) */
 export function isTopLevelPost(event: NostrEvent): boolean {
-  // A top-level post has i tag pointing to the web URL identifier (same as I tag)
-  // and k tag is "web" (the web kind)
   const ITag = event.tags.find(([name]) => name === 'I')?.[1];
   const iTag = event.tags.find(([name]) => name === 'i')?.[1];
   const kTag = event.tags.find(([name]) => name === 'k')?.[1];
@@ -99,38 +77,35 @@ export function formatCount(count: number): string {
   return `${(count / 1000000).toFixed(1)}M`;
 }
 
-/** Generate NIP-32 AI label tags for publishing */
-export function createAILabelTags(): string[][] {
-  return [
-    ['L', AI_LABEL.namespace],
-    ['l', AI_LABEL.value, AI_LABEL.namespace],
-  ];
-}
-
-/** Generate tags for a new top-level post in a subclaw */
-export function createPostTags(subclaw: string): string[][] {
-  const identifier = subclawToIdentifier(subclaw);
+/** Generate tags for a new top-level post in a den */
+export function createPostTags(den: string): string[][] {
+  const identifier = denToIdentifier(den);
   return [
     ['I', identifier],
     ['K', WEB_KIND],
     ['i', identifier],
     ['k', WEB_KIND],
-    ...createAILabelTags(),
   ];
 }
 
 /** Generate tags for a reply to a post */
 export function createReplyTags(
-  subclaw: string, 
+  den: string, 
   parentEvent: NostrEvent
 ): string[][] {
-  const identifier = subclawToIdentifier(subclaw);
+  const identifier = denToIdentifier(den);
   return [
     ['I', identifier],
     ['K', WEB_KIND],
     ['e', parentEvent.id, '', parentEvent.pubkey],
     ['k', '1111'],
     ['p', parentEvent.pubkey],
-    ...createAILabelTags(),
   ];
 }
+
+// Backward compatibility aliases
+export const subclawToIdentifier = denToIdentifier;
+export const identifierToSubclaw = identifierToDen;
+export const isClawstrIdentifier = isFoxholeIdentifier;
+export const getPostSubclaw = getPostDen;
+export const CLAWSTR_BASE_URL = FOXHOLE_BASE_URL;

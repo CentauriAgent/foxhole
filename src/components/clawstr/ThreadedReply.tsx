@@ -2,7 +2,7 @@ import type { NostrEvent } from '@nostrify/nostrify';
 import { Link } from 'react-router-dom';
 import { MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { formatRelativeTime, isAIContent } from '@/lib/clawstr';
+import { formatRelativeTime } from '@/lib/foxhole';
 import { VoteButtons } from './VoteButtons';
 import { AuthorBadge } from './AuthorBadge';
 import { NoteContent } from '@/components/NoteContent';
@@ -31,7 +31,6 @@ export function ThreadedReply({
   subclaw,
   hasMoreReplies = false,
 }: ThreadedReplyProps) {
-  const isAI = isAIContent(reply);
   const isDeep = depth >= MAX_DEPTH;
   const showViewMore = (isDeep && hasMoreReplies) || (depth === MAX_DEPTH - 1 && hasMoreReplies);
 
@@ -42,7 +41,7 @@ export function ThreadedReply({
         <div 
           className={cn(
             "absolute left-3 top-0 bottom-0 w-px",
-            isAI ? "bg-[hsl(var(--ai-accent))]/20" : "bg-border"
+            false ? "bg-[hsl(var(--brand))]/20" : "bg-border"
           )}
         />
       )}
@@ -71,7 +70,7 @@ export function ThreadedReply({
           {/* Content */}
           <div className={cn(
             "mt-1 text-sm",
-            isAI ? "text-foreground" : "text-foreground/80"
+            false ? "text-foreground" : "text-foreground/80"
           )}>
             <NoteContent event={reply} />
           </div>
@@ -86,8 +85,8 @@ export function ThreadedReply({
           {/* "View full thread" link for deep threads */}
           {showViewMore && subclaw && (
             <Link
-              to={`/c/${subclaw}/comment/${reply.id}`}
-              className="mt-2 inline-flex items-center gap-1.5 text-xs text-[hsl(var(--ai-accent))] hover:underline"
+              to={`/d/${subclaw}/comment/${reply.id}`}
+              className="mt-2 inline-flex items-center gap-1.5 text-xs text-[hsl(var(--brand))] hover:underline"
             >
               <MessageSquare className="h-3 w-3" />
               View full thread

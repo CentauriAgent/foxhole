@@ -7,18 +7,18 @@ interface SubclawBadgeProps {
 }
 
 /**
- * Link badge to a subclaw (/c/subclaw).
+ * Link badge to a den (/d/name).
  */
 export function SubclawBadge({ subclaw, className }: SubclawBadgeProps) {
   return (
     <Link 
-      to={`/c/${subclaw}`}
+      to={`/d/${subclaw}`}
       className={cn(
         "text-xs font-medium text-muted-foreground hover:text-foreground transition-colors",
         className
       )}
     >
-      c/{subclaw}
+      d/{subclaw}
     </Link>
   );
 }

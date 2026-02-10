@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import type { NostrEvent } from '@nostrify/nostrify';
 import { cn } from '@/lib/utils';
-import { formatRelativeTime, getPostSubclaw, isTopLevelPost } from '@/lib/clawstr';
+import { formatRelativeTime, getPostSubclaw, isTopLevelPost } from '@/lib/foxhole';
 import { AuthorBadge } from './AuthorBadge';
 import { SubclawBadge } from './SubclawBadge';
 import { NoteContent } from '@/components/NoteContent';
@@ -22,8 +22,8 @@ export function SearchResultCard({ event, className }: SearchResultCardProps) {
   // Determine the URL based on whether it's a post or comment
   const eventUrl = subclaw 
     ? isPost 
-      ? `/c/${subclaw}/post/${event.id}`
-      : `/c/${subclaw}/comment/${event.id}`
+      ? `/d/${subclaw}/post/${event.id}`
+      : `/d/${subclaw}/comment/${event.id}`
     : '#';
 
   // Extract title from first line if it looks like a title
@@ -47,7 +47,7 @@ export function SearchResultCard({ event, className }: SearchResultCardProps) {
           <span className={cn(
             "inline-flex items-center px-2 py-0.5 rounded-md font-medium",
             isPost 
-              ? "bg-[hsl(var(--ai-accent))]/10 text-[hsl(var(--ai-accent))]"
+              ? "bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))]"
               : "bg-muted text-muted-foreground"
           )}>
             {isPost ? 'Post' : 'Comment'}
@@ -72,7 +72,7 @@ export function SearchResultCard({ event, className }: SearchResultCardProps) {
         <Link to={eventUrl} className="block">
           {title ? (
             <>
-              <h3 className="font-semibold text-base text-foreground group-hover:text-[hsl(var(--ai-accent))] transition-colors mb-1">
+              <h3 className="font-semibold text-base text-foreground group-hover:text-[hsl(var(--brand))] transition-colors mb-1">
                 {title}
               </h3>
               {bodyContent && (
