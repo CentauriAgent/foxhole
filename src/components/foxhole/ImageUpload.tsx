@@ -1,11 +1,14 @@
-import { useState, useRef, useCallback } from 'react';
+import { useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { ImagePlus, X, Loader2 } from 'lucide-react';
+import { useUploadFile } from '@/hooks/useUploadFile';
 
 export interface UploadedImage {
   url: string;
   mimeType: string;
   dimensions?: { width: number; height: number };
+  /** Raw tags returned by Blossom uploader (NIP-92 imeta etc.) */
+  tags?: string[][];
 }
 
 interface ImageUploadProps {
@@ -17,67 +20,75 @@ interface ImageUploadProps {
 
 const ACCEPTED_TYPES = 'image/jpeg,image/png,image/gif,image/webp';
 
+function getImageDimensions(file: File): Promise<{ width: number; height: number }> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      resolve({ width: img.naturalWidth, height: img.naturalHeight });
+      URL.revokeObjectURL(img.src);
+    };
+    img.onerror = () => {
+      resolve({ width: 0, height: 0 });
+      URL.revokeObjectURL(img.src);
+    };
+    img.src = URL.createObjectURL(file);
+  });
+}
+
 export function ImageUpload({ onImagesChange, images, compact, disabled }: ImageUploadProps) {
-  const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const uploadFile = useUploadFile();
 
-  const getImageDimensions = (file: File): Promise<{ width: number; height: number }> => {
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.onload = () => {
-        resolve({ width: img.naturalWidth, height: img.naturalHeight });
-        URL.revokeObjectURL(img.src);
-      };
-      img.onerror = () => {
-        resolve({ width: 0, height: 0 });
-        URL.revokeObjectURL(img.src);
-      };
-      img.src = URL.createObjectURL(file);
-    });
-  };
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-  const uploadFile = useCallback(async (file: File) => {
-    setUploading(true);
     try {
-      const dims = await getImageDimensions(file);
-      const formData = new FormData();
-      formData.append('file', file);
+      const [dims, tags] = await Promise.all([
+        getImageDimensions(file),
+        uploadFile.mutateAsync(file),
+      ]);
 
-      const res = await fetch('https://nostr.build/api/v2/upload/files', {
-        method: 'POST',
-        body: formData,
-      });
+      // Extract URL from the Blossom response tags (usually an 'url' or 'imeta' tag)
+      let url = '';
+      for (const tag of tags) {
+        if (tag[0] === 'url' && tag[1]) {
+          url = tag[1];
+          break;
+        }
+        // imeta tag format: ["imeta", "url https://...", "m image/png", ...]
+        if (tag[0] === 'imeta') {
+          const urlPart = tag.find((v: string) => v.startsWith('url '));
+          if (urlPart) {
+            url = urlPart.slice(4);
+            break;
+          }
+        }
+      }
 
-      if (!res.ok) throw new Error(`Upload failed: ${res.status}`);
-
-      const data = await res.json();
-      const uploaded = data?.data?.[0];
-      if (!uploaded?.url) throw new Error('No URL in response');
+      if (!url) throw new Error('No URL in upload response');
 
       const newImage: UploadedImage = {
-        url: uploaded.url,
+        url,
         mimeType: file.type,
         dimensions: dims.width ? dims : undefined,
+        tags,
       };
 
       onImagesChange([...images, newImage]);
     } catch (err) {
       console.error('Image upload failed:', err);
-      alert('Image upload failed. Please try again.');
+      alert('Image upload failed. Make sure you are logged in with a Nostr extension.');
     } finally {
-      setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
-  }, [images, onImagesChange]);
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) uploadFile(file);
   };
 
   const removeImage = (index: number) => {
     onImagesChange(images.filter((_, i) => i !== index));
   };
+
+  const uploading = uploadFile.isPending;
 
   return (
     <div className={compact ? 'inline-flex items-center gap-1' : 'space-y-2'}>
@@ -131,12 +142,20 @@ export function ImageUpload({ onImagesChange, images, compact, disabled }: Image
 
 /** Build imeta tags for uploaded images (NIP-92) */
 export function buildImetaTags(images: UploadedImage[]): string[][] {
-  return images.map((img) => {
-    const tag = ['imeta', `url ${img.url}`];
-    if (img.mimeType) tag.push(`m ${img.mimeType}`);
-    if (img.dimensions?.width) tag.push(`dim ${img.dimensions.width}x${img.dimensions.height}`);
-    return tag;
-  });
+  // If Blossom returned tags directly, use those
+  const result: string[][] = [];
+  for (const img of images) {
+    if (img.tags) {
+      result.push(...img.tags);
+    } else {
+      // Fallback: build imeta manually
+      const tag = ['imeta', `url ${img.url}`];
+      if (img.mimeType) tag.push(`m ${img.mimeType}`);
+      if (img.dimensions?.width) tag.push(`dim ${img.dimensions.width}x${img.dimensions.height}`);
+      result.push(tag);
+    }
+  }
+  return result;
 }
 
 /** Append image URLs to content text */
