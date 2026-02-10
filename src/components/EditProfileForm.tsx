@@ -39,6 +39,7 @@ export const EditProfileForm: React.FC = () => {
       banner: '',
       website: '',
       nip05: '',
+      lud16: '',
     },
   });
 
@@ -52,6 +53,7 @@ export const EditProfileForm: React.FC = () => {
         banner: metadata.banner || '',
         website: metadata.website || '',
         nip05: metadata.nip05 || '',
+        lud16: metadata.lud16 || '',
       });
     }
   }, [metadata, form]);
@@ -229,6 +231,23 @@ export const EditProfileForm: React.FC = () => {
             )}
           />
         </div>
+
+        <FormField
+          control={form.control}
+          name="lud16"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Lightning Address</FormLabel>
+              <FormControl>
+                <Input placeholder="you@walletofsatoshi.com" {...field} />
+              </FormControl>
+              <FormDescription>
+                Your Lightning address for receiving zaps.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <Button 
           type="submit" 

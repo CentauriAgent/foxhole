@@ -1,13 +1,16 @@
 import { nip19 } from 'nostr-tools';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
-import { User, ExternalLink, MessageSquare, FileText, Zap } from 'lucide-react';
+import { User, ExternalLink, MessageSquare, FileText, Zap, Settings } from 'lucide-react';
 import { SiteHeader, Sidebar, PostList, ReplyList, FoxIcon } from '@/components/foxhole';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ProfileZapDialog } from '@/components/ProfileZapDialog';
+import { EditProfileForm } from '@/components/EditProfileForm';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useUserPosts } from '@/hooks/useUserPosts';
 import { useUserReplies } from '@/hooks/useUserReplies';
@@ -54,6 +57,8 @@ function ProfilePage({ pubkey }: { pubkey: string }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') || 'posts';
   
+  const { user: currentUser } = useCurrentUser();
+  const isOwnProfile = currentUser?.pubkey === pubkey;
   const { data: author, isLoading: authorLoading } = useAuthor(pubkey);
   const { data: posts, isLoading: postsLoading } = useUserPosts(pubkey);
   const { data: replies, isLoading: repliesLoading } = useUserReplies(pubkey);
@@ -139,6 +144,22 @@ function ProfilePage({ pubkey }: { pubkey: string }) {
                             Zap
                           </Button>
                         </ProfileZapDialog>
+                      )}
+                      {isOwnProfile && (
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="outline" size="sm" className="gap-1.5">
+                              <Settings className="h-4 w-4" />
+                              Edit Profile
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+                            <DialogHeader>
+                              <DialogTitle>Edit Profile</DialogTitle>
+                            </DialogHeader>
+                            <EditProfileForm />
+                          </DialogContent>
+                        </Dialog>
                       )}
                     </div>
                     

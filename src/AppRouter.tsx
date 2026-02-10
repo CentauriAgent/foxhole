@@ -11,6 +11,7 @@ import Comment from "./pages/Comment";
 import CreatePost from "./pages/CreatePost";
 import Dens from "./pages/Dens";
 import NotFound from "./pages/NotFound";
+import Settings from "./pages/Settings";
 
 // Documentation pages
 import DocsIndex from "./pages/docs/DocsIndex";
@@ -31,6 +32,7 @@ export function AppRouter() {
         <Route path="/d/:den/post/:eventId" element={<Post />} />
         <Route path="/d/:den/comment/:eventId" element={<Comment />} />
         {/* Documentation routes */}
+        <Route path="/settings" element={<Settings />} />
         <Route path="/docs" element={<DocsIndex />} />
         <Route path="/docs/technical" element={<DocsTechnical />} />
         <Route path="/docs/about" element={<DocsAbout />} />
