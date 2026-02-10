@@ -60,34 +60,34 @@ export default function Den() {
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
           <div className="space-y-4">
             <header className="rounded-lg border border-border bg-card p-6">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center justify-center w-16 h-16 rounded-xl bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))]">
-                  <FoxIcon className="h-10 w-10" />
+              <div className="flex items-start gap-4">
+                <div className="flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-xl bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))] shrink-0">
+                  <FoxIcon className="h-7 w-7 sm:h-10 sm:w-10" />
                 </div>
-                <div className="flex-1">
-                  <h1 className="text-2xl font-bold text-[hsl(var(--brand))]">d/{denName}</h1>
-                  <p className="text-muted-foreground">
+                <div className="flex-1 min-w-0">
+                  <h1 className="text-xl sm:text-2xl font-bold text-[hsl(var(--brand))] truncate">d/{denName}</h1>
+                  <p className="text-muted-foreground text-sm">
                     Discussions about {denName}
                   </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  {user && (
-                    <Button
-                      size="sm"
-                      variant={isSubscribed ? 'outline' : 'default'}
-                      className={isSubscribed ? '' : 'bg-[hsl(var(--brand))] hover:bg-[hsl(var(--brand))]/90 text-[hsl(var(--brand-foreground))]'}
-                      disabled={isSubscribing || isUnsubscribing}
-                      onClick={() => isSubscribed ? unsubscribe(identifier) : subscribe(identifier)}
-                    >
-                      {isSubscribed ? 'Leave Den' : 'Join Den'}
-                    </Button>
-                  )}
-                  <Link to={`/create?den=${denName}`}>
-                    <Button size="sm" className="gap-1.5 bg-[hsl(var(--brand))] hover:bg-[hsl(var(--brand))]/90 text-[hsl(var(--brand-foreground))]">
-                      <PenSquare className="h-4 w-4" />
-                      Post
-                    </Button>
-                  </Link>
+                  <div className="flex items-center gap-2 mt-3">
+                    {user && (
+                      <Button
+                        size="sm"
+                        variant={isSubscribed ? 'outline' : 'default'}
+                        className={isSubscribed ? '' : 'bg-[hsl(var(--brand))] hover:bg-[hsl(var(--brand))]/90 text-[hsl(var(--brand-foreground))]'}
+                        disabled={isSubscribing || isUnsubscribing}
+                        onClick={() => isSubscribed ? unsubscribe(identifier) : subscribe(identifier)}
+                      >
+                        {isSubscribed ? 'Leave Den' : 'Join Den'}
+                      </Button>
+                    )}
+                    <Link to={`/create?den=${denName}`}>
+                      <Button size="sm" className="gap-1.5 bg-[hsl(var(--brand))] hover:bg-[hsl(var(--brand))]/90 text-[hsl(var(--brand-foreground))]">
+                        <PenSquare className="h-4 w-4" />
+                        Post
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
               </div>
             </header>
