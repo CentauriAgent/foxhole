@@ -1,32 +1,50 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
-import { Search as SearchIcon, Sparkles } from 'lucide-react';
+import { Search as SearchIcon, Sparkles, X } from 'lucide-react';
 import { SiteHeader } from '@/components/foxhole';
 import { SearchResultCard } from '@/components/foxhole/SearchResultCard';
 import { useSearchPosts } from '@/hooks/useSearchPosts';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 export default function Search() {
   const [searchParams, setSearchParams] = useSearchParams();
   const queryParam = searchParams.get('q') || '';
+  const denParam = searchParams.get('den') || '';
   const [query, setQuery] = useState(queryParam);
+  const [den, setDen] = useState(denParam);
 
   useEffect(() => {
     setQuery(queryParam);
   }, [queryParam]);
 
+  useEffect(() => {
+    setDen(denParam);
+  }, [denParam]);
+
   const { data: results, isLoading } = useSearchPosts({
     query: queryParam,
+    den: denParam || undefined,
     limit: 50,
   });
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
-      setSearchParams({ q: query.trim() });
+      const params: Record<string, string> = { q: query.trim() };
+      if (den.trim()) params.den = den.trim();
+      setSearchParams(params);
+    }
+  };
+
+  const clearDen = () => {
+    setDen('');
+    if (queryParam) {
+      setSearchParams({ q: queryParam });
     }
   };
 
@@ -66,11 +84,33 @@ export default function Search() {
                   autoFocus
                 />
               </div>
+
+              <div className="flex items-center gap-3">
+                <label className="text-sm text-muted-foreground whitespace-nowrap">Den:</label>
+                <Input
+                  type="text"
+                  placeholder="e.g. gaming (leave empty for all)"
+                  value={den}
+                  onChange={(e) => setDen(e.target.value)}
+                  className="h-9 text-sm max-w-xs"
+                />
+              </div>
               
-              <div className="flex items-center justify-end">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {denParam && (
+                    <Badge variant="secondary" className="gap-1">
+                      /d/{denParam}
+                      <button type="button" onClick={clearDen} className="ml-1 hover:text-foreground">
+                        <X className="h-3 w-3" />
+                      </button>
+                    </Badge>
+                  )}
+                </div>
                 {queryParam && (
                   <p className="text-sm text-muted-foreground">
                     Searching for: <span className="font-medium text-foreground">"{queryParam}"</span>
+                    {denParam && <> in <span className="font-medium text-foreground">/d/{denParam}</span></>}
                   </p>
                 )}
               </div>

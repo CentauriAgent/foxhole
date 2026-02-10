@@ -4,19 +4,22 @@ import { useQuery } from '@tanstack/react-query';
 
 interface UseSearchPostsOptions {
   query: string;
+  den?: string;
   limit?: number;
 }
 
 export function useSearchPosts(options: UseSearchPostsOptions) {
   const { nostr } = useNostr();
-  const { query, limit = 50 } = options;
+  const { query, den, limit = 50 } = options;
 
   return useQuery({
-    queryKey: ['search', 'posts', query, limit],
+    queryKey: ['search', 'posts', query, den, limit],
     queryFn: async ({ signal }) => {
       const filter: NostrFilter = {
         kinds: [1111],
         search: query,
+        '#K': ['#'],
+        ...(den ? { '#I': ['#' + den] } : {}),
         limit,
       };
 
