@@ -108,33 +108,31 @@ export function SiteHeader() {
         </div>
       </header>
 
-      {/* Mobile Menu - rendered via portal to escape stacking contexts */}
+      {/* Mobile Menu - full screen */}
       {mobileMenuOpen && createPortal(
-        <div className="fixed inset-0" style={{ zIndex: 9999 }}>
-          {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-black/80"
-            onClick={() => setMobileMenuOpen(false)}
-          />
-          {/* Panel */}
-          <div className="absolute top-0 right-0 bottom-0 w-[280px] sm:w-[320px] p-6 shadow-2xl overflow-y-auto border-l border-border" style={{ background: 'hsl(var(--card))' }}>
-            {/* Close button */}
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 99999, background: '#1a1510', overflowY: 'auto' }}>
+          {/* Top bar matching header */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '56px', padding: '0 16px', borderBottom: '1px solid #2a2219' }}>
+            <Link to="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2">
+              <div className={cn(
+                "flex items-center justify-center w-9 h-9 rounded-lg",
+                "bg-[hsl(var(--brand))] text-[hsl(var(--brand-foreground))]"
+              )}>
+                <FoxIcon className="h-6 w-6" />
+              </div>
+              <span className="font-bold text-xl tracking-tight text-[hsl(var(--brand))]">
+                Foxhole
+              </span>
+            </Link>
             <button
               onClick={() => setMobileMenuOpen(false)}
-              className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100"
+              className="rounded-sm p-2 opacity-70 hover:opacity-100"
             >
-              <X className="h-4 w-4" />
-              <span className="sr-only">Close</span>
+              <X className="h-5 w-5" />
             </button>
-
-            {/* Header */}
-            <div className="flex items-center gap-2 mb-8">
-              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[hsl(var(--brand))] text-[hsl(var(--brand-foreground))]">
-                <FoxIcon className="h-5 w-5" />
-              </div>
-              <span className="text-lg font-semibold text-[hsl(var(--brand))]">Foxhole</span>
-            </div>
-            
+          </div>
+          {/* Menu content */}
+          <div style={{ padding: '24px' }}>
             {/* Nav links */}
             <nav className="flex flex-col gap-2">
               {navItems.map((item) => (
