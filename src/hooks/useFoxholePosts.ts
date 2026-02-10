@@ -27,7 +27,7 @@ export function useFoxholePosts(options: UseFoxholePostsOptions = {}) {
 
   return useQuery({
     queryKey: ['foxhole', 'posts', limit, queryKeyTimeRange],
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       const filter: NostrFilter = {
         kinds: [1111],
         '#k': [HASHTAG_KIND],
@@ -39,7 +39,7 @@ export function useFoxholePosts(options: UseFoxholePostsOptions = {}) {
       }
 
       const events = await nostr.query([filter], {
-        signal: AbortSignal.timeout(10000),
+        signal: AbortSignal.any([signal, AbortSignal.timeout(10000)]),
       });
 
       return events;

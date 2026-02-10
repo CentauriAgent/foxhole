@@ -27,6 +27,7 @@ export function useLargestZaps(options: UseLargestZapsOptions = {}) {
     queryKey: ['foxhole', 'largest-zaps', limit, timeRange],
     queryFn: async ({ signal }) => {
       const since = getTimeRangeSince(timeRange);
+      const combinedSignal = AbortSignal.any([signal, AbortSignal.timeout(8000)]);
 
       const postFilter: NostrFilter = {
         kinds: [1111],
@@ -35,9 +36,7 @@ export function useLargestZaps(options: UseLargestZapsOptions = {}) {
       };
       if (since) postFilter.since = since;
 
-      const posts = await nostr.query([postFilter], {
-        signal: AbortSignal.any([signal, AbortSignal.timeout(5000)]),
-      });
+      const posts = await nostr.query([postFilter], { signal: combinedSignal });
 
       const validPosts = posts.filter((event) => {
         if (!isTopLevelPost(event)) return false;
@@ -51,14 +50,13 @@ export function useLargestZaps(options: UseLargestZapsOptions = {}) {
       const zapFilter: NostrFilter = { kinds: [9735], '#e': postIds, limit: 100 };
       if (since) zapFilter.since = since;
 
-      const zapReceipts = await nostr.query([zapFilter], {
-        signal: AbortSignal.any([signal, AbortSignal.timeout(5000)]),
-      });
+      const zapReceipts = await nostr.query([zapFilter], { signal: combinedSignal });
 
+      const postIdSet = new Set(postIds);
       const allZaps: LargestZap[] = [];
       for (const zap of zapReceipts) {
         const targetEventId = zap.tags.find(([name]) => name === 'e')?.[1] ?? null;
-        if (!targetEventId || !postIds.includes(targetEventId)) continue;
+        if (!targetEventId || !postIdSet.has(targetEventId)) continue;
         const amount = extractSatsFromZap(zap);
         if (amount === 0) continue;
         allZaps.push({

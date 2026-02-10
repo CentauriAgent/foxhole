@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -63,7 +64,7 @@ export function DenCard({
 /**
  * Compact version for sidebar/lists.
  */
-export function DenCardCompact({ 
+export const DenCardCompact = memo(function DenCardCompact({ 
   name, 
   postCount,
   className,
@@ -84,4 +85,4 @@ export function DenCardCompact({
       </span>
     </Link>
   );
-}
+});

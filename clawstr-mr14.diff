@@ -1,0 +1,1629 @@
+diff --git a/package-lock.json b/package-lock.json
+index 545e4b114e91a5f017f4c076a6d4219110be84fa..23e52fe59058b42a66e48296b84859c0cf802c3c 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -3009,6 +3009,7 @@
+       "cpu": [
+         "arm"
+       ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -3022,6 +3023,7 @@
+       "cpu": [
+         "arm64"
+       ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -3035,6 +3037,7 @@
+       "cpu": [
+         "arm64"
+       ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -3048,6 +3051,7 @@
+       "cpu": [
+         "x64"
+       ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -3061,6 +3065,7 @@
+       "cpu": [
+         "arm64"
+       ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -3074,6 +3079,7 @@
+       "cpu": [
+         "x64"
+       ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -3087,6 +3093,7 @@
+       "cpu": [
+         "arm"
+       ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -3100,6 +3107,7 @@
+       "cpu": [
+         "arm"
+       ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -3113,6 +3121,7 @@
+       "cpu": [
+         "arm64"
+       ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -3126,6 +3135,7 @@
+       "cpu": [
+         "arm64"
+       ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -3139,6 +3149,7 @@
+       "cpu": [
+         "loong64"
+       ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -3152,6 +3163,7 @@
+       "cpu": [
+         "ppc64"
+       ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -3165,6 +3177,7 @@
+       "cpu": [
+         "riscv64"
+       ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -3178,6 +3191,7 @@
+       "cpu": [
+         "riscv64"
+       ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -3191,6 +3205,7 @@
+       "cpu": [
+         "s390x"
+       ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -3204,6 +3219,7 @@
+       "cpu": [
+         "x64"
+       ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -3217,6 +3233,7 @@
+       "cpu": [
+         "x64"
+       ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -3230,6 +3247,7 @@
+       "cpu": [
+         "arm64"
+       ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -3243,6 +3261,7 @@
+       "cpu": [
+         "ia32"
+       ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -3256,6 +3275,7 @@
+       "cpu": [
+         "x64"
+       ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+diff --git a/src/components/NoteContent.tsx b/src/components/NoteContent.tsx
+index 15f123507388502364b7fcd4c6cc0e2cc74e2340..f5a0a65d57d7c5c5cdb281d554d28d574336a7ae 100644
+--- a/src/components/NoteContent.tsx
++++ b/src/components/NoteContent.tsx
+@@ -110,7 +110,7 @@ export function NoteContent({
+     }
+     
+     return parts;
+-  }, [event]);
++  }, [event.content]);
+ 
+   return (
+     <div className={cn("whitespace-pre-wrap break-words", className)}>
+diff --git a/src/components/clawstr/AgentCard.tsx b/src/components/clawstr/AgentCard.tsx
+index 66a5bf7fcf67bfc3acaf40a9d3d3c368d41cb1b9..5fb1904cbb9d9d74d083dae7af0ebbdee2f5f779 100644
+--- a/src/components/clawstr/AgentCard.tsx
++++ b/src/components/clawstr/AgentCard.tsx
+@@ -1,3 +1,4 @@
++import { memo } from 'react';
+ import { Link } from 'react-router-dom';
+ import { Zap, FileText, MessageSquare } from 'lucide-react';
+ import { nip19 } from 'nostr-tools';
+@@ -7,7 +8,7 @@ import { useAuthor } from '@/hooks/useAuthor';
+ import { genUserName } from '@/lib/genUserName';
+ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+ import { Skeleton } from '@/components/ui/skeleton';
+-import type { PopularAgent } from '@/hooks/usePopularAgents';
++import type { PopularAgent } from '@/hooks/usePopularPageData';
+ 
+ interface AgentCardProps {
+   agent: PopularAgent;
+@@ -17,8 +18,9 @@ interface AgentCardProps {
+ 
+ /**
+  * Card component displaying a popular agent with their engagement stats.
++ * Memoized to prevent unnecessary re-renders in the sidebar list.
+  */
+-export function AgentCard({ agent, rank, className }: AgentCardProps) {
++export const AgentCard = memo(function AgentCard({ agent, rank, className }: AgentCardProps) {
+   const author = useAuthor(agent.pubkey);
+   const metadata = author.data?.metadata;
+   
+@@ -92,4 +94,4 @@ export function AgentCard({ agent, rank, className }: AgentCardProps) {
+       </div>
+     </Link>
+   );
+-}
++});
+diff --git a/src/components/clawstr/PopularPostCard.tsx b/src/components/clawstr/PopularPostCard.tsx
+index 0d57bd0fb8a97466ed24640e9651b67287b9b415..3db96b5b59854f46d5d1c628104929e2882f7a8d 100644
+--- a/src/components/clawstr/PopularPostCard.tsx
++++ b/src/components/clawstr/PopularPostCard.tsx
+@@ -1,3 +1,4 @@
++import { memo } from 'react';
+ import { Link } from 'react-router-dom';
+ import { MessageSquare, Zap } from 'lucide-react';
+ import type { NostrEvent } from '@nostrify/nostrify';
+@@ -8,7 +9,7 @@ import { VoteButtons } from './VoteButtons';
+ import { AuthorBadge } from './AuthorBadge';
+ import { SubclawBadge } from './SubclawBadge';
+ import { NoteContent } from '@/components/NoteContent';
+-import type { PopularPostMetrics } from '@/hooks/usePopularPosts';
++import type { PopularPostMetrics } from '@/hooks/usePopularPageData';
+ 
+ interface PopularPostCardProps {
+   post: NostrEvent;
+@@ -20,8 +21,10 @@ interface PopularPostCardProps {
+ /**
+  * Post card variant for Popular page with engagement metrics display.
+  * Shows zap amounts, vote score, and reply count prominently.
++ * 
++ * Memoized to prevent re-rendering all 50 cards when a single card's metrics update.
+  */
+-export function PopularPostCard({ 
++export const PopularPostCard = memo(function PopularPostCard({ 
+   post, 
+   metrics,
+   rank,
+@@ -114,4 +117,4 @@ export function PopularPostCard({
+       </div>
+     </article>
+   );
+-}
++});
+diff --git a/src/components/clawstr/SubclawCard.tsx b/src/components/clawstr/SubclawCard.tsx
+index 230d1ed6a1443c19e24855a946502f52816c078b..34434620550c29dce3fbc83efb00a73b29320a6a 100644
+--- a/src/components/clawstr/SubclawCard.tsx
++++ b/src/components/clawstr/SubclawCard.tsx
+@@ -1,3 +1,4 @@
++import { memo } from 'react';
+ import { Link } from 'react-router-dom';
+ import { MessageSquare } from 'lucide-react';
+ import { cn } from '@/lib/utils';
+@@ -62,8 +63,9 @@ export function SubclawCard({
+ 
+ /**
+  * Compact version for sidebar/lists.
++ * Memoized to prevent unnecessary re-renders in the sidebar list.
+  */
+-export function SubclawCardCompact({ 
++export const SubclawCardCompact = memo(function SubclawCardCompact({ 
+   name, 
+   postCount,
+   className,
+@@ -84,4 +86,4 @@ export function SubclawCardCompact({
+       </span>
+     </Link>
+   );
+-}
++});
+diff --git a/src/components/clawstr/ZapActivityItem.tsx b/src/components/clawstr/ZapActivityItem.tsx
+index 6b3539eb680603128a78308f6fcc9fb7b436720e..ed836d1aeba66258995aeed58b2702588d8f5fbe 100644
+--- a/src/components/clawstr/ZapActivityItem.tsx
++++ b/src/components/clawstr/ZapActivityItem.tsx
+@@ -1,3 +1,4 @@
++import { memo } from 'react';
+ import { Zap } from 'lucide-react';
+ import { cn } from '@/lib/utils';
+ import { formatRelativeTime } from '@/lib/clawstr';
+@@ -5,7 +6,7 @@ import { formatSats } from '@/lib/hotScore';
+ import { useAuthor } from '@/hooks/useAuthor';
+ import { genUserName } from '@/lib/genUserName';
+ import type { RecentZap } from '@/hooks/useRecentZaps';
+-import type { LargestZap } from '@/hooks/useLargestZaps';
++import type { LargestZap } from '@/hooks/usePopularPageData';
+ 
+ interface ZapActivityItemProps {
+   zap: RecentZap | LargestZap;
+@@ -15,8 +16,9 @@ interface ZapActivityItemProps {
+ /**
+  * Displays a single zap activity item.
+  * Shows sender, recipient, amount, and time.
++ * Memoized to prevent unnecessary re-renders in the sidebar list.
+  */
+-export function ZapActivityItem({ zap, className }: ZapActivityItemProps) {
++export const ZapActivityItem = memo(function ZapActivityItem({ zap, className }: ZapActivityItemProps) {
+   const sender = useAuthor(zap.senderPubkey ?? undefined);
+   const recipient = useAuthor(zap.recipientPubkey ?? undefined);
+ 
+@@ -48,4 +50,4 @@ export function ZapActivityItem({ zap, className }: ZapActivityItemProps) {
+       </div>
+     </div>
+   );
+-}
++});
+diff --git a/src/hooks/useBatchAuthors.ts b/src/hooks/useBatchAuthors.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..e869c500427642ae1e04a7e9b9def38ed4c18e45
+--- /dev/null
++++ b/src/hooks/useBatchAuthors.ts
+@@ -0,0 +1,61 @@
++import { NSchema as n } from '@nostrify/nostrify';
++import { useNostr } from '@nostrify/react';
++import { useQuery, useQueryClient } from '@tanstack/react-query';
++import { useEffect } from 'react';
++import { hashStringArray } from '@/lib/utils';
++
++/**
++ * Batch fetch author profiles (kind 0) for multiple pubkeys in a single query.
++ * 
++ * Seeds the individual `['author', pubkey]` query cache so that subsequent
++ * `useAuthor(pubkey)` calls hit the cache instead of firing individual requests.
++ * 
++ * This dramatically reduces network requests on pages that display many authors
++ * (e.g., the Popular page with 50+ posts, each needing author metadata).
++ */
++export function useBatchAuthors(pubkeys: string[]) {
++  const { nostr } = useNostr();
++  const queryClient = useQueryClient();
++
++  // Deduplicate for stable query key
++  const uniquePubkeys = [...new Set(pubkeys)].filter(Boolean).sort();
++  const queryKeyHash = hashStringArray(uniquePubkeys);
++
++  const query = useQuery({
++    queryKey: ['clawstr', 'batch-authors', queryKeyHash],
++    queryFn: async ({ signal }) => {
++      if (uniquePubkeys.length === 0) return [];
++
++      const events = await nostr.query(
++        [{ kinds: [0], authors: uniquePubkeys, limit: uniquePubkeys.length }],
++        { signal: AbortSignal.any([signal, AbortSignal.timeout(5000)]) },
++      );
++
++      return events;
++    },
++    enabled: uniquePubkeys.length > 0,
++    staleTime: 5 * 60 * 1000, // Match useAuthor's staleTime
++  });
++
++  // Seed individual author caches when batch data arrives
++  useEffect(() => {
++    if (!query.data) return;
++
++    for (const event of query.data) {
++      const pubkey = event.pubkey;
++
++      // Only seed if not already cached (don't overwrite fresher data)
++      const existing = queryClient.getQueryData(['author', pubkey]);
++      if (existing) continue;
++
++      try {
++        const metadata = n.json().pipe(n.metadata()).parse(event.content);
++        queryClient.setQueryData(['author', pubkey], { metadata, event });
++      } catch {
++        queryClient.setQueryData(['author', pubkey], { event });
++      }
++    }
++  }, [query.data, queryClient]);
++
++  return query;
++}
+diff --git a/src/hooks/useBatchReplyCountsGlobal.ts b/src/hooks/useBatchReplyCountsGlobal.ts
+index b1081bfaeb2bad59c3aecbda41f83ff63e9802ec..f55110a24a9ff75d9937c6765e307cd4ffb1d394 100644
+--- a/src/hooks/useBatchReplyCountsGlobal.ts
++++ b/src/hooks/useBatchReplyCountsGlobal.ts
+@@ -2,6 +2,7 @@ import type { NostrFilter } from '@nostrify/nostrify';
+ import { useNostr } from '@nostrify/react';
+ import { useQuery } from '@tanstack/react-query';
+ import { AI_LABEL } from '@/lib/clawstr';
++import { hashStringArray } from '@/lib/utils';
+ 
+ /**
+  * Get reply counts for multiple posts efficiently across all subclaws.
+@@ -15,9 +16,8 @@ export function useBatchReplyCountsGlobal(
+ ) {
+   const { nostr } = useNostr();
+ 
+-  // Create stable query key - sort once and reuse
+-  const stableIds = eventIds.length > 0 ? [...eventIds].sort() : [];
+-  const queryKeyHash = stableIds.length > 0 ? stableIds.join(',') : 'empty';
++  // Create compact stable query key via hash (much smaller than joining all IDs)
++  const queryKeyHash = hashStringArray(eventIds);
+ 
+   return useQuery({
+     queryKey: ['clawstr', 'batch-reply-counts-global', queryKeyHash, showAll],
+diff --git a/src/hooks/useBatchZaps.ts b/src/hooks/useBatchZaps.ts
+index 1a54d33a43bdb492ecbefa42e1ec55d4554e1140..89ab2b6ffd1a4f3f016efb28b780a54a8ad0ae63 100644
+--- a/src/hooks/useBatchZaps.ts
++++ b/src/hooks/useBatchZaps.ts
+@@ -2,6 +2,7 @@ import type { NostrEvent } from '@nostrify/nostrify';
+ import { useNostr } from '@nostrify/react';
+ import { useQuery } from '@tanstack/react-query';
+ import { nip57 } from 'nostr-tools';
++import { hashStringArray } from '@/lib/utils';
+ 
+ export interface ZapData {
+   zapCount: number;
+@@ -68,9 +69,8 @@ function extractSatsFromZap(zap: NostrEvent): number {
+ export function useBatchZaps(eventIds: string[]) {
+   const { nostr } = useNostr();
+   
+-  // Create stable query key - sort once and reuse
+-  const stableIds = eventIds.length > 0 ? [...eventIds].sort() : [];
+-  const queryKeyHash = stableIds.length > 0 ? stableIds.join(',') : 'empty';
++  // Create compact stable query key via hash (much smaller than joining all IDs)
++  const queryKeyHash = hashStringArray(eventIds);
+ 
+   return useQuery({
+     queryKey: ['clawstr', 'batch-zaps', queryKeyHash],
+diff --git a/src/hooks/useClawstrPosts.ts b/src/hooks/useClawstrPosts.ts
+index 29397232962c8d1d8f6e652e7284d907579f8109..fc2a3c5bf525cc1b12c85910c84f0f63edbad954 100644
+--- a/src/hooks/useClawstrPosts.ts
++++ b/src/hooks/useClawstrPosts.ts
+@@ -30,7 +30,7 @@ export function useClawstrPosts(options: UseClawstrPostsOptions = {}) {
+ 
+   return useQuery({
+     queryKey: ['clawstr', 'posts', showAll, limit, queryKeyTimeRange],
+-    queryFn: async () => {
++    queryFn: async ({ signal }) => {
+       const filter: NostrFilter = {
+         kinds: [1111],
+         '#k': [WEB_KIND],
+@@ -48,7 +48,7 @@ export function useClawstrPosts(options: UseClawstrPostsOptions = {}) {
+       }
+ 
+       return nostr.query([filter], {
+-        signal: AbortSignal.timeout(10000),
++        signal: AbortSignal.any([signal, AbortSignal.timeout(10000)]),
+       });
+     },
+     staleTime: 30 * 1000, // 30 seconds
+diff --git a/src/hooks/useLargestZaps.ts b/src/hooks/useLargestZaps.ts
+index 58ca1f5baefbb1ccbd5eda33e34300e2c34fa191..50cc13f4f3670f5648d8cc8bd318938356db8392 100644
+--- a/src/hooks/useLargestZaps.ts
++++ b/src/hooks/useLargestZaps.ts
+@@ -25,8 +25,10 @@ interface UseLargestZapsOptions {
+ 
+ /**
+  * Fetch largest zaps for Clawstr posts, sorted by amount.
+- * 
+- * Fetches posts and zaps in a single query function to avoid stale closure issues.
++ *
++ * Fetches posts and zap receipts in a single queryFn. The posts query must
++ * complete first (we need IDs to filter zaps), but everything happens within
++ * one React Query cycle — no multi-hook waterfall.
+  */
+ export function useLargestZaps(options: UseLargestZapsOptions = {}) {
+   const { nostr } = useNostr();
+@@ -36,6 +38,7 @@ export function useLargestZaps(options: UseLargestZapsOptions = {}) {
+     queryKey: ['clawstr', 'largest-zaps', limit, timeRange, showAll],
+     queryFn: async ({ signal }) => {
+       const since = getTimeRangeSince(timeRange);
++      const combinedSignal = AbortSignal.any([signal, AbortSignal.timeout(8000)]);
+ 
+       // Step 1: Fetch posts within time range
+       const postFilter: NostrFilter = {
+@@ -53,26 +56,22 @@ export function useLargestZaps(options: UseLargestZapsOptions = {}) {
+         postFilter['#L'] = [AI_LABEL.namespace];
+       }
+ 
+-      const posts = await nostr.query([postFilter], {
+-        signal: AbortSignal.any([signal, AbortSignal.timeout(5000)]),
+-      });
++      const posts = await nostr.query([postFilter], { signal: combinedSignal });
+ 
+-      // Filter to valid Clawstr top-level posts
++      // Filter to valid top-level posts
+       const validPosts = posts.filter((event) => {
+         if (!isTopLevelPost(event)) return false;
+         const identifier = event.tags.find(([name]) => name === 'I')?.[1];
+         return identifier && isClawstrIdentifier(identifier);
+       });
+ 
+-      if (validPosts.length === 0) {
+-        return [];
+-      }
++      if (validPosts.length === 0) return [];
+ 
+       const postIds = validPosts.map((p) => p.id);
+ 
+       // Step 2: Fetch zaps for these posts
+-      const zapFilter: NostrFilter = { 
+-        kinds: [9735], 
++      const zapFilter: NostrFilter = {
++        kinds: [9735],
+         '#e': postIds,
+         limit: 100,
+       };
+@@ -81,39 +80,31 @@ export function useLargestZaps(options: UseLargestZapsOptions = {}) {
+         zapFilter.since = since;
+       }
+ 
+-      const zapReceipts = await nostr.query(
+-        [zapFilter],
+-        { signal: AbortSignal.any([signal, AbortSignal.timeout(5000)]) }
+-      );
++      const zapReceipts = await nostr.query([zapFilter], { signal: combinedSignal });
+ 
+-      // Process and collect all valid zaps
++      // Step 3: Process and sort
++      const postIdSet = new Set(postIds);
+       const allZaps: LargestZap[] = [];
+ 
+       for (const zap of zapReceipts) {
+-        const eTag = zap.tags.find(([name]) => name === 'e');
+-        const targetEventId = eTag?.[1] ?? null;
++        const targetEventId = zap.tags.find(([name]) => name === 'e')?.[1] ?? null;
+ 
+-        if (!targetEventId || !postIds.includes(targetEventId)) continue;
++        if (!targetEventId || !postIdSet.has(targetEventId)) continue;
+ 
+-        const senderPubkey = getZapSender(zap);
+-        const recipientPubkey = getZapRecipient(zap);
+         const amount = extractSatsFromZap(zap);
+-
+         if (amount === 0) continue;
+ 
+         allZaps.push({
+           zapReceipt: zap,
+           targetEventId,
+-          senderPubkey,
+-          recipientPubkey,
++          senderPubkey: getZapSender(zap),
++          recipientPubkey: getZapRecipient(zap),
+           amount,
+           timestamp: zap.created_at,
+         });
+       }
+ 
+-      // Sort by amount descending (largest first)
+       allZaps.sort((a, b) => b.amount - a.amount);
+-
+       return allZaps.slice(0, limit);
+     },
+     staleTime: 60 * 1000,
+diff --git a/src/hooks/usePopularAgents.ts b/src/hooks/usePopularAgents.ts
+index e3be878825a1dc00285a852591cb5f83a4045245..db6aa6fa25db91961539f22c890745bf9c75dccf 100644
+--- a/src/hooks/usePopularAgents.ts
++++ b/src/hooks/usePopularAgents.ts
+@@ -1,11 +1,9 @@
+-import { useMemo } from 'react';
+-import type { NostrFilter } from '@nostrify/nostrify';
++import type { NostrEvent, NostrFilter } from '@nostrify/nostrify';
+ import { useNostr } from '@nostrify/react';
+ import { useQuery } from '@tanstack/react-query';
++import { nip57 } from 'nostr-tools';
+ import { AI_LABEL, WEB_KIND, isClawstrIdentifier } from '@/lib/clawstr';
+ import { getTimeRangeSince, type TimeRange } from '@/lib/hotScore';
+-import { useBatchZaps } from './useBatchZaps';
+-import { useBatchPostVotes } from './usePostVotes';
+ 
+ export interface PopularAgent {
+   pubkey: string;
+@@ -26,125 +24,142 @@ interface UsePopularAgentsOptions {
+ 
+ /**
+  * Get popular agents ranked by their total engagement.
+- * 
+- * Aggregates metrics from ALL content by each author (posts + replies)
+- * to find the most engaging agents on the platform.
++ *
++ * Fetches content, zaps, and votes in a single queryFn using Promise.all
++ * to avoid the sequential waterfall. All relay queries run in parallel.
+  */
+ export function usePopularAgents(options: UsePopularAgentsOptions) {
+   const { nostr } = useNostr();
+   const { showAll = false, timeRange, limit = 10 } = options;
+ 
+-  // Step 1: Fetch ALL Clawstr content (posts + replies) within time range
+-  const contentQuery = useQuery({
+-    queryKey: ['clawstr', 'agent-content-raw', showAll, timeRange],
++  return useQuery({
++    queryKey: ['clawstr', 'popular-agents', showAll, timeRange, limit],
+     queryFn: async ({ signal }) => {
+       const since = getTimeRangeSince(timeRange);
++      const combinedSignal = AbortSignal.any([signal, AbortSignal.timeout(8000)]);
+ 
+-      const filter: NostrFilter = {
++      // Step 1: Fetch all Clawstr content (posts + replies)
++      const contentFilter: NostrFilter = {
+         kinds: [1111],
+-        '#K': [WEB_KIND],  // All Clawstr content has this tag
++        '#K': [WEB_KIND],
+         since,
+-        limit: 150, // Reduced for better performance
++        limit: 150,
+       };
+ 
+-      // Add AI-only filters unless showing all content
+       if (!showAll) {
+-        filter['#l'] = [AI_LABEL.value];
+-        filter['#L'] = [AI_LABEL.namespace];
++        contentFilter['#l'] = [AI_LABEL.value];
++        contentFilter['#L'] = [AI_LABEL.namespace];
+       }
+ 
+-      const events = await nostr.query([filter], {
+-        signal: AbortSignal.any([signal, AbortSignal.timeout(8000)]),
+-      });
++      const rawEvents = await nostr.query([contentFilter], { signal: combinedSignal });
+ 
+-      // Filter to only events with valid Clawstr identifiers
+-      return events.filter((event) => {
++      // Filter to valid Clawstr content
++      const allContent = rawEvents.filter((event) => {
+         const identifier = event.tags.find(([name]) => name === 'I')?.[1];
+         return identifier && isClawstrIdentifier(identifier);
+       });
++
++      if (allContent.length === 0) return [];
++
++      const contentIds = allContent.map((e) => e.id);
++
++      // Step 2: Fetch zaps and votes in parallel (no waterfall)
++      const [zapReceipts, reactions] = await Promise.all([
++        nostr.query([{ kinds: [9735], '#e': contentIds, limit: 500 }], { signal: combinedSignal }),
++        nostr.query([{ kinds: [7], '#e': contentIds, limit: 500 }], { signal: combinedSignal }),
++      ]);
++
++      // Process zaps
++      const zapsMap = new Map<string, number>();
++      for (const zap of zapReceipts) {
++        const targetId = zap.tags.find(([name]) => name === 'e')?.[1];
++        if (targetId) {
++          zapsMap.set(targetId, (zapsMap.get(targetId) ?? 0) + extractSatsAmount(zap));
++        }
++      }
++
++      // Process votes
++      const votesMap = new Map<string, number>();
++      for (const reaction of reactions) {
++        const targetId = reaction.tags.find(([name]) => name === 'e')?.[1];
++        if (targetId) {
++          const content = reaction.content.trim();
++          if (content === '+' || content === '') {
++            votesMap.set(targetId, (votesMap.get(targetId) ?? 0) + 1);
++          } else if (content === '-') {
++            votesMap.set(targetId, (votesMap.get(targetId) ?? 0) - 1);
++          }
++        }
++      }
++
++      // Step 3: Aggregate by author
++      const agentMap = new Map<string, {
++        totalSats: number;
++        totalPosts: number;
++        totalComments: number;
++        totalEngagement: number;
++      }>();
++
++      for (const event of allContent) {
++        const { pubkey } = event;
++        const existing = agentMap.get(pubkey) ?? {
++          totalSats: 0, totalPosts: 0, totalComments: 0, totalEngagement: 0,
++        };
++
++        const kTag = event.tags.find(([name]) => name === 'k')?.[1];
++        const isTopLevel = kTag === WEB_KIND;
++
++        const sats = zapsMap.get(event.id) ?? 0;
++        const voteScore = votesMap.get(event.id) ?? 0;
++        const engagement = sats * 0.1 + voteScore;
++
++        agentMap.set(pubkey, {
++          totalSats: existing.totalSats + sats,
++          totalPosts: existing.totalPosts + (isTopLevel ? 1 : 0),
++          totalComments: existing.totalComments + (isTopLevel ? 0 : 1),
++          totalEngagement: existing.totalEngagement + engagement,
++        });
++      }
++
++      // Convert and sort
++      const agentList: PopularAgent[] = Array.from(agentMap.entries()).map(([pubkey, data]) => ({
++        pubkey, ...data,
++      }));
++
++      return agentList
++        .sort((a, b) => b.totalEngagement - a.totalEngagement)
++        .slice(0, limit);
+     },
+     staleTime: 30 * 1000,
+   });
++}
+ 
+-  const allContent = contentQuery.data ?? [];
+-  const contentIds = allContent.map((e) => e.id);
+-
+-  // Step 2: Batch fetch engagement metrics for ALL content
+-  const zapsQuery = useBatchZaps(contentIds);
+-  const votesQuery = useBatchPostVotes(contentIds);
+-
+-  // Step 3: Aggregate by author
+-  const agents = useMemo<PopularAgent[]>(() => {
+-    if (!contentQuery.data || contentQuery.data.length === 0) return [];
+-
+-    const zapsMap = zapsQuery.data ?? new Map();
+-    const votesMap = votesQuery.data ?? new Map();
+-
+-    // Group by pubkey
+-    const agentMap = new Map<string, {
+-      totalSats: number;
+-      totalPosts: number;
+-      totalComments: number;
+-      totalEngagement: number;
+-    }>();
+-
+-    for (const event of contentQuery.data) {
+-      const { pubkey } = event;
+-      const existing = agentMap.get(pubkey) ?? {
+-        totalSats: 0,
+-        totalPosts: 0,
+-        totalComments: 0,
+-        totalEngagement: 0,
+-      };
++/** Extract sats from a zap receipt using amount tag, bolt11, or description. */
++function extractSatsAmount(zap: NostrEvent): number {
++  const amountTag = zap.tags.find(([name]) => name === 'amount')?.[1];
++  if (amountTag) {
++    const millisats = parseInt(amountTag);
++    if (!isNaN(millisats)) return Math.floor(millisats / 1000);
++  }
++
++  const bolt11Tag = zap.tags.find(([name]) => name === 'bolt11')?.[1];
++  if (bolt11Tag) {
++    try {
++      return nip57.getSatoshisAmountFromBolt11(bolt11Tag);
++    } catch { /* fall through */ }
++  }
++
++  const descriptionTag = zap.tags.find(([name]) => name === 'description')?.[1];
++  if (descriptionTag) {
++    try {
++      const zapRequest = JSON.parse(descriptionTag);
++      const reqAmount = zapRequest.tags?.find(([name]: string[]) => name === 'amount')?.[1];
++      if (reqAmount) {
++        const millisats = parseInt(reqAmount);
++        if (!isNaN(millisats)) return Math.floor(millisats / 1000);
++      }
++    } catch { /* fall through */ }
++  }
+ 
+-      // Check if this is a top-level post or a reply
+-      // Top-level posts have k=web, replies have k=1111
+-      const kTag = event.tags.find(([name]) => name === 'k')?.[1];
+-      const isTopLevel = kTag === WEB_KIND;
+-
+-      // Get engagement metrics for this event
+-      const zapData = zapsMap.get(event.id) ?? { zapCount: 0, totalSats: 0, zaps: [] };
+-      const voteData = votesMap.get(event.id) ?? { upvotes: 0, downvotes: 0, score: 0, reactions: [] };
+-
+-      // Calculate engagement for this event
+-      // Zaps: 0.1 points per sat (10 sats = 1 point)
+-      // Votes: score (upvotes - downvotes)
+-      const engagement = zapData.totalSats * 0.1 + voteData.score;
+-
+-      agentMap.set(pubkey, {
+-        totalSats: existing.totalSats + zapData.totalSats,
+-        totalPosts: existing.totalPosts + (isTopLevel ? 1 : 0),
+-        totalComments: existing.totalComments + (isTopLevel ? 0 : 1),
+-        totalEngagement: existing.totalEngagement + engagement,
+-      });
+-    }
+-
+-    // Convert to array and sort by total engagement
+-    const agentList: PopularAgent[] = Array.from(agentMap.entries()).map(([pubkey, data]) => ({
+-      pubkey,
+-      totalSats: data.totalSats,
+-      totalPosts: data.totalPosts,
+-      totalComments: data.totalComments,
+-      totalEngagement: data.totalEngagement,
+-    }));
+-
+-    // Sort by total engagement descending
+-    return agentList
+-      .sort((a, b) => b.totalEngagement - a.totalEngagement)
+-      .slice(0, limit);
+-  }, [contentQuery.data, zapsQuery.data, votesQuery.data, limit]);
+-
+-  // Combine loading states
+-  const isLoading = contentQuery.isLoading || 
+-    (contentIds.length > 0 && (zapsQuery.isLoading || votesQuery.isLoading));
+-
+-  const isError = contentQuery.isError || zapsQuery.isError || votesQuery.isError;
+-  const error = contentQuery.error || zapsQuery.error || votesQuery.error;
+-
+-  return {
+-    data: agents,
+-    isLoading,
+-    isError,
+-    error,
+-  };
++  return 0;
+ }
+diff --git a/src/hooks/usePopularPageData.ts b/src/hooks/usePopularPageData.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..92d4e1b91cff25f2d65770562d0e92ff721e1522
+--- /dev/null
++++ b/src/hooks/usePopularPageData.ts
+@@ -0,0 +1,308 @@
++import type { NostrEvent, NostrFilter, NostrMetadata } from '@nostrify/nostrify';
++import { NSchema as n } from '@nostrify/nostrify';
++import { useNostr } from '@nostrify/react';
++import { useQuery, useQueryClient } from '@tanstack/react-query';
++import { nip57 } from 'nostr-tools';
++import { useEffect } from 'react';
++import {
++  AI_LABEL, WEB_KIND,
++  identifierToSubclaw, isClawstrIdentifier, isTopLevelPost,
++} from '@/lib/clawstr';
++import {
++  calculateHotScore, getTimeRangeSince,
++  type TimeRange, type PostMetrics,
++} from '@/lib/hotScore';
++import { getZapSender, getZapRecipient, extractSatsFromZap } from './useBatchZaps';
++
++// ── Public types ─────────────────────────────────────────────────────────────
++
++export interface PopularPostMetrics extends PostMetrics {
++  score: number;
++}
++
++export interface PopularPost {
++  event: NostrEvent;
++  metrics: PopularPostMetrics;
++  hotScore: number;
++}
++
++export interface PopularAgent {
++  pubkey: string;
++  totalSats: number;
++  totalPosts: number;
++  totalComments: number;
++  totalEngagement: number;
++}
++
++export interface SubclawStats {
++  name: string;
++  postCount: number;
++  latestPost: number;
++}
++
++export interface LargestZap {
++  zapReceipt: NostrEvent;
++  targetEventId: string | null;
++  senderPubkey: string | null;
++  recipientPubkey: string | null;
++  amount: number;
++  timestamp: number;
++}
++
++interface PopularPageData {
++  posts: PopularPost[];
++  agents: PopularAgent[];
++  subclaws: SubclawStats[];
++  largestZaps: LargestZap[];
++}
++
++interface UsePopularPageDataOptions {
++  showAll?: boolean;
++  timeRange: TimeRange;
++  postsLimit?: number;
++  agentsLimit?: number;
++  zapsLimit?: number;
++}
++
++/**
++ * Single consolidated hook for the entire Popular page.
++ *
++ * Fetches ALL data in exactly **2 sequential relay round-trips**:
++ *   1. Fetch all Clawstr content (posts + replies) — 1 query
++ *   2. Fetch zaps, votes, reply counts, and author profiles — 4 queries in parallel
++ *
++ * This replaces 4+ separate hooks that each had their own internal waterfall,
++ * cutting total relay round-trips from ~8 down to 2.
++ */
++export function usePopularPageData(options: UsePopularPageDataOptions) {
++  const { nostr } = useNostr();
++  const queryClient = useQueryClient();
++  const {
++    showAll = false,
++    timeRange,
++    postsLimit = 50,
++    agentsLimit = 10,
++    zapsLimit = 10,
++  } = options;
++
++  const query = useQuery({
++    queryKey: ['clawstr', 'popular-page', showAll, timeRange, postsLimit, agentsLimit, zapsLimit],
++    queryFn: async ({ signal }): Promise<PopularPageData> => {
++      const since = getTimeRangeSince(timeRange);
++      const s = AbortSignal.any([signal, AbortSignal.timeout(10000)]);
++
++      // ── ROUND-TRIP 1: Fetch all Clawstr content ──────────────────────
++      // One broad query that covers posts + replies for all sections.
++      const contentFilter: NostrFilter = {
++        kinds: [1111],
++        '#K': [WEB_KIND],
++        since,
++        limit: 200,
++      };
++      if (!showAll) {
++        contentFilter['#l'] = [AI_LABEL.value];
++        contentFilter['#L'] = [AI_LABEL.namespace];
++      }
++
++      const allContent = await nostr.query([contentFilter], { signal: s });
++
++      // Separate into top-level posts vs all valid content
++      const validContent = allContent.filter((e) => {
++        const id = e.tags.find(([t]) => t === 'I')?.[1];
++        return id && isClawstrIdentifier(id);
++      });
++
++      const topLevelPosts = validContent.filter(isTopLevelPost);
++      const postIds = topLevelPosts.map((p) => p.id);
++      const allContentIds = validContent.map((e) => e.id);
++
++      if (topLevelPosts.length === 0) {
++        return { posts: [], agents: [], subclaws: [], largestZaps: [] };
++      }
++
++      // Collect all author pubkeys we'll need profiles for
++      const pubkeySet = new Set<string>();
++      for (const e of validContent) pubkeySet.add(e.pubkey);
++
++      // ── ROUND-TRIP 2: Fetch metrics + profiles in parallel ───────────
++      const replyFilter: NostrFilter = {
++        kinds: [1111], '#k': ['1111'], '#e': postIds, limit: 500,
++      };
++      if (!showAll) {
++        replyFilter['#l'] = [AI_LABEL.value];
++        replyFilter['#L'] = [AI_LABEL.namespace];
++      }
++
++      const [zapReceipts, reactions, replyEvents, authorEvents] = await Promise.all([
++        nostr.query([{ kinds: [9735], '#e': allContentIds, limit: 500 }], { signal: s }),
++        nostr.query([{ kinds: [7], '#e': allContentIds, limit: 500 }], { signal: s }),
++        nostr.query([replyFilter], { signal: s }),
++        nostr.query([{ kinds: [0], authors: [...pubkeySet], limit: pubkeySet.size }], { signal: s }),
++      ]);
++
++      // Also collect zap sender/recipient pubkeys for the sidebar
++      for (const zap of zapReceipts) {
++        const sender = getZapSender(zap);
++        const recipient = getZapRecipient(zap);
++        if (sender) pubkeySet.add(sender);
++        if (recipient) pubkeySet.add(recipient);
++      }
++
++      // ── Process zaps ─────────────────────────────────────────────────
++      const zapsMap = new Map<string, { zapCount: number; totalSats: number }>();
++      for (const zap of zapReceipts) {
++        const tid = zap.tags.find(([t]) => t === 'e')?.[1];
++        if (!tid) continue;
++        const cur = zapsMap.get(tid) ?? { zapCount: 0, totalSats: 0 };
++        cur.zapCount++;
++        cur.totalSats += extractSatsLocal(zap);
++        zapsMap.set(tid, cur);
++      }
++
++      // ── Process votes ────────────────────────────────────────────────
++      const votesMap = new Map<string, { upvotes: number; downvotes: number; score: number }>();
++      for (const reaction of reactions) {
++        const tid = reaction.tags.find(([t]) => t === 'e')?.[1];
++        if (!tid) continue;
++        const cur = votesMap.get(tid) ?? { upvotes: 0, downvotes: 0, score: 0 };
++        const c = reaction.content.trim();
++        if (c === '+' || c === '') cur.upvotes++;
++        else if (c === '-') cur.downvotes++;
++        cur.score = cur.upvotes - cur.downvotes;
++        votesMap.set(tid, cur);
++      }
++
++      // ── Process reply counts (for top-level posts only) ──────────────
++      const repliesMap = new Map<string, number>();
++      for (const ev of replyEvents) {
++        const pid = ev.tags.find(([t]) => t === 'e')?.[1];
++        if (pid) repliesMap.set(pid, (repliesMap.get(pid) ?? 0) + 1);
++      }
++
++      // ── Build Popular Posts ──────────────────────────────────────────
++      const posts: PopularPost[] = topLevelPosts.map((event) => {
++        const zd = zapsMap.get(event.id) ?? { zapCount: 0, totalSats: 0 };
++        const vd = votesMap.get(event.id) ?? { upvotes: 0, downvotes: 0, score: 0 };
++        const rc = repliesMap.get(event.id) ?? 0;
++        const metrics: PopularPostMetrics = {
++          totalSats: zd.totalSats, zapCount: zd.zapCount,
++          upvotes: vd.upvotes, downvotes: vd.downvotes, score: vd.score,
++          replyCount: rc, createdAt: event.created_at,
++        };
++        return { event, metrics, hotScore: calculateHotScore(metrics) };
++      });
++      posts.sort((a, b) => b.hotScore - a.hotScore);
++
++      // ── Build Popular Agents ─────────────────────────────────────────
++      const agentMap = new Map<string, {
++        totalSats: number; totalPosts: number;
++        totalComments: number; totalEngagement: number;
++      }>();
++      for (const event of validContent) {
++        const pk = event.pubkey;
++        const cur = agentMap.get(pk) ?? {
++          totalSats: 0, totalPosts: 0, totalComments: 0, totalEngagement: 0,
++        };
++        const isTop = event.tags.find(([t]) => t === 'k')?.[1] === WEB_KIND;
++        const sats = zapsMap.get(event.id)?.totalSats ?? 0;
++        const vs = votesMap.get(event.id)?.score ?? 0;
++        cur.totalSats += sats;
++        cur.totalPosts += isTop ? 1 : 0;
++        cur.totalComments += isTop ? 0 : 1;
++        cur.totalEngagement += sats * 0.1 + vs;
++        agentMap.set(pk, cur);
++      }
++      const agents: PopularAgent[] = Array.from(agentMap.entries())
++        .map(([pubkey, d]) => ({ pubkey, ...d }))
++        .sort((a, b) => b.totalEngagement - a.totalEngagement)
++        .slice(0, agentsLimit);
++
++      // ── Build Popular Subclaws ───────────────────────────────────────
++      const subclawMap = new Map<string, SubclawStats>();
++      for (const event of topLevelPosts) {
++        const id = event.tags.find(([t]) => t === 'I')?.[1];
++        if (!id) continue;
++        const name = identifierToSubclaw(id);
++        if (!name) continue;
++        const cur = subclawMap.get(name);
++        if (cur) {
++          cur.postCount++;
++          cur.latestPost = Math.max(cur.latestPost, event.created_at);
++        } else {
++          subclawMap.set(name, { name, postCount: 1, latestPost: event.created_at });
++        }
++      }
++      const subclaws = Array.from(subclawMap.values())
++        .sort((a, b) => b.postCount - a.postCount);
++
++      // ── Build Largest Zaps ───────────────────────────────────────────
++      const postIdSet = new Set(postIds);
++      const allZaps: LargestZap[] = [];
++      for (const zap of zapReceipts) {
++        const tid = zap.tags.find(([t]) => t === 'e')?.[1] ?? null;
++        if (!tid || !postIdSet.has(tid)) continue;
++        const amount = extractSatsFromZap(zap);
++        if (amount === 0) continue;
++        allZaps.push({
++          zapReceipt: zap, targetEventId: tid,
++          senderPubkey: getZapSender(zap), recipientPubkey: getZapRecipient(zap),
++          amount, timestamp: zap.created_at,
++        });
++      }
++      allZaps.sort((a, b) => b.amount - a.amount);
++
++      return {
++        posts: posts.slice(0, postsLimit),
++        agents,
++        subclaws,
++        largestZaps: allZaps.slice(0, zapsLimit),
++        _authorEvents: authorEvents,
++      } as PopularPageData & { _authorEvents: NostrEvent[] };
++    },
++    staleTime: 30 * 1000,
++  });
++
++  // Seed individual useAuthor caches from the batch-fetched author events
++  useEffect(() => {
++    if (!query.data) return;
++    // Access the private field we stashed on the data object
++    const data = query.data as PopularPageData & { _authorEvents?: NostrEvent[] };
++    const authorEvents = data._authorEvents;
++    if (!authorEvents) return;
++
++    for (const event of authorEvents) {
++      const existing = queryClient.getQueryData(['author', event.pubkey]);
++      if (existing) continue;
++      try {
++        const metadata: NostrMetadata = n.json().pipe(n.metadata()).parse(event.content);
++        queryClient.setQueryData(['author', event.pubkey], { metadata, event });
++      } catch {
++        queryClient.setQueryData(['author', event.pubkey], { event });
++      }
++    }
++  }, [query.data, queryClient]);
++
++  return query;
++}
++
++/** Extract sats from a zap receipt. */
++function extractSatsLocal(zap: NostrEvent): number {
++  const amountTag = zap.tags.find(([t]) => t === 'amount')?.[1];
++  if (amountTag) {
++    const ms = parseInt(amountTag);
++    if (!isNaN(ms)) return Math.floor(ms / 1000);
++  }
++  const bolt11 = zap.tags.find(([t]) => t === 'bolt11')?.[1];
++  if (bolt11) {
++    try { return nip57.getSatoshisAmountFromBolt11(bolt11); } catch { /* */ }
++  }
++  const desc = zap.tags.find(([t]) => t === 'description')?.[1];
++  if (desc) {
++    try {
++      const req = JSON.parse(desc);
++      const a = req.tags?.find(([t]: string[]) => t === 'amount')?.[1];
++      if (a) { const ms = parseInt(a); if (!isNaN(ms)) return Math.floor(ms / 1000); }
++    } catch { /* */ }
++  }
++  return 0;
++}
+diff --git a/src/hooks/usePopularPosts.ts b/src/hooks/usePopularPosts.ts
+index ae1192166328072574879fa148d68d7a47eb24da..f97aac5bcdfb9b45456e7cfd96c99bb4f8377421 100644
+--- a/src/hooks/usePopularPosts.ts
++++ b/src/hooks/usePopularPosts.ts
+@@ -1,10 +1,9 @@
+-import { useMemo } from 'react';
+-import type { NostrEvent } from '@nostrify/nostrify';
++import type { NostrEvent, NostrFilter } from '@nostrify/nostrify';
++import { useNostr } from '@nostrify/react';
++import { useQuery } from '@tanstack/react-query';
++import { nip57 } from 'nostr-tools';
+ import { calculateHotScore, getTimeRangeSince, type TimeRange, type PostMetrics } from '@/lib/hotScore';
+-import { useBatchZaps } from './useBatchZaps';
+-import { useBatchPostVotes } from './usePostVotes';
+-import { useBatchReplyCountsGlobal } from './useBatchReplyCountsGlobal';
+-import { useClawstrPosts } from './useClawstrPosts';
++import { AI_LABEL, WEB_KIND } from '@/lib/clawstr';
+ 
+ export interface PopularPostMetrics extends PostMetrics {
+   score: number; // upvotes - downvotes
+@@ -27,89 +26,165 @@ interface UsePopularPostsOptions {
+ 
+ /**
+  * Fetch popular posts ranked by engagement.
+- * 
+- * Uses progressive loading: posts show immediately, metrics load in background.
+- * Posts are initially sorted by time, then re-sorted by hot score when metrics arrive.
++ *
++ * Fetches posts and all engagement metrics (zaps, votes, replies) in a single
++ * queryFn using Promise.all to avoid the sequential waterfall that was causing
++ * 7-8s load times. Posts and metrics are fetched in parallel, then combined
++ * and sorted by hot score before returning.
+  */
+ export function usePopularPosts(options: UsePopularPostsOptions) {
++  const { nostr } = useNostr();
+   const { showAll = false, timeRange, limit = 50 } = options;
+ 
+-  const since = getTimeRangeSince(timeRange);
+-
+-  // Step 1: Use the shared posts query with time filter
+-  // Pass timeRange for stable query key caching
+-  const postsQuery = useClawstrPosts({ showAll, limit: 100, since, timeRange });
+-
+-  const posts = postsQuery.data ?? [];
+-  const postIds = posts.map((p) => p.id);
+-
+-  // Step 2: Batch fetch engagement metrics (runs in parallel after posts load)
+-  const zapsQuery = useBatchZaps(postIds);
+-  const votesQuery = useBatchPostVotes(postIds);
+-  const repliesQuery = useBatchReplyCountsGlobal(postIds, showAll);
+-
+-  // Check if metrics are still loading
+-  const metricsLoading = postIds.length > 0 && 
+-    (zapsQuery.isLoading || votesQuery.isLoading || repliesQuery.isLoading);
+-
+-  // Step 3: Combine data and calculate hot scores
+-  const popularPosts = useMemo<PopularPost[]>(() => {
+-    if (!postsQuery.data || postsQuery.data.length === 0) return [];
+-
+-    const zapsMap = zapsQuery.data ?? new Map();
+-    const votesMap = votesQuery.data ?? new Map();
+-    const repliesMap = repliesQuery.data ?? new Map();
+-
+-    const postsWithScores: PopularPost[] = postsQuery.data.map((event) => {
+-      const zapData = zapsMap.get(event.id) ?? { zapCount: 0, totalSats: 0, zaps: [] };
+-      const voteData = votesMap.get(event.id) ?? { upvotes: 0, downvotes: 0, score: 0, reactions: [] };
+-      const replyCount = repliesMap.get(event.id) ?? 0;
+-
+-      const metrics: PopularPostMetrics = {
+-        totalSats: zapData.totalSats,
+-        zapCount: zapData.zapCount,
+-        upvotes: voteData.upvotes,
+-        downvotes: voteData.downvotes,
+-        score: voteData.score,
+-        replyCount,
+-        createdAt: event.created_at,
++  return useQuery({
++    queryKey: ['clawstr', 'popular-posts', showAll, timeRange, limit],
++    queryFn: async ({ signal }) => {
++      const since = getTimeRangeSince(timeRange);
++      const timeout = AbortSignal.timeout(8000);
++      const combinedSignal = AbortSignal.any([signal, timeout]);
++
++      // Step 1: Fetch posts
++      const postFilter: NostrFilter = {
++        kinds: [1111],
++        '#k': [WEB_KIND],
++        limit: 100,
+       };
+ 
+-      const hotScore = calculateHotScore(metrics);
++      if (since) {
++        postFilter.since = since;
++      }
+ 
+-      return {
+-        event,
+-        metrics,
+-        hotScore,
++      if (!showAll) {
++        postFilter['#l'] = [AI_LABEL.value];
++        postFilter['#L'] = [AI_LABEL.namespace];
++      }
++
++      const posts = await nostr.query([postFilter], { signal: combinedSignal });
++
++      if (posts.length === 0) return [];
++
++      const postIds = posts.map((p) => p.id);
++
++      // Step 2: Fetch all metrics in parallel (no waterfall)
++      const replyFilter: NostrFilter = {
++        kinds: [1111],
++        '#k': ['1111'],
++        '#e': postIds,
++        limit: 500,
+       };
+-    });
+-
+-    // Sort by hot score descending and limit
+-    return postsWithScores
+-      .sort((a, b) => b.hotScore - a.hotScore)
+-      .slice(0, limit);
+-  }, [postsQuery.data, zapsQuery.data, votesQuery.data, repliesQuery.data, limit]);
+-
+-  // Only show loading state while posts are loading
+-  // Once posts are loaded, show them immediately (metrics will update in place)
+-  const isLoading = postsQuery.isLoading;
+-
+-  const isError = postsQuery.isError || zapsQuery.isError || votesQuery.isError || repliesQuery.isError;
+-
+-  const error = postsQuery.error || zapsQuery.error || votesQuery.error || repliesQuery.error;
+-
+-  return {
+-    data: popularPosts,
+-    isLoading,
+-    isMetricsLoading: metricsLoading,
+-    isError,
+-    error,
+-    // Expose individual query states for debugging
+-    queries: {
+-      posts: postsQuery,
+-      zaps: zapsQuery,
+-      votes: votesQuery,
+-      replies: repliesQuery,
++      if (!showAll) {
++        replyFilter['#l'] = [AI_LABEL.value];
++        replyFilter['#L'] = [AI_LABEL.namespace];
++      }
++
++      const [zapReceipts, reactions, replyEvents] = await Promise.all([
++        nostr.query([{ kinds: [9735], '#e': postIds, limit: 500 }], { signal: combinedSignal }),
++        nostr.query([{ kinds: [7], '#e': postIds, limit: 500 }], { signal: combinedSignal }),
++        nostr.query([replyFilter], { signal: combinedSignal }),
++      ]);
++
++      // Step 3: Process zaps
++      const zapsMap = new Map<string, { zapCount: number; totalSats: number }>();
++      for (const id of postIds) {
++        zapsMap.set(id, { zapCount: 0, totalSats: 0 });
++      }
++      for (const zap of zapReceipts) {
++        const targetId = zap.tags.find(([name]) => name === 'e')?.[1];
++        if (targetId && zapsMap.has(targetId)) {
++          const data = zapsMap.get(targetId)!;
++          data.zapCount++;
++          data.totalSats += extractSatsAmount(zap);
++        }
++      }
++
++      // Step 4: Process votes
++      const votesMap = new Map<string, { upvotes: number; downvotes: number; score: number }>();
++      for (const id of postIds) {
++        votesMap.set(id, { upvotes: 0, downvotes: 0, score: 0 });
++      }
++      for (const reaction of reactions) {
++        const targetId = reaction.tags.find(([name]) => name === 'e')?.[1];
++        if (targetId && votesMap.has(targetId)) {
++          const data = votesMap.get(targetId)!;
++          const content = reaction.content.trim();
++          if (content === '+' || content === '') {
++            data.upvotes++;
++          } else if (content === '-') {
++            data.downvotes++;
++          }
++          data.score = data.upvotes - data.downvotes;
++        }
++      }
++
++      // Step 5: Process reply counts
++      const repliesMap = new Map<string, number>();
++      for (const id of postIds) {
++        repliesMap.set(id, 0);
++      }
++      for (const event of replyEvents) {
++        const parentId = event.tags.find(([name]) => name === 'e')?.[1];
++        if (parentId && repliesMap.has(parentId)) {
++          repliesMap.set(parentId, repliesMap.get(parentId)! + 1);
++        }
++      }
++
++      // Step 6: Calculate hot scores and sort
++      const postsWithScores: PopularPost[] = posts.map((event) => {
++        const zapData = zapsMap.get(event.id) ?? { zapCount: 0, totalSats: 0 };
++        const voteData = votesMap.get(event.id) ?? { upvotes: 0, downvotes: 0, score: 0 };
++        const replyCount = repliesMap.get(event.id) ?? 0;
++
++        const metrics: PopularPostMetrics = {
++          totalSats: zapData.totalSats,
++          zapCount: zapData.zapCount,
++          upvotes: voteData.upvotes,
++          downvotes: voteData.downvotes,
++          score: voteData.score,
++          replyCount,
++          createdAt: event.created_at,
++        };
++
++        return {
++          event,
++          metrics,
++          hotScore: calculateHotScore(metrics),
++        };
++      });
++
++      return postsWithScores
++        .sort((a, b) => b.hotScore - a.hotScore)
++        .slice(0, limit);
+     },
+-  };
++    staleTime: 30 * 1000,
++  });
++}
++
++/** Extract sats from a zap receipt using amount tag, bolt11, or description. */
++function extractSatsAmount(zap: NostrEvent): number {
++  const amountTag = zap.tags.find(([name]) => name === 'amount')?.[1];
++  if (amountTag) {
++    const millisats = parseInt(amountTag);
++    if (!isNaN(millisats)) return Math.floor(millisats / 1000);
++  }
++
++  const bolt11Tag = zap.tags.find(([name]) => name === 'bolt11')?.[1];
++  if (bolt11Tag) {
++    try {
++      return nip57.getSatoshisAmountFromBolt11(bolt11Tag);
++    } catch { /* fall through */ }
++  }
++
++  const descriptionTag = zap.tags.find(([name]) => name === 'description')?.[1];
++  if (descriptionTag) {
++    try {
++      const zapRequest = JSON.parse(descriptionTag);
++      const reqAmount = zapRequest.tags?.find(([name]: string[]) => name === 'amount')?.[1];
++      if (reqAmount) {
++        const millisats = parseInt(reqAmount);
++        if (!isNaN(millisats)) return Math.floor(millisats / 1000);
++      }
++    } catch { /* fall through */ }
++  }
++
++  return 0;
+ }
+diff --git a/src/hooks/usePopularSubclaws.ts b/src/hooks/usePopularSubclaws.ts
+index 9f4cf6292d42950d7ee82c2f5452b1ea6c2c9899..ef9deea2e34c2f616cab9f2ea4263ad118e899be 100644
+--- a/src/hooks/usePopularSubclaws.ts
++++ b/src/hooks/usePopularSubclaws.ts
+@@ -1,6 +1,8 @@
+ import { useMemo } from 'react';
+ import { identifierToSubclaw, isClawstrIdentifier } from '@/lib/clawstr';
+ import { useClawstrPosts } from './useClawstrPosts';
++import type { TimeRange } from '@/lib/hotScore';
++import { getTimeRangeSince } from '@/lib/hotScore';
+ 
+ interface SubclawStats {
+   name: string;
+@@ -13,19 +15,22 @@ interface UsePopularSubclawsOptions {
+   showAll?: boolean;
+   /** Maximum number of posts to scan */
+   limit?: number;
++  /** Time range for filtering posts */
++  timeRange?: TimeRange;
+ }
+ 
+ /**
+  * Discover popular subclaws by scanning recent posts.
+  * 
+- * Reuses the shared posts query to avoid duplicate fetching.
++ * Uses useClawstrPosts as the data source and computes subclaw stats in-memory.
+  * Returns subclaws sorted by post count.
+  */
+ export function usePopularSubclaws(options: UsePopularSubclawsOptions = {}) {
+-  const { showAll = false, limit = 100 } = options;
++  const { showAll = false, limit = 100, timeRange } = options;
+ 
+-  // Reuse the shared posts query
+-  const postsQuery = useClawstrPosts({ showAll, limit });
++  const since = timeRange ? getTimeRangeSince(timeRange) : undefined;
++
++  const postsQuery = useClawstrPosts({ showAll, limit, since, timeRange });
+ 
+   // Compute subclaw stats from posts
+   const subclaws = useMemo(() => {
+diff --git a/src/hooks/usePostReplies.ts b/src/hooks/usePostReplies.ts
+index 2d8c4018a1dfd98941f871b59e608e452015c44f..9538f1d03a7df7501dbcebeac0040149f7b9d532 100644
+--- a/src/hooks/usePostReplies.ts
++++ b/src/hooks/usePostReplies.ts
+@@ -2,6 +2,7 @@ import type { NostrEvent, NostrFilter } from '@nostrify/nostrify';
+ import { useNostr } from '@nostrify/react';
+ import { useQuery } from '@tanstack/react-query';
+ import { AI_LABEL, subclawToIdentifier } from '@/lib/clawstr';
++import { hashStringArray } from '@/lib/utils';
+ 
+ interface RepliesData {
+   allReplies: NostrEvent[];
+@@ -131,7 +132,7 @@ export function useBatchReplyCounts(
+   const { nostr } = useNostr();
+ 
+   return useQuery({
+-    queryKey: ['clawstr', 'batch-reply-counts', [...eventIds].sort().join(','), subclaw, showAll],
++    queryKey: ['clawstr', 'batch-reply-counts', hashStringArray(eventIds), subclaw, showAll],
+     queryFn: async ({ signal }) => {
+       if (eventIds.length === 0) {
+         return new Map<string, number>();
+diff --git a/src/hooks/usePostVotes.ts b/src/hooks/usePostVotes.ts
+index ac3c9c1bdaff0a785fa13f9d276d0ce81383df28..b029afdf76068afa392fb761dae3664f1582446f 100644
+--- a/src/hooks/usePostVotes.ts
++++ b/src/hooks/usePostVotes.ts
+@@ -1,6 +1,7 @@
+ import type { NostrEvent } from '@nostrify/nostrify';
+ import { useNostr } from '@nostrify/react';
+ import { useQuery } from '@tanstack/react-query';
++import { hashStringArray } from '@/lib/utils';
+ 
+ interface VoteData {
+   upvotes: number;
+@@ -62,9 +63,8 @@ export function usePostVotes(eventId: string | undefined) {
+ export function useBatchPostVotes(eventIds: string[]) {
+   const { nostr } = useNostr();
+   
+-  // Create stable query key - sort once and reuse
+-  const stableIds = eventIds.length > 0 ? [...eventIds].sort() : [];
+-  const queryKeyHash = stableIds.length > 0 ? stableIds.join(',') : 'empty';
++  // Create compact stable query key via hash (much smaller than joining all IDs)
++  const queryKeyHash = hashStringArray(eventIds);
+ 
+   return useQuery({
+     queryKey: ['clawstr', 'batch-votes', queryKeyHash],
+diff --git a/src/lib/utils.ts b/src/lib/utils.ts
+index bd0c391ddd1088e9067844c48835bf4abcd61783..6f38b283af44891cf047b12620a4537142a272f5 100644
+--- a/src/lib/utils.ts
++++ b/src/lib/utils.ts
+@@ -4,3 +4,23 @@ import { twMerge } from "tailwind-merge"
+ export function cn(...inputs: ClassValue[]) {
+   return twMerge(clsx(inputs))
+ }
++
++/**
++ * Create a short, stable hash from an array of strings for use as query keys.
++ * 
++ * Sorts the array for order-independence, then uses a fast hash (djb2) to produce
++ * a compact string. Much more efficient than joining all IDs into one giant string.
++ */
++export function hashStringArray(items: string[]): string {
++  if (items.length === 0) return 'empty';
++  const sorted = [...items].sort();
++  // djb2 hash - fast and produces good distribution
++  let hash = 5381;
++  for (const item of sorted) {
++    for (let i = 0; i < item.length; i++) {
++      hash = ((hash << 5) + hash + item.charCodeAt(i)) | 0;
++    }
++  }
++  // Include count to distinguish sets of different sizes that hash-collide
++  return `${(hash >>> 0).toString(36)}_${sorted.length}`;
++}
+diff --git a/src/pages/Popular.tsx b/src/pages/Popular.tsx
+index b6265246c5f6feb9706da355e2708d779547d100..91f04605f562337995b239c4e4d69de0070e0343 100644
+--- a/src/pages/Popular.tsx
++++ b/src/pages/Popular.tsx
+@@ -10,10 +10,7 @@ import {
+   AgentCard,
+   ZapActivityItem,
+ } from '@/components/clawstr';
+-import { usePopularSubclaws } from '@/hooks/usePopularSubclaws';
+-import { usePopularPosts } from '@/hooks/usePopularPosts';
+-import { usePopularAgents } from '@/hooks/usePopularAgents';
+-import { useLargestZaps } from '@/hooks/useLargestZaps';
++import { usePopularPageData } from '@/hooks/usePopularPageData';
+ import { Skeleton } from '@/components/ui/skeleton';
+ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+ import type { TimeRange } from '@/lib/hotScore';
+@@ -21,31 +18,21 @@ import type { TimeRange } from '@/lib/hotScore';
+ export default function Popular() {
+   const [showAll, setShowAll] = useState(false);
+   const [timeRange, setTimeRange] = useState<TimeRange>('24h');
+-  
+-  // Fetch data
+-  const { data: posts, isLoading: postsLoading } = usePopularPosts({ 
+-    showAll, 
+-    timeRange,
+-    limit: 50,
+-  });
+-  
+-  const { data: agents, isLoading: agentsLoading } = usePopularAgents({ 
+-    showAll, 
+-    timeRange,
+-    limit: 10,
+-  });
+-  
+-  const { data: subclaws, isLoading: subclawsLoading } = usePopularSubclaws({ 
+-    showAll, 
+-    limit: 100,
+-  });
+-  
+-  const { data: largestZaps, isLoading: largestZapsLoading } = useLargestZaps({ 
+-    limit: 10,
++
++  // Single consolidated query: fetches ALL page data in 2 relay round-trips.
++  const { data, isLoading } = usePopularPageData({
+     showAll,
+     timeRange,
++    postsLimit: 50,
++    agentsLimit: 10,
++    zapsLimit: 10,
+   });
+ 
++  const posts = data?.posts ?? [];
++  const agents = data?.agents ?? [];
++  const subclaws = data?.subclaws ?? [];
++  const largestZaps = data?.largestZaps ?? [];
++
+   useSeoMeta({
+     title: 'Popular - Clawstr',
+     description: 'Discover trending posts, top agents, and popular communities on Clawstr',
+@@ -90,8 +77,7 @@ export default function Popular() {
+               </div>
+               
+               <div className="rounded-lg border border-border bg-card divide-y divide-border">
+-                {postsLoading ? (
+-                  // Loading skeletons
++                {isLoading ? (
+                   [...Array(5)].map((_, i) => (
+                     <div key={i} className="p-3 flex gap-3">
+                       <div className="flex items-start gap-2">
+@@ -110,7 +96,7 @@ export default function Popular() {
+                       </div>
+                     </div>
+                   ))
+-                ) : posts && posts.length > 0 ? (
++                ) : posts.length > 0 ? (
+                   posts.map((post, index) => (
+                     <PopularPostCard
+                       key={post.event.id}
+@@ -142,7 +128,7 @@ export default function Popular() {
+                 </CardTitle>
+               </CardHeader>
+               <CardContent className="pt-0">
+-                {agentsLoading ? (
++                {isLoading ? (
+                   <div className="space-y-2">
+                     {[...Array(5)].map((_, i) => (
+                       <div key={i} className="flex items-center gap-3 p-2">
+@@ -155,7 +141,7 @@ export default function Popular() {
+                       </div>
+                     ))}
+                   </div>
+-                ) : agents && agents.length > 0 ? (
++                ) : agents.length > 0 ? (
+                   <div className="space-y-1">
+                     {agents.map((agent, index) => (
+                       <AgentCard
+@@ -182,7 +168,7 @@ export default function Popular() {
+                 </CardTitle>
+               </CardHeader>
+               <CardContent className="pt-0">
+-                {subclawsLoading ? (
++                {isLoading ? (
+                   <div className="space-y-2">
+                     {[...Array(5)].map((_, i) => (
+                       <div key={i} className="p-2">
+@@ -196,7 +182,7 @@ export default function Popular() {
+                       </div>
+                     ))}
+                   </div>
+-                ) : subclaws && subclaws.length > 0 ? (
++                ) : subclaws.length > 0 ? (
+                   <div className="space-y-1">
+                     {subclaws.map((subclaw) => (
+                       <SubclawCardCompact
+@@ -223,7 +209,7 @@ export default function Popular() {
+                 </CardTitle>
+               </CardHeader>
+               <CardContent className="pt-0">
+-                {largestZapsLoading ? (
++                {isLoading ? (
+                   <div className="space-y-2">
+                     {[...Array(5)].map((_, i) => (
+                       <div key={i} className="flex items-start gap-2 py-2">
+@@ -235,7 +221,7 @@ export default function Popular() {
+                       </div>
+                     ))}
+                   </div>
+-                ) : largestZaps && largestZaps.length > 0 ? (
++                ) : largestZaps.length > 0 ? (
+                   <div className="divide-y divide-border">
+                     {largestZaps.map((zap) => (
+                       <ZapActivityItem

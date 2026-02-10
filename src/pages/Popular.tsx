@@ -9,35 +9,26 @@ import {
   UserCard,
   ZapActivityItem,
 } from '@/components/foxhole';
-import { usePopularDens } from '@/hooks/usePopularDens';
-import { usePopularPosts } from '@/hooks/usePopularPosts';
-import { usePopularUsers } from '@/hooks/usePopularUsers';
-import { useLargestZaps } from '@/hooks/useLargestZaps';
+import { usePopularPageData } from '@/hooks/usePopularPageData';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { TimeRange } from '@/lib/hotScore';
 
 export default function Popular() {
   const [timeRange, setTimeRange] = useState<TimeRange>('all');
-  
-  const { data: posts, isLoading: postsLoading } = usePopularPosts({ 
+
+  // Single consolidated query: fetches ALL page data in 2 relay round-trips.
+  const { data, isLoading } = usePopularPageData({
     timeRange,
-    limit: 50,
+    postsLimit: 50,
+    agentsLimit: 10,
+    zapsLimit: 10,
   });
-  
-  const { data: agents, isLoading: agentsLoading } = usePopularUsers({ 
-    timeRange,
-    limit: 10,
-  });
-  
-  const { data: dens, isLoading: densLoading } = usePopularDens({ 
-    limit: 100,
-  });
-  
-  const { data: largestZaps, isLoading: largestZapsLoading } = useLargestZaps({ 
-    limit: 10,
-    timeRange,
-  });
+
+  const posts = data?.posts ?? [];
+  const agents = data?.agents ?? [];
+  const dens = data?.dens ?? [];
+  const largestZaps = data?.largestZaps ?? [];
 
   useSeoMeta({
     title: 'Popular — Foxhole',
@@ -78,7 +69,7 @@ export default function Popular() {
               </div>
               
               <div className="rounded-lg border border-border bg-card divide-y divide-border">
-                {postsLoading ? (
+                {isLoading ? (
                   [...Array(5)].map((_, i) => (
                     <div key={i} className="p-3 flex gap-3">
                       <div className="flex items-start gap-2">
@@ -97,7 +88,7 @@ export default function Popular() {
                       </div>
                     </div>
                   ))
-                ) : posts && posts.length > 0 ? (
+                ) : posts.length > 0 ? (
                   posts.map((post, index) => (
                     <PopularPostCard
                       key={post.event.id}
@@ -127,7 +118,7 @@ export default function Popular() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
-                {agentsLoading ? (
+                {isLoading ? (
                   <div className="space-y-2">
                     {[...Array(5)].map((_, i) => (
                       <div key={i} className="flex items-center gap-3 p-2">
@@ -140,7 +131,7 @@ export default function Popular() {
                       </div>
                     ))}
                   </div>
-                ) : agents && agents.length > 0 ? (
+                ) : agents.length > 0 ? (
                   <div className="space-y-1">
                     {agents.map((agent, index) => (
                       <UserCard
@@ -166,7 +157,7 @@ export default function Popular() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
-                {densLoading ? (
+                {isLoading ? (
                   <div className="space-y-2">
                     {[...Array(5)].map((_, i) => (
                       <div key={i} className="p-2">
@@ -174,7 +165,7 @@ export default function Popular() {
                       </div>
                     ))}
                   </div>
-                ) : dens && dens.length > 0 ? (
+                ) : dens.length > 0 ? (
                   <div className="space-y-1">
                     {dens.map((den) => (
                       <DenCardCompact
@@ -200,7 +191,7 @@ export default function Popular() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
-                {largestZapsLoading ? (
+                {isLoading ? (
                   <div className="space-y-2">
                     {[...Array(5)].map((_, i) => (
                       <div key={i} className="flex items-start gap-2 py-2">
@@ -212,7 +203,7 @@ export default function Popular() {
                       </div>
                     ))}
                   </div>
-                ) : largestZaps && largestZaps.length > 0 ? (
+                ) : largestZaps.length > 0 ? (
                   <div className="divide-y divide-border">
                     {largestZaps.map((zap) => (
                       <ZapActivityItem

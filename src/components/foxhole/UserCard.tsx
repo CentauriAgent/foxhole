@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { Zap, FileText, MessageSquare } from 'lucide-react';
 import { nip19 } from 'nostr-tools';
@@ -7,7 +8,7 @@ import { useAuthor } from '@/hooks/useAuthor';
 import { genUserName } from '@/lib/genUserName';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
-import type { PopularUser } from '@/hooks/usePopularUsers';
+import type { PopularUser } from '@/hooks/usePopularPageData';
 
 interface UserCardProps {
   user: PopularUser;
@@ -18,7 +19,7 @@ interface UserCardProps {
 /**
  * Card component displaying a popular user with their engagement stats.
  */
-export function UserCard({ user, rank, className }: UserCardProps) {
+export const UserCard = memo(function UserCard({ user, rank, className }: UserCardProps) {
   const author = useAuthor(user.pubkey);
   const metadata = author.data?.metadata;
   
@@ -92,4 +93,4 @@ export function UserCard({ user, rank, className }: UserCardProps) {
       </div>
     </Link>
   );
-}
+});

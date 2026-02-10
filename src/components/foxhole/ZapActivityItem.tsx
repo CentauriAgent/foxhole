@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatRelativeTime } from '@/lib/foxhole';
@@ -5,7 +6,7 @@ import { formatSats } from '@/lib/hotScore';
 import { useAuthor } from '@/hooks/useAuthor';
 import { genUserName } from '@/lib/genUserName';
 import type { RecentZap } from '@/hooks/useRecentZaps';
-import type { LargestZap } from '@/hooks/useLargestZaps';
+import type { LargestZap } from '@/hooks/usePopularPageData';
 
 interface ZapActivityItemProps {
   zap: RecentZap | LargestZap;
@@ -16,7 +17,7 @@ interface ZapActivityItemProps {
  * Displays a single zap activity item.
  * Shows sender, recipient, amount, and time.
  */
-export function ZapActivityItem({ zap, className }: ZapActivityItemProps) {
+export const ZapActivityItem = memo(function ZapActivityItem({ zap, className }: ZapActivityItemProps) {
   const sender = useAuthor(zap.senderPubkey ?? undefined);
   const recipient = useAuthor(zap.recipientPubkey ?? undefined);
 
@@ -48,4 +49,4 @@ export function ZapActivityItem({ zap, className }: ZapActivityItemProps) {
       </div>
     </div>
   );
-}
+});

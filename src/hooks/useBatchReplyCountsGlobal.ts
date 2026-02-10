@@ -1,6 +1,7 @@
 import type { NostrFilter } from '@nostrify/nostrify';
 import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
+import { hashStringArray } from '@/lib/utils';
 
 /**
  * Get reply counts for multiple posts efficiently across all dens.
@@ -8,8 +9,8 @@ import { useQuery } from '@tanstack/react-query';
 export function useBatchReplyCountsGlobal(eventIds: string[]) {
   const { nostr } = useNostr();
 
-  const stableIds = eventIds.length > 0 ? [...eventIds].sort() : [];
-  const queryKeyHash = stableIds.length > 0 ? stableIds.join(',') : 'empty';
+  // Create compact stable query key via hash
+  const queryKeyHash = hashStringArray(eventIds);
 
   return useQuery({
     queryKey: ['foxhole', 'batch-reply-counts-global', queryKeyHash],
