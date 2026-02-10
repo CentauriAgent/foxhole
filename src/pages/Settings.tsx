@@ -243,21 +243,23 @@ export default function Settings() {
                           <p className="text-sm text-muted-foreground">No relays configured. Add one below.</p>
                         )}
                         {relays.map((relay) => (
-                          <div key={relay.url} className="flex items-center gap-3 p-3 rounded-lg border border-border">
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-mono truncate">{relay.url}</p>
-                            </div>
+                          <div key={relay.url} className="p-3 rounded-lg border border-border space-y-2">
                             <div className="flex items-center gap-2">
-                              <Label className="text-xs">Read</Label>
-                              <Switch checked={relay.read} onCheckedChange={() => toggleRelay(relay.url, 'read')} />
+                              <p className="flex-1 text-sm font-mono truncate min-w-0">{relay.url}</p>
+                              <Button variant="ghost" size="icon" className="shrink-0" onClick={() => removeRelay(relay.url)}>
+                                <Trash2 className="h-4 w-4 text-red-500" />
+                              </Button>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <Label className="text-xs">Write</Label>
-                              <Switch checked={relay.write} onCheckedChange={() => toggleRelay(relay.url, 'write')} />
+                            <div className="flex items-center gap-4">
+                              <div className="flex items-center gap-2">
+                                <Switch checked={relay.read} onCheckedChange={() => toggleRelay(relay.url, 'read')} />
+                                <Label className="text-xs">Read</Label>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Switch checked={relay.write} onCheckedChange={() => toggleRelay(relay.url, 'write')} />
+                                <Label className="text-xs">Write</Label>
+                              </div>
                             </div>
-                            <Button variant="ghost" size="icon" onClick={() => removeRelay(relay.url)}>
-                              <Trash2 className="h-4 w-4 text-red-500" />
-                            </Button>
                           </div>
                         ))}
                         <div className="flex gap-2">
