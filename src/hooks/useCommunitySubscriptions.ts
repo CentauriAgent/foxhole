@@ -4,9 +4,9 @@ import { useCurrentUser } from './useCurrentUser';
 import { useNostrPublish } from './useNostrPublish';
 import { identifierToDen } from '@/lib/foxhole';
 
-const COMMUNITY_LIST_KIND = 30073;
+const COMMUNITY_LIST_KIND = 10073;
 
-/** Fetch the user's subscribed community identifiers from kind:30073. */
+/** Fetch the user's subscribed community identifiers from kind:10073 (DIP-05). */
 export function useCommunitySubscriptions() {
   const { nostr } = useNostr();
   const { user } = useCurrentUser();
@@ -18,7 +18,7 @@ export function useCommunitySubscriptions() {
       if (!pubkey) return [];
 
       const events = await nostr.query(
-        [{ kinds: [COMMUNITY_LIST_KIND], authors: [pubkey], '#d': [''], limit: 1 }],
+        [{ kinds: [COMMUNITY_LIST_KIND], authors: [pubkey], limit: 1 }],
         { signal: AbortSignal.any([signal, AbortSignal.timeout(5000)]) },
       );
 
@@ -61,14 +61,14 @@ export function useSubscribeToCommunity() {
 
       // Fetch current list
       const events = await nostr.query(
-        [{ kinds: [COMMUNITY_LIST_KIND], authors: [user.pubkey], '#d': [''], limit: 1 }],
+        [{ kinds: [COMMUNITY_LIST_KIND], authors: [user.pubkey], limit: 1 }],
         { signal: AbortSignal.timeout(5000) },
       );
 
       const existing = events.sort((a, b) => b.created_at - a.created_at)[0];
       const currentTags: string[][] = existing
-        ? existing.tags.filter(([name]) => name === 'I' || name === 'd')
-        : [['d', '']];
+        ? existing.tags.filter(([name]) => name === 'I')
+        : [];
 
       // Already subscribed?
       if (currentTags.some(([, val]) => val === identifier)) return;
@@ -95,7 +95,7 @@ export function useUnsubscribeFromCommunity() {
       if (!user) throw new Error('Not logged in');
 
       const events = await nostr.query(
-        [{ kinds: [COMMUNITY_LIST_KIND], authors: [user.pubkey], '#d': [''], limit: 1 }],
+        [{ kinds: [COMMUNITY_LIST_KIND], authors: [user.pubkey], limit: 1 }],
         { signal: AbortSignal.timeout(5000) },
       );
 
