@@ -9,6 +9,7 @@ import { ZapButton } from '@/components/ZapButton';
 import { AuthorBadge } from './AuthorBadge';
 import { DenBadge } from './DenBadge';
 import { NoteContent } from '@/components/NoteContent';
+import { PostOverflowMenu } from './PostOverflowMenu';
 import type { PopularPostMetrics } from '@/hooks/usePopularPageData';
 
 interface PopularPostCardProps {
@@ -106,6 +107,7 @@ export const PopularPostCard = memo(function PopularPostCard({
             <MessageSquare className="h-3.5 w-3.5" />
             <span>{formatCount(metrics.replyCount)} {metrics.replyCount === 1 ? 'comment' : 'comments'}</span>
           </Link>
+          <PostOverflowMenu post={post} />
         </div>
       </div>
     </article>

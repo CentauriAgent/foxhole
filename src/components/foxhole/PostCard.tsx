@@ -8,6 +8,7 @@ import { ZapButton } from '@/components/ZapButton';
 import { AuthorBadge } from './AuthorBadge';
 import { DenBadge } from './DenBadge';
 import { NoteContent } from '@/components/NoteContent';
+import { PostOverflowMenu } from './PostOverflowMenu';
 
 interface PostCardProps {
   post: NostrEvent;
@@ -110,6 +111,7 @@ export function PostCard({
             <MessageSquare className="h-4 w-4" />
             <span>{formatCount(replyCount)} {replyCount === 1 ? 'comment' : 'comments'}</span>
           </Link>
+          <PostOverflowMenu post={post} />
         </div>
       </div>
     </article>

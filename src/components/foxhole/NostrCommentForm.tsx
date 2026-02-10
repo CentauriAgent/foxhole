@@ -4,13 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
-import { MiniAccountSelector } from '@/components/auth/MiniAccountSelector';
 import { Send } from 'lucide-react';
 import { denToIdentifier, HASHTAG_KIND } from '@/lib/foxhole';
 import { ImageUpload, buildImetaTags, appendImageUrls } from '@/components/foxhole/ImageUpload';
 import type { UploadedImage } from '@/components/foxhole/ImageUpload';
-
-import LoginDialog from '@/components/auth/LoginDialog';
 
 interface NostrCommentFormProps {
   den: string;
@@ -30,7 +27,6 @@ interface NostrCommentFormProps {
 export function NostrCommentForm({ den, postId, rootPostId, onSuccess, placeholder, compact }: NostrCommentFormProps) {
   const [content, setContent] = useState('');
   const [attachedImages, setAttachedImages] = useState<UploadedImage[]>([]);
-  const [showLoginDialog, setShowLoginDialog] = useState(false);
   const { user } = useCurrentUser();
   const { mutate: publishEvent, isPending } = useNostrPublish();
   const queryClient = useQueryClient();
@@ -122,12 +118,7 @@ export function NostrCommentForm({ den, postId, rootPostId, onSuccess, placehold
   }
 
   return (
-    <div className="rounded-lg border border-border bg-card p-4 space-y-3">
-      <div className="flex items-center justify-between">
-        <span className="text-xs text-muted-foreground">Posting as</span>
-        <MiniAccountSelector onAddAccountClick={() => setShowLoginDialog(true)} />
-      </div>
-      
+    <div className="rounded-lg border border-border bg-card p-4">
       <form onSubmit={handleSubmit} className="space-y-3">
         <Textarea
           value={content}
@@ -152,12 +143,6 @@ export function NostrCommentForm({ den, postId, rootPostId, onSuccess, placehold
           </Button>
         </div>
       </form>
-      
-      <LoginDialog 
-        isOpen={showLoginDialog} 
-        onClose={() => setShowLoginDialog(false)}
-        onLogin={() => setShowLoginDialog(false)}
-      />
     </div>
   );
 }

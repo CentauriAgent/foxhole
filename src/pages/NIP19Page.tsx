@@ -1,7 +1,7 @@
 import { nip19 } from 'nostr-tools';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
-import { User, ExternalLink, MessageSquare, FileText, Zap, Settings } from 'lucide-react';
+import { User, ExternalLink, MessageSquare, FileText, Zap, Settings, UserPlus, UserMinus } from 'lucide-react';
 import { SiteHeader, Sidebar, PostList, ReplyList, FoxIcon } from '@/components/foxhole';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,8 @@ import { useUserPosts } from '@/hooks/useUserPosts';
 import { useUserReplies } from '@/hooks/useUserReplies';
 import { genUserName } from '@/lib/genUserName';
 import { cn } from '@/lib/utils';
+import { useIsFollowing, useFollow, useUnfollow } from '@/hooks/useFollows';
+import { useToast } from '@/hooks/useToast';
 import NotFound from './NotFound';
 
 export function NIP19Page() {
@@ -62,6 +64,10 @@ function ProfilePage({ pubkey }: { pubkey: string }) {
   const { data: author, isLoading: authorLoading } = useAuthor(pubkey);
   const { data: posts, isLoading: postsLoading } = useUserPosts(pubkey);
   const { data: replies, isLoading: repliesLoading } = useUserReplies(pubkey);
+  const isFollowing = useIsFollowing(pubkey);
+  const { mutate: follow, isPending: isFollowing_ } = useFollow();
+  const { mutate: unfollow, isPending: isUnfollowing } = useUnfollow();
+  const { toast } = useToast();
   
   const metadata = author?.metadata;
   const displayName = metadata?.name || metadata?.display_name || genUserName(pubkey);
@@ -144,6 +150,37 @@ function ProfilePage({ pubkey }: { pubkey: string }) {
                             Zap
                           </Button>
                         </ProfileZapDialog>
+                      )}
+                      {currentUser && !isOwnProfile && (
+                        isFollowing ? (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="gap-1.5"
+                            disabled={isUnfollowing}
+                            onClick={() => unfollow(pubkey, {
+                              onSuccess: () => toast({ title: 'Unfollowed', description: `You unfollowed ${displayName}` }),
+                              onError: () => toast({ title: 'Error', description: 'Failed to unfollow', variant: 'destructive' }),
+                            })}
+                          >
+                            <UserMinus className="h-4 w-4" />
+                            {isUnfollowing ? 'Unfollowing...' : 'Unfollow'}
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="default"
+                            size="sm"
+                            className="gap-1.5"
+                            disabled={isFollowing_}
+                            onClick={() => follow(pubkey, {
+                              onSuccess: () => toast({ title: 'Followed', description: `You are now following ${displayName}` }),
+                              onError: () => toast({ title: 'Error', description: 'Failed to follow', variant: 'destructive' }),
+                            })}
+                          >
+                            <UserPlus className="h-4 w-4" />
+                            {isFollowing_ ? 'Following...' : 'Follow'}
+                          </Button>
+                        )
                       )}
                       {isOwnProfile && (
                         <Dialog>

@@ -11,6 +11,7 @@ export { SiteHeader } from './SiteHeader';
 export { Sidebar } from './Sidebar';
 export { FoxIcon } from './FoxIcon';
 export { NostrCommentForm } from './NostrCommentForm';
+export { PostOverflowMenu } from './PostOverflowMenu';
 export { ImageUpload, buildImetaTags, appendImageUrls } from './ImageUpload';
 
 // Popular page components
