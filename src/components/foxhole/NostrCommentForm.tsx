@@ -42,6 +42,7 @@ export function NostrCommentForm({ den, postId, onSuccess }: NostrCommentFormPro
         tags: [
           ['I', identifier],
           ['K', HASHTAG_KIND],
+          ['E', postId],
           ['e', postId],
           ['k', '1111'],
         ],

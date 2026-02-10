@@ -7,6 +7,8 @@ import { DenCardCompact } from './DenCard';
 import { ZapActivityItem } from './ZapActivityItem';
 import { usePopularDens } from '@/hooks/usePopularDens';
 import { useRecentZaps } from '@/hooks/useRecentZaps';
+import { useSubscribedDens } from '@/hooks/useCommunitySubscriptions';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 
 interface SidebarProps {
   den?: string;
@@ -25,6 +27,7 @@ export function Sidebar({ den, className }: SidebarProps) {
         <AboutCard />
       )}
       
+      <YourDensCard currentDen={den} />
       <PopularDensCard currentDen={den} />
       <RecentZapsCard />
     </aside>
@@ -76,6 +79,62 @@ function AboutCard() {
         <p className="text-xs">
           Sign in with your Nostr key to post, comment, and zap.
         </p>
+      </CardContent>
+    </Card>
+  );
+}
+
+function YourDensCard({ currentDen }: { currentDen?: string }) {
+  const { user } = useCurrentUser();
+  const { data: dens, isLoading } = useSubscribedDens();
+
+  if (!user) return null;
+
+  const filteredDens = (dens ?? []).filter(d => d !== currentDen);
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Your Dens</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="h-8 rounded bg-muted animate-pulse" />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (filteredDens.length === 0) {
+    return (
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Your Dens</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            Join dens to see them here!
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base">Your Dens</CardTitle>
+      </CardHeader>
+      <CardContent className="p-2">
+        <div className="space-y-0.5">
+          {filteredDens.map((den) => (
+            <DenCardCompact key={den} name={den} postCount={0} />
+          ))}
+        </div>
       </CardContent>
     </Card>
   );

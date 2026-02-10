@@ -1,15 +1,22 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { SiteHeader, Sidebar, PopularPostCard } from '@/components/foxhole';
 import { FoxIcon } from '@/components/foxhole/FoxIcon';
 import { useRecentPostsInfinite } from '@/hooks/useRecentPostsInfinite';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useCommunitySubscriptions } from '@/hooks/useCommunitySubscriptions';
+import { getPostIdentifier } from '@/lib/foxhole';
 import { Button } from '@/components/ui/button';
 import { PenSquare } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useInView } from 'react-intersection-observer';
 
 const Index = () => {
+  const [feedTab, setFeedTab] = useState<'all' | 'yours'>('all');
+  const { user } = useCurrentUser();
+  const { data: subscriptions } = useCommunitySubscriptions();
+
   const { 
     data: posts, 
     isLoading: postsLoading, 
@@ -19,6 +26,15 @@ const Index = () => {
   } = useRecentPostsInfinite({ limit: 50 });
 
   const { ref, inView } = useInView();
+
+  const filteredPosts = useMemo(() => {
+    if (!posts) return [];
+    if (feedTab !== 'yours' || !subscriptions?.length) return posts;
+    return posts.filter(post => {
+      const id = getPostIdentifier(post.event);
+      return id ? subscriptions.includes(id) : false;
+    });
+  }, [posts, feedTab, subscriptions]);
 
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
@@ -96,7 +112,22 @@ const Index = () => {
           <div className="space-y-6">
             <section>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold">Latest Posts</h2>
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={() => setFeedTab('all')}
+                    className={`text-lg font-semibold transition-colors ${feedTab === 'all' ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                  >
+                    All Posts
+                  </button>
+                  {user && (
+                    <button
+                      onClick={() => setFeedTab('yours')}
+                      className={`text-lg font-semibold transition-colors ${feedTab === 'yours' ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                    >
+                      Your Feed
+                    </button>
+                  )}
+                </div>
               </div>
               
               <div className="rounded-lg border border-border bg-card divide-y divide-border/50">
@@ -121,9 +152,9 @@ const Index = () => {
                       </div>
                     </div>
                   ))
-                ) : posts && posts.length > 0 ? (
+                ) : filteredPosts && filteredPosts.length > 0 ? (
                   <>
-                    {posts.map((post) => (
+                    {filteredPosts.map((post) => (
                       <PopularPostCard
                         key={post.event.id}
                         post={post.event}

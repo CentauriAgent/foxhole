@@ -4,6 +4,9 @@ import { useSeoMeta } from '@unhead/react';
 import { SiteHeader, Sidebar, PopularPostCard } from '@/components/foxhole';
 import { FoxIcon } from '@/components/foxhole/FoxIcon';
 import { useDenPostsInfinite } from '@/hooks/useDenPostsInfinite';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useCommunitySubscriptions, useSubscribeToCommunity, useUnsubscribeFromCommunity } from '@/hooks/useCommunitySubscriptions';
+import { denToIdentifier } from '@/lib/foxhole';
 import { Button } from '@/components/ui/button';
 import { PenSquare } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -24,6 +27,13 @@ export default function Den() {
   } = useDenPostsInfinite(denName || '', { limit: 50 });
 
   const { ref, inView } = useInView();
+  const { user } = useCurrentUser();
+  const { data: subscriptions } = useCommunitySubscriptions();
+  const { mutate: subscribe, isPending: isSubscribing } = useSubscribeToCommunity();
+  const { mutate: unsubscribe, isPending: isUnsubscribing } = useUnsubscribeFromCommunity();
+  
+  const identifier = denName ? denToIdentifier(denName) : '';
+  const isSubscribed = subscriptions?.includes(identifier) ?? false;
 
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
@@ -60,12 +70,25 @@ export default function Den() {
                     Discussions about {denName}
                   </p>
                 </div>
-                <Link to={`/create?den=${denName}`}>
-                  <Button size="sm" className="gap-1.5 bg-[hsl(var(--brand))] hover:bg-[hsl(var(--brand))]/90 text-[hsl(var(--brand-foreground))]">
-                    <PenSquare className="h-4 w-4" />
-                    Post
-                  </Button>
-                </Link>
+                <div className="flex items-center gap-2">
+                  {user && (
+                    <Button
+                      size="sm"
+                      variant={isSubscribed ? 'outline' : 'default'}
+                      className={isSubscribed ? '' : 'bg-[hsl(var(--brand))] hover:bg-[hsl(var(--brand))]/90 text-[hsl(var(--brand-foreground))]'}
+                      disabled={isSubscribing || isUnsubscribing}
+                      onClick={() => isSubscribed ? unsubscribe(identifier) : subscribe(identifier)}
+                    >
+                      {isSubscribed ? 'Leave Den' : 'Join Den'}
+                    </Button>
+                  )}
+                  <Link to={`/create?den=${denName}`}>
+                    <Button size="sm" className="gap-1.5 bg-[hsl(var(--brand))] hover:bg-[hsl(var(--brand))]/90 text-[hsl(var(--brand-foreground))]">
+                      <PenSquare className="h-4 w-4" />
+                      Post
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </header>
 

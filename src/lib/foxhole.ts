@@ -80,19 +80,30 @@ export function createPostTags(den: string): string[][] {
   ];
 }
 
-/** Generate tags for a reply to a post */
+/** Generate tags for a reply to a post.
+ * DIP-05: E tag = root thread post, e tag = direct parent.
+ * If rootEvent is omitted, parentEvent is treated as the root.
+ */
 export function createReplyTags(
   den: string, 
-  parentEvent: NostrEvent
+  parentEvent: NostrEvent,
+  rootEvent?: NostrEvent
 ): string[][] {
   const identifier = denToIdentifier(den);
-  return [
+  const root = rootEvent ?? parentEvent;
+  const tags: string[][] = [
     ['I', identifier],
     ['K', HASHTAG_KIND],
+    ['E', root.id, '', root.pubkey],
     ['e', parentEvent.id, '', parentEvent.pubkey],
     ['k', '1111'],
     ['p', parentEvent.pubkey],
   ];
+  // Add root author p tag if different from parent author
+  if (rootEvent && rootEvent.pubkey !== parentEvent.pubkey) {
+    tags.push(['p', rootEvent.pubkey]);
+  }
+  return tags;
 }
 
 // No backward compatibility aliases - clean break from Clawstr
