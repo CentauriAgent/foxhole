@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatCount } from '@/lib/foxhole';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useUserVote } from '@/hooks/useUserVote';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface VoteButtonsProps {
   eventId: string;
@@ -17,6 +19,9 @@ interface VoteButtonsProps {
 /**
  * Interactive Reddit-style vote buttons with dig (upvote) and bury (downvote).
  * Publishes NIP-25 reactions (kind 7): "+" for dig, "-" for bury.
+ * 
+ * Fetches the user's existing vote so the UI reflects their prior vote on load.
+ * Only one vote per user is counted (the latest reaction per pubkey).
  */
 export function VoteButtons({ 
   eventId,
@@ -26,9 +31,30 @@ export function VoteButtons({
 }: VoteButtonsProps) {
   const { user } = useCurrentUser();
   const { mutate: publishEvent } = useNostrPublish();
-  const [userVote, setUserVote] = useState<'up' | 'down' | null>(null);
+  const queryClient = useQueryClient();
+  const { data: existingVote, isLoading: voteLoading } = useUserVote(eventId);
 
-  const displayScore = score + (userVote === 'up' ? 1 : userVote === 'down' ? -1 : 0);
+  // Local vote state: tracks optimistic UI. null = no override, synced from server.
+  const [localVote, setLocalVote] = useState<'up' | 'down' | null | undefined>(undefined);
+
+  // Sync local vote from server data once loaded
+  useEffect(() => {
+    if (!voteLoading && existingVote !== undefined && localVote === undefined) {
+      setLocalVote(existingVote);
+    }
+  }, [existingVote, voteLoading, localVote]);
+
+  // The effective vote is local override if set, otherwise server data
+  const effectiveVote = localVote !== undefined ? localVote : (existingVote ?? null);
+
+  // The server score already includes the user's existing vote.
+  // We need to adjust optimistically only for the *difference* between
+  // the existing server vote and the new local vote.
+  const serverVoteValue = existingVote === 'up' ? 1 : existingVote === 'down' ? -1 : 0;
+  const localVoteValue = effectiveVote === 'up' ? 1 : effectiveVote === 'down' ? -1 : 0;
+  const optimisticAdjustment = localVoteValue - serverVoteValue;
+
+  const displayScore = score + optimisticAdjustment;
   const isPositive = displayScore > 0;
   const isNegative = displayScore < 0;
 
@@ -38,13 +64,10 @@ export function VoteButtons({
   const handleVote = (direction: 'up' | 'down') => {
     if (!user) return;
 
-    // Toggle off if already voted this way
-    if (userVote === direction) {
-      setUserVote(null);
-      return;
-    }
+    // If already voted this direction, do nothing (no toggle off)
+    if (effectiveVote === direction) return;
 
-    setUserVote(direction);
+    setLocalVote(direction);
 
     publishEvent({
       kind: 7,
@@ -53,7 +76,14 @@ export function VoteButtons({
         ['e', eventId],
       ],
       created_at: Math.floor(Date.now() / 1000),
-    } as any);
+    } as any, {
+      onSuccess: () => {
+        // Invalidate caches so scores refresh
+        queryClient.invalidateQueries({ queryKey: ['foxhole', 'user-vote', eventId] });
+        queryClient.invalidateQueries({ queryKey: ['foxhole', 'votes', eventId] });
+        queryClient.invalidateQueries({ queryKey: ['foxhole', 'batch-votes'] });
+      },
+    });
   };
 
   return (
@@ -69,7 +99,7 @@ export function VoteButtons({
           "p-0.5 rounded transition-colors",
           user && "hover:bg-[hsl(var(--upvote))]/10 cursor-pointer",
           !user && "cursor-default",
-          userVote === 'up' ? "text-[hsl(var(--upvote))] bg-[hsl(var(--upvote))]/10" :
+          effectiveVote === 'up' ? "text-[hsl(var(--upvote))] bg-[hsl(var(--upvote))]/10" :
           isPositive ? "text-[hsl(var(--upvote))]" : "text-muted-foreground/60"
         )}
       >
@@ -79,9 +109,9 @@ export function VoteButtons({
       <span className={cn(
         "font-semibold tabular-nums",
         textSize,
-        (isPositive || userVote === 'up') && "text-[hsl(var(--upvote))]",
-        (isNegative || userVote === 'down') && "text-[hsl(var(--downvote))]",
-        !isPositive && !isNegative && !userVote && "text-muted-foreground"
+        (isPositive || effectiveVote === 'up') && "text-[hsl(var(--upvote))]",
+        (isNegative || effectiveVote === 'down') && "text-[hsl(var(--downvote))]",
+        !isPositive && !isNegative && !effectiveVote && "text-muted-foreground"
       )}>
         {formatCount(displayScore)}
       </span>
@@ -94,7 +124,7 @@ export function VoteButtons({
           "p-0.5 rounded transition-colors",
           user && "hover:bg-[hsl(var(--downvote))]/10 cursor-pointer",
           !user && "cursor-default",
-          userVote === 'down' ? "text-[hsl(var(--downvote))] bg-[hsl(var(--downvote))]/10" :
+          effectiveVote === 'down' ? "text-[hsl(var(--downvote))] bg-[hsl(var(--downvote))]/10" :
           isNegative ? "text-[hsl(var(--downvote))]" : "text-muted-foreground/60"
         )}
       >

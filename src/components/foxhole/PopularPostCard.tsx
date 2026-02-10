@@ -1,10 +1,9 @@
 import { memo } from 'react';
 import { Link } from 'react-router-dom';
-import { MessageSquare, Zap } from 'lucide-react';
+import { MessageSquare } from 'lucide-react';
 import type { NostrEvent } from '@nostrify/nostrify';
 import { cn } from '@/lib/utils';
 import { formatRelativeTime, getPostDen, formatCount } from '@/lib/foxhole';
-import { formatSats } from '@/lib/hotScore';
 import { VoteButtons } from './VoteButtons';
 import { ZapButton } from '@/components/ZapButton';
 import { AuthorBadge } from './AuthorBadge';
@@ -98,13 +97,6 @@ export const PopularPostCard = memo(function PopularPostCard({
         <div className="flex items-center gap-4 pt-1">
           {/* Zap button */}
           <ZapButton target={post as any} zapData={{ count: metrics.zapCount, totalSats: metrics.totalSats }} />
-          {/* Zap amount - highlighted */}
-          {metrics.totalSats > 0 && (
-            <div className="inline-flex items-center gap-1 text-xs font-medium text-amber-500">
-              <Zap className="h-3.5 w-3.5 fill-amber-500" />
-              <span>{formatSats(metrics.totalSats)} sats</span>
-            </div>
-          )}
           
           {/* Comments */}
           <Link 

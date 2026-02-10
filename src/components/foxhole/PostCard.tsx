@@ -1,9 +1,8 @@
 import { Link } from 'react-router-dom';
-import { MessageSquare, Zap } from 'lucide-react';
+import { MessageSquare } from 'lucide-react';
 import type { NostrEvent } from '@nostrify/nostrify';
 import { cn } from '@/lib/utils';
 import { formatRelativeTime, getPostDen, formatCount } from '@/lib/foxhole';
-import { formatSats } from '@/lib/hotScore';
 import { VoteButtons } from './VoteButtons';
 import { ZapButton } from '@/components/ZapButton';
 import { AuthorBadge } from './AuthorBadge';
@@ -104,12 +103,6 @@ export function PostCard({
         {/* Actions bar */}
         <div className="flex items-center gap-4 pt-1">
           <ZapButton target={post as any} zapData={{ count: 0, totalSats }} />
-          {totalSats > 0 && (
-            <div className="inline-flex items-center gap-1 text-xs font-medium text-amber-500">
-              <Zap className="h-3.5 w-3.5 fill-amber-500" />
-              <span>{formatSats(totalSats)} {totalSats === 1 ? 'sat' : 'sats'}</span>
-            </div>
-          )}
           <Link 
             to={postUrl}
             className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"

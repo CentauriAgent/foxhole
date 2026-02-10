@@ -13,6 +13,7 @@ import {
   type TimeRange, type PostMetrics,
 } from '@/lib/hotScore';
 import { getZapSender, getZapRecipient, extractSatsFromZap } from './useBatchZaps';
+import { deduplicateAndCountReactions } from './usePostVotes';
 
 // ── Public types ─────────────────────────────────────────────────────────────
 
@@ -148,18 +149,9 @@ export function usePopularPageData(options: UsePopularPageDataOptions) {
         zapsMap.set(tid, cur);
       }
 
-      // ── Process votes ────────────────────────────────────────────────
-      const votesMap = new Map<string, { upvotes: number; downvotes: number; score: number }>();
-      for (const reaction of reactions) {
-        const tid = reaction.tags.find(([t]) => t === 'e')?.[1];
-        if (!tid) continue;
-        const cur = votesMap.get(tid) ?? { upvotes: 0, downvotes: 0, score: 0 };
-        const c = reaction.content.trim();
-        if (c === '+' || c === '') cur.upvotes++;
-        else if (c === '-') cur.downvotes++;
-        cur.score = cur.upvotes - cur.downvotes;
-        votesMap.set(tid, cur);
-      }
+      // ── Process votes (deduplicated: only latest per pubkey per target) ──
+      const allContentIdSet = new Set(allContentIds);
+      const votesMap = deduplicateAndCountReactions(reactions, allContentIdSet);
 
       // ── Process reply counts (for top-level posts only) ──────────────
       const repliesMap = new Map<string, number>();

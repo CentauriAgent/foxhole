@@ -84,18 +84,18 @@ export function ThreadedReply({
           </div>
 
           {/* Zap + Reply buttons */}
-          <div className="mt-1 inline-flex items-center gap-3">
+          <div className="mt-1 flex items-center gap-4">
             <ZapButton target={reply as any} className="text-xs" />
+            {user && den && (
+              <button
+                onClick={() => setShowReplyForm(!showReplyForm)}
+                className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-[hsl(var(--brand))] transition-colors"
+              >
+                <Reply className="h-3 w-3" />
+                Reply
+              </button>
+            )}
           </div>
-          {user && den && (
-            <button
-              onClick={() => setShowReplyForm(!showReplyForm)}
-              className="mt-1 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-[hsl(var(--brand))] transition-colors"
-            >
-              <Reply className="h-3 w-3" />
-              Reply
-            </button>
-          )}
 
           {/* Inline reply form */}
           {showReplyForm && den && (
