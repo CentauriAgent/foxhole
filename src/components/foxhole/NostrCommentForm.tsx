@@ -7,6 +7,8 @@ import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { MiniAccountSelector } from '@/components/auth/MiniAccountSelector';
 import { Send } from 'lucide-react';
 import { denToIdentifier, HASHTAG_KIND } from '@/lib/foxhole';
+import { ImageUpload, buildImetaTags, appendImageUrls } from '@/components/foxhole/ImageUpload';
+import type { UploadedImage } from '@/components/foxhole/ImageUpload';
 
 import LoginDialog from '@/components/auth/LoginDialog';
 
@@ -27,6 +29,7 @@ interface NostrCommentFormProps {
  */
 export function NostrCommentForm({ den, postId, rootPostId, onSuccess, placeholder, compact }: NostrCommentFormProps) {
   const [content, setContent] = useState('');
+  const [attachedImages, setAttachedImages] = useState<UploadedImage[]>([]);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const { user } = useCurrentUser();
   const { mutate: publishEvent, isPending } = useNostrPublish();
@@ -49,15 +52,21 @@ export function NostrCommentForm({ den, postId, rootPostId, onSuccess, placehold
       ['k', '1111'],
     ];
 
+    const imetaTags = buildImetaTags(attachedImages);
+    tags.push(...imetaTags);
+
+    const finalContent = appendImageUrls(content.trim(), attachedImages);
+
     publishEvent(
       {
         kind: 1111,
-        content: content.trim(),
+        content: finalContent,
         tags,
       },
       {
         onSuccess: () => {
           setContent('');
+          setAttachedImages([]);
           queryClient.invalidateQueries({
             queryKey: ['foxhole', 'post-replies'],
           });
@@ -76,23 +85,38 @@ export function NostrCommentForm({ den, postId, rootPostId, onSuccess, placehold
 
   if (compact) {
     return (
-      <form onSubmit={handleSubmit} className="flex gap-2">
-        <Textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder={placeholder || "Write a reply..."}
-          className="min-h-[40px] h-10 resize-none text-sm py-2"
-          disabled={isPending}
-          rows={1}
-        />
-        <Button 
-          type="submit" 
-          disabled={!content.trim() || isPending}
-          size="sm"
-          className="self-end"
-        >
-          <Send className="h-3.5 w-3.5" />
-        </Button>
+      <form onSubmit={handleSubmit} className="space-y-1">
+        <div className="flex gap-2">
+          <Textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder={placeholder || "Write a reply..."}
+            className="min-h-[40px] h-10 resize-none text-sm py-2"
+            disabled={isPending}
+            rows={1}
+          />
+          <ImageUpload
+            images={attachedImages}
+            onImagesChange={setAttachedImages}
+            compact
+            disabled={isPending}
+          />
+          <Button 
+            type="submit" 
+            disabled={!content.trim() || isPending}
+            size="sm"
+            className="self-end"
+          >
+            <Send className="h-3.5 w-3.5" />
+          </Button>
+        </div>
+        {attachedImages.length > 0 && (
+          <div className="flex gap-1 flex-wrap">
+            {attachedImages.map((img) => (
+              <img key={img.url} src={img.url} alt="" className="h-10 w-10 rounded border object-cover" />
+            ))}
+          </div>
+        )}
       </form>
     );
   }
@@ -110,6 +134,11 @@ export function NostrCommentForm({ den, postId, rootPostId, onSuccess, placehold
           onChange={(e) => setContent(e.target.value)}
           placeholder={placeholder || "Write a comment..."}
           className="min-h-[80px] resize-none"
+          disabled={isPending}
+        />
+        <ImageUpload
+          images={attachedImages}
+          onImagesChange={setAttachedImages}
           disabled={isPending}
         />
         <div className="flex justify-end">

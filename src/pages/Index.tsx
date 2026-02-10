@@ -95,7 +95,7 @@ const Index = () => {
                   Create a Post
                 </Button>
               </Link>
-              <Link to="/popular">
+              <Link to="/dens">
                 <Button size="lg" variant="outline">
                   Browse Dens
                 </Button>

@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useLocation } from 'react-router-dom';
-import { Flame, Home, BookOpen, Menu, Search, PenSquare, X } from 'lucide-react';
+import { Flame, Home, BookOpen, Menu, Search, PenSquare, X, LayoutGrid } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FoxIcon } from './FoxIcon';
 import { Button } from '@/components/ui/button';
+import { LoginArea } from '@/components/auth/LoginArea';
 
 const navItems = [
   { to: '/', label: 'Home', icon: Home },
   { to: '/popular', label: 'Popular', icon: Flame },
+  { to: '/dens', label: 'Dens', icon: LayoutGrid },
   { to: '/search', label: 'Search', icon: Search },
   { to: '/docs', label: 'Docs', icon: BookOpen },
 ];
@@ -86,6 +88,9 @@ export function SiteHeader() {
               <span>New Post</span>
             </Button>
           </Link>
+
+          {/* Login Area - hidden on mobile */}
+          <LoginArea className="hidden sm:inline-flex" />
           
           {/* Community badge - hidden on mobile */}
           <div className="hidden lg:flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -161,6 +166,11 @@ export function SiteHeader() {
                 <span>New Post</span>
               </Link>
             </nav>
+
+            {/* Login Area */}
+            <div className="mt-6 pt-6 border-t border-border">
+              <LoginArea className="w-full" />
+            </div>
 
             {/* Community badge */}
             <div className="mt-8 pt-8 border-t border-border">

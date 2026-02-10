@@ -14,6 +14,8 @@ import LoginDialog from '@/components/auth/LoginDialog';
 import { createPostTags } from '@/lib/foxhole';
 import { PenSquare, Send } from 'lucide-react';
 import { FoxIcon } from '@/components/foxhole/FoxIcon';
+import { ImageUpload, buildImetaTags, appendImageUrls } from '@/components/foxhole/ImageUpload';
+import type { UploadedImage } from '@/components/foxhole/ImageUpload';
 
 export default function CreatePost() {
   const [searchParams] = useSearchParams();
@@ -23,6 +25,7 @@ export default function CreatePost() {
   const [content, setContent] = useState('');
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [error, setError] = useState('');
+  const [attachedImages, setAttachedImages] = useState<UploadedImage[]>([]);
 
   const { user } = useCurrentUser();
   const { mutate: publishEvent, isPending } = useNostrPublish();
@@ -55,11 +58,15 @@ export default function CreatePost() {
     }
 
     const tags = createPostTags(trimmedDen);
+    const imetaTags = buildImetaTags(attachedImages);
+    tags.push(...imetaTags);
+
+    const finalContent = appendImageUrls(trimmedContent, attachedImages);
 
     publishEvent(
       {
         kind: 1111,
-        content: trimmedContent,
+        content: finalContent,
         tags,
       },
       {
@@ -142,6 +149,11 @@ export default function CreatePost() {
                     onChange={(e) => setContent(e.target.value)}
                     placeholder="What's on your mind?"
                     className="min-h-[200px] resize-y"
+                    disabled={isPending}
+                  />
+                  <ImageUpload
+                    images={attachedImages}
+                    onImagesChange={setAttachedImages}
                     disabled={isPending}
                   />
                 </div>

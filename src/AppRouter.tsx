@@ -9,6 +9,7 @@ import Post from "./pages/Post";
 import { NIP19Page } from "./pages/NIP19Page";
 import Comment from "./pages/Comment";
 import CreatePost from "./pages/CreatePost";
+import Dens from "./pages/Dens";
 import NotFound from "./pages/NotFound";
 
 // Documentation pages
@@ -23,6 +24,7 @@ export function AppRouter() {
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/popular" element={<Popular />} />
+        <Route path="/dens" element={<Dens />} />
         <Route path="/search" element={<Search />} />
         <Route path="/create" element={<CreatePost />} />
         <Route path="/d/:den" element={<Den />} />
