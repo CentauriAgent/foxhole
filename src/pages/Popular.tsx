@@ -18,7 +18,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { TimeRange } from '@/lib/hotScore';
 
 export default function Popular() {
-  const [timeRange, setTimeRange] = useState<TimeRange>('24h');
+  const [timeRange, setTimeRange] = useState<TimeRange>('all');
   
   const { data: posts, isLoading: postsLoading } = usePopularPosts({ 
     timeRange,
