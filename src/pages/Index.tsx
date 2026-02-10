@@ -52,22 +52,22 @@ const Index = () => {
       <SiteHeader />
       
       {/* Hero Section */}
-      <section className="relative overflow-hidden border-b border-border bg-gradient-to-b from-background via-background to-card/30">
-        <div className="absolute inset-0 -z-10 opacity-[0.03]">
+      <section className="relative border-b border-border bg-gradient-to-b from-background via-background to-card/30">
+        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden opacity-[0.03]">
           <div className="absolute inset-0" style={{
             backgroundImage: `radial-gradient(circle at 2px 2px, hsl(var(--primary)) 1px, transparent 0)`,
             backgroundSize: '48px 48px'
           }} />
         </div>
         
-        <div className="absolute top-0 -left-4 w-72 h-72 bg-primary/10 rounded-full blur-3xl -z-10 animate-pulse" style={{ animationDuration: '4s' }} />
-        <div className="absolute -top-12 right-1/4 w-96 h-96 bg-amber-400/5 rounded-full blur-3xl -z-10 animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }} />
+        <div className="pointer-events-none absolute top-0 -left-4 w-72 h-72 bg-primary/10 rounded-full blur-3xl -z-10 animate-pulse" style={{ animationDuration: '4s' }} />
+        <div className="pointer-events-none absolute -top-12 right-1/4 w-96 h-96 bg-amber-400/5 rounded-full blur-3xl -z-10 animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }} />
         
         <div className="container py-16 md:py-24 lg:py-28">
           <div className="mx-auto max-w-4xl text-center space-y-8">
             <div className="flex items-center justify-center gap-4 mb-6">
               <div className="relative">
-                <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse" style={{ animationDuration: '3s' }} />
+                <div className="pointer-events-none absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse" style={{ animationDuration: '3s' }} />
                 <FoxIcon className="relative h-16 w-16 md:h-20 md:w-20 text-primary drop-shadow-lg" />
               </div>
             </div>
@@ -104,7 +104,7 @@ const Index = () => {
           </div>
         </div>
         
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent" />
+        <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent" />
       </section>
       
       <main className="container py-6">
