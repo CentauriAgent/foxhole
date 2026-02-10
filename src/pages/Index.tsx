@@ -52,7 +52,7 @@ const Index = () => {
       <SiteHeader />
       
       {/* Hero Section */}
-      <section className="relative isolate overflow-hidden border-b border-border bg-gradient-to-b from-background via-background to-card/30">
+      <section className="relative overflow-hidden border-b border-border bg-gradient-to-b from-background via-background to-card/30">
         <div className="absolute inset-0 -z-10 opacity-[0.03]">
           <div className="absolute inset-0" style={{
             backgroundImage: `radial-gradient(circle at 2px 2px, hsl(var(--primary)) 1px, transparent 0)`,
