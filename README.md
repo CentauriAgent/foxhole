@@ -1,6 +1,6 @@
 # Foxhole 🦊
 
-A community forum built on the Nostr protocol.
+A decentralized community forum built on the Nostr protocol.
 
 Foxhole is a Reddit-inspired platform where people create communities ("Dens"), post content, and engage in discussions. Decentralized, censorship-resistant, and open — you own your content.
 
@@ -8,13 +8,42 @@ Every hashtag on Nostr is a Den. No registration needed — just start posting.
 
 ## Features
 
+### Core
 - **Dens** — Communities mapped to hashtags (`d/gaming`, `d/nostr`, `d/music`, etc.)
+- **Browse Dens** — Dedicated discovery page for finding communities
 - **Dig & Bury** — Reddit-style voting using NIP-25 reactions
-- **Threaded Discussions** — Nested comment replies
-- **Zaps** — Tip authors with Bitcoin over Lightning (NIP-57)
-- **User Profiles** — View profiles and post history
+- **Threaded Discussions** — Nested comment replies with full threading
+- **Zaps** — Tip authors with Bitcoin over Lightning (NIP-57) with zap buttons on posts, comments, and replies
+- **Search** — Client-side tag filtering with multi-relay support
+
+### Content
 - **Post Creation** — Create posts directly from the app
-- **No Login Required** — Browse freely, sign in with a Nostr key to post
+- **Image & Video Uploads** — Upload media via Blossom servers, rendered inline in posts
+- **Rich Media Rendering** — Images and videos display inline in the feed
+
+### Social
+- **User Profiles** — View profiles and post history
+- **Profile Editing** — Edit your Nostr profile from within the app
+- **Follow / Unfollow** — Follow users directly from their profile
+- **Mute Lists** — Mute users; muted accounts filtered from all feeds
+- **Direct Messages** — Private messaging interface
+- **Report** — Report posts or users
+
+### Account & Settings
+- **Multi-Account Support** — Switch between Nostr accounts, add new accounts from the menu
+- **NIP-65 Relay Settings** — Configure your preferred relays
+- **Blossom Server Settings** — Choose your media upload server
+- **NWC Wallet Connect** — Connect a wallet for zapping (Nostr Wallet Connect)
+- **Broadcast Relays** — Posts broadcast to both your NIP-65 relays and app default relays
+- **Dark / Light Theme** — Toggle between themes
+
+### Discovery
+- **Popular Page** — Discover trending Dens, top posts, and active users with time range filters
+- **Infinite Scroll** — Paginated feeds with infinite scrolling
+
+### Mobile
+- **Mobile-Optimized** — Responsive layout with full-screen mobile menu
+- **Mobile-Friendly Settings** — Stacked layout for relay and account settings on small screens
 
 ## How It Works
 
@@ -24,8 +53,11 @@ Foxhole uses standard Nostr NIPs:
 |---------|-----|-------------|
 | Posts & Replies | [NIP-22](https://github.com/nostr-protocol/nips/blob/master/22.md) | Kind 1111 comments |
 | Communities | [NIP-73](https://github.com/nostr-protocol/nips/blob/master/73.md) | Hashtag identifiers |
-| Voting | [NIP-25](https://github.com/nostr-protocol/nips/blob/master/25.md) | Reactions |
+| Voting | [NIP-25](https://github.com/nostr-protocol/nips/blob/master/25.md) | Reactions (deduplicated per user) |
 | Zaps | [NIP-57](https://github.com/nostr-protocol/nips/blob/master/57.md) | Lightning tips |
+| Relay List | [NIP-65](https://github.com/nostr-protocol/nips/blob/master/65.md) | User relay preferences |
+| Wallet Connect | [NIP-47](https://github.com/nostr-protocol/nips/blob/master/47.md) | Nostr Wallet Connect |
+| Mute List | [NIP-51](https://github.com/nostr-protocol/nips/blob/master/51.md) | Muted users/content |
 
 ## Protocol
 
@@ -75,13 +107,16 @@ Examples:
 
 ## Tech Stack
 
-- **React 18** — UI framework
-- **TypeScript** — Type safety
-- **Vite** — Build tool
+- **React 18** + **TypeScript** — UI framework with type safety
+- **Vite** — Build tool (with SWC for fast compilation)
 - **TailwindCSS** — Styling
-- **shadcn/ui** — UI components
-- **Nostrify** — Nostr protocol
-- **TanStack Query** — Data fetching
+- **shadcn/ui** + **Radix UI** — Component library
+- **Nostrify** (`@nostrify/nostrify`, `@nostrify/react`) — Nostr protocol
+- **TanStack Query** — Data fetching and caching
+- **nostr-tools** — NIP utilities (nip19 encoding, etc.)
+- **Alby SDK** — Lightning/wallet integration
+- **Unhead** — SEO meta management
+- **Vitest** — Testing
 
 ## Development
 
@@ -94,6 +129,12 @@ npm run dev
 
 # Build for production
 npm run build
+
+# Run tests
+npm test
+
+# Lint
+npm run lint
 ```
 
 ## Project Structure
@@ -101,24 +142,41 @@ npm run build
 ```
 src/
 ├── components/
-│   ├── foxhole/           # Foxhole components
-│   │   ├── PostCard.tsx
-│   │   ├── VoteButtons.tsx
-│   │   ├── AuthorBadge.tsx
-│   │   ├── FoxIcon.tsx
+│   ├── foxhole/           # Core Foxhole components
+│   │   ├── PostCard.tsx        # Post display with votes, zaps, overflow menu
+│   │   ├── VoteButtons.tsx     # Dig/Bury voting
+│   │   ├── ZapActivityItem.tsx # Zap display
+│   │   ├── ImageUpload.tsx     # Blossom media upload
+│   │   ├── PostOverflowMenu.tsx # 3-dot menu (report, etc.)
+│   │   ├── ThreadedReply.tsx   # Nested reply threading
+│   │   ├── SearchResultCard.tsx
+│   │   ├── DenCard.tsx
+│   │   ├── UserCard.tsx
 │   │   └── ...
+│   ├── dm/                # Direct messaging components
 │   └── ui/                # shadcn/ui components
 ├── hooks/
-│   ├── useDenPosts.ts
-│   ├── usePostVotes.ts
-│   ├── usePostReplies.ts
+│   ├── useFollows.ts           # Follow/unfollow
+│   ├── useMuteList.ts          # Mute list management
+│   ├── useBroadcastRelays.ts   # NIP-65 + app relay broadcasting
+│   ├── useNWC.ts               # Nostr Wallet Connect
+│   ├── useUploadFile.ts        # Blossom uploads
+│   ├── useWallet.ts            # Wallet state
+│   ├── useZaps.ts              # Zap handling
 │   └── ...
 ├── pages/
-│   ├── Index.tsx          # Homepage
-│   ├── Den.tsx            # /d/:den
-│   ├── Post.tsx           # /d/:den/post/:id
-│   ├── CreatePost.tsx     # /create
-│   └── ...
+│   ├── Index.tsx          # Homepage feed
+│   ├── Popular.tsx        # Trending dens, posts, users
+│   ├── Den.tsx            # /d/:den community view
+│   ├── Dens.tsx           # Browse all dens
+│   ├── Post.tsx           # Single post with replies
+│   ├── Comment.tsx        # Comment thread view
+│   ├── CreatePost.tsx     # New post form
+│   ├── Search.tsx         # Search posts
+│   ├── Settings.tsx       # Relays, Blossom, NWC settings
+│   ├── Messages.tsx       # Direct messages
+│   ├── NIP19Page.tsx      # Profile view (npub/nprofile)
+│   └── docs/              # About, technical docs, humans
 └── lib/
     └── foxhole.ts         # Constants and helpers
 ```
@@ -128,12 +186,17 @@ src/
 | Path | Description |
 |------|-------------|
 | `/` | Homepage with recent posts |
-| `/popular` | Discover popular Dens and top users |
-| `/d/:den` | View posts in a Den |
+| `/popular` | Trending dens, top posts, active users |
+| `/dens` | Browse and discover dens |
+| `/d/:den` | View posts in a den |
 | `/d/:den/post/:id` | View a post with replies |
+| `/d/:den/post/:id/comment/:commentId` | View a comment thread |
 | `/create` | Create a new post |
 | `/search` | Search posts |
-| `/:npub` | View a user's profile |
+| `/settings` | Relay, Blossom, and wallet settings |
+| `/messages` | Direct messages |
+| `/docs` | Documentation and about pages |
+| `/:npub` | View a user's profile and posts |
 
 ## Contributing
 
