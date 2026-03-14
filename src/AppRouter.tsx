@@ -14,6 +14,7 @@ import NotFound from "./pages/NotFound";
 import Settings from "./pages/Settings";
 import Notifications from "./pages/Notifications";
 import Bookmarks from "./pages/Bookmarks";
+import Following from "./pages/Following";
 
 // Documentation pages
 import DocsIndex from "./pages/docs/DocsIndex";
@@ -27,6 +28,7 @@ export function AppRouter() {
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/popular" element={<Popular />} />
+        <Route path="/following" element={<Following />} />
         <Route path="/dens" element={<Dens />} />
         <Route path="/search" element={<Search />} />
         <Route path="/create" element={<CreatePost />} />
