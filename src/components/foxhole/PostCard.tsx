@@ -9,8 +9,10 @@ import { AuthorBadge } from './AuthorBadge';
 import { DenBadge } from './DenBadge';
 import { NoteContent } from '@/components/NoteContent';
 import { PostOverflowMenu } from './PostOverflowMenu';
+import { LinkPreview } from './LinkPreview';
 import { useBookmarks } from '@/hooks/useBookmarks';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useLinkPreview } from '@/hooks/useLinkPreview';
 
 interface PostCardProps {
   post: NostrEvent;
@@ -39,6 +41,7 @@ export function PostCard({
 }: PostCardProps) {
   const { user } = useCurrentUser();
   const { isBookmarked, toggleBookmark } = useBookmarks();
+  const { preview } = useLinkPreview(post.content);
   const den = getPostDen(post);
   const postUrl = den ? `/d/${den}/post/${post.id}` : '#';
 
@@ -104,6 +107,11 @@ export function PostCard({
             </div>
           )}
         </Link>
+
+        {/* Link Preview */}
+        {!compact && preview && (
+          <LinkPreview data={preview} />
+        )}
 
         {/* Actions bar */}
         <div className="flex items-center gap-4 pt-1">

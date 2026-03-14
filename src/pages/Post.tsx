@@ -6,6 +6,7 @@ import { SiteHeader, Sidebar, VoteButtons, AuthorBadge, ThreadedReplies, FoxIcon
 import { ZapButton } from '@/components/ZapButton';
 import { NostrCommentForm } from '@/components/foxhole/NostrCommentForm';
 import { NoteContent } from '@/components/NoteContent';
+import { LinkPreview } from '@/components/foxhole/LinkPreview';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { usePost } from '@/hooks/usePost';
@@ -15,6 +16,7 @@ import { useBatchPostVotes } from '@/hooks/usePostVotes';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { formatRelativeTime, getPostDen } from '@/lib/foxhole';
 import { useMuteList } from '@/hooks/useMuteList';
+import { useLinkPreview } from '@/hooks/useLinkPreview';
 import LoginDialog from '@/components/auth/LoginDialog';
 import NotFound from './NotFound';
 
@@ -27,6 +29,7 @@ export default function Post() {
   const { data: repliesData, isLoading: repliesLoading } = usePostReplies(eventId, den || '');
   const { user } = useCurrentUser();
   const { data: mutedPubkeys } = useMuteList();
+  const { preview } = useLinkPreview(post?.content ?? '');
   
   // Get votes for all replies
   const replyIds = repliesData?.allReplies.map(r => r.id) ?? [];
@@ -104,6 +107,9 @@ export default function Post() {
                     <div className="prose prose-sm dark:prose-invert max-w-none">
                       <NoteContent event={post} />
                     </div>
+
+                    {/* Link Preview */}
+                    {preview && <LinkPreview data={preview} />}
 
                     {/* Stats */}
                     <div className="flex items-center gap-4 pt-2 text-sm text-muted-foreground">
