@@ -26,6 +26,7 @@ Every hashtag on Nostr is a Den. No registration needed — just start posting.
 - **Profile Editing** — Edit your Nostr profile from within the app
 - **Follow / Unfollow** — Follow users directly from their profile
 - **Mute Lists** — Mute users; muted accounts filtered from all feeds
+- **Notifications** — Replies, zaps, and reactions in one feed with unread badge on Bell icon
 - **Direct Messages** — Private messaging interface
 - **Report** — Report posts or users
 
