@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
-import { Search as SearchIcon, Sparkles, X } from 'lucide-react';
+import { Search as SearchIcon, Sparkles, X, Globe, HardDrive } from 'lucide-react';
 import { SiteHeader } from '@/components/foxhole';
 import { SearchResultCard } from '@/components/foxhole/SearchResultCard';
 import { useSearchPosts } from '@/hooks/useSearchPosts';
@@ -27,18 +27,19 @@ export default function Search() {
     setDen(denParam);
   }, [denParam]);
 
-  const { data: rawResults, isLoading } = useSearchPosts({
+  const { data: searchResult, isLoading } = useSearchPosts({
     query: queryParam,
     den: denParam || undefined,
     limit: 50,
   });
   const { data: mutedPubkeys } = useMuteList();
 
+  const searchMode = searchResult?.mode;
   const results = useMemo(() => {
-    if (!rawResults) return [];
-    if (!mutedPubkeys?.size) return rawResults;
-    return rawResults.filter(event => !mutedPubkeys.has(event.pubkey));
-  }, [rawResults, mutedPubkeys]);
+    if (!searchResult?.events) return [];
+    if (!mutedPubkeys?.size) return searchResult.events;
+    return searchResult.events.filter(event => !mutedPubkeys.has(event.pubkey));
+  }, [searchResult, mutedPubkeys]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -132,11 +133,28 @@ export default function Search() {
 
           {queryParam ? (
             <section>
-              <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="h-4 w-4 text-muted-foreground" />
-                <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-                  Results
-                </h2>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-muted-foreground" />
+                  <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+                    Results
+                  </h2>
+                </div>
+                {searchMode && !isLoading && (
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    {searchMode === 'relay' ? (
+                      <>
+                        <Globe className="h-3 w-3" />
+                        <span>Relay search</span>
+                      </>
+                    ) : (
+                      <>
+                        <HardDrive className="h-3 w-3" />
+                        <span>Local filter</span>
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div className="rounded-lg border border-border bg-card divide-y divide-border">
