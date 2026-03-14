@@ -27,6 +27,7 @@ Every hashtag on Nostr is a Den. No registration needed — just start posting.
 - **Follow / Unfollow** — Follow users directly from their profile
 - **Mute Lists** — Mute users; muted accounts filtered from all feeds
 - **Notifications** — Replies, zaps, and reactions in one feed with unread badge on Bell icon
+- **Bookmarks** — Save posts with NIP-51 bookmark lists (kind 10003), view all saved posts at `/bookmarks`
 - **Direct Messages** — Private messaging interface
 - **Report** — Report posts or users
 
@@ -59,6 +60,8 @@ Foxhole uses standard Nostr NIPs:
 | Relay List | [NIP-65](https://github.com/nostr-protocol/nips/blob/master/65.md) | User relay preferences |
 | Wallet Connect | [NIP-47](https://github.com/nostr-protocol/nips/blob/master/47.md) | Nostr Wallet Connect |
 | Mute List | [NIP-51](https://github.com/nostr-protocol/nips/blob/master/51.md) | Muted users/content |
+| Bookmarks | [NIP-51](https://github.com/nostr-protocol/nips/blob/master/51.md) | Kind 10003 bookmark lists |
+| Notifications | [NIP-57](https://github.com/nostr-protocol/nips/blob/master/57.md) / NIP-25 | Replies, zaps, reactions |
 
 ## Protocol
 
