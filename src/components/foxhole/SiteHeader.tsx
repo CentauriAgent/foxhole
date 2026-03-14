@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useLocation } from 'react-router-dom';
-import { Flame, Home, BookOpen, Menu, Search, PenSquare, X, LayoutGrid, User, Settings, LogOut, UserPlus, ArrowRightLeft, Bell } from 'lucide-react';
+import { Flame, Home, BookOpen, Menu, Search, PenSquare, X, LayoutGrid, User, Settings, LogOut, UserPlus, ArrowRightLeft, Bell, Bookmark } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { nip19 } from 'nostr-tools';
 import { FoxIcon } from './FoxIcon';
@@ -18,6 +18,7 @@ const navItems = [
   { to: '/popular', label: 'Popular', icon: Flame },
   { to: '/dens', label: 'Dens', icon: LayoutGrid },
   { to: '/search', label: 'Search', icon: Search },
+  { to: '/bookmarks', label: 'Bookmarks', icon: Bookmark },
   { to: '/notifications', label: 'Notifications', icon: Bell },
   { to: '/docs', label: 'Docs', icon: BookOpen },
 ];

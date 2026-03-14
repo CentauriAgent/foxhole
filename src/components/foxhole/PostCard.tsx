@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { MessageSquare } from 'lucide-react';
+import { MessageSquare, Bookmark } from 'lucide-react';
 import type { NostrEvent } from '@nostrify/nostrify';
 import { cn } from '@/lib/utils';
 import { formatRelativeTime, getPostDen, formatCount } from '@/lib/foxhole';
@@ -9,6 +9,8 @@ import { AuthorBadge } from './AuthorBadge';
 import { DenBadge } from './DenBadge';
 import { NoteContent } from '@/components/NoteContent';
 import { PostOverflowMenu } from './PostOverflowMenu';
+import { useBookmarks } from '@/hooks/useBookmarks';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 
 interface PostCardProps {
   post: NostrEvent;
@@ -35,6 +37,8 @@ export function PostCard({
   compact = false,
   className,
 }: PostCardProps) {
+  const { user } = useCurrentUser();
+  const { isBookmarked, toggleBookmark } = useBookmarks();
   const den = getPostDen(post);
   const postUrl = den ? `/d/${den}/post/${post.id}` : '#';
 
@@ -111,6 +115,20 @@ export function PostCard({
             <MessageSquare className="h-4 w-4" />
             <span>{formatCount(replyCount)} {replyCount === 1 ? 'comment' : 'comments'}</span>
           </Link>
+          {user && (
+            <button
+              onClick={() => toggleBookmark(post.id)}
+              className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+              title={isBookmarked(post.id) ? 'Remove bookmark' : 'Bookmark'}
+            >
+              <Bookmark
+                className={cn(
+                  "h-4 w-4",
+                  isBookmarked(post.id) && "fill-[hsl(var(--brand))] text-[hsl(var(--brand))]"
+                )}
+              />
+            </button>
+          )}
           <PostOverflowMenu post={post} />
         </div>
       </div>
