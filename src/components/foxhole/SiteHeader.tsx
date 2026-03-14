@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { LoginArea } from '@/components/auth/LoginArea';
 import LoginDialog from '@/components/auth/LoginDialog';
 import { useLoggedInAccounts } from '@/hooks/useLoggedInAccounts';
+import { useUnreadNotificationCount, getUnreadDisplay } from '@/hooks/useUnreadNotificationCount';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { genUserName } from '@/lib/genUserName';
 
@@ -29,6 +30,7 @@ export function SiteHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileLoginOpen, setMobileLoginOpen] = useState(false);
   const { currentUser, otherUsers, setLogin, removeLogin } = useLoggedInAccounts();
+  const { count: unreadCount } = useUnreadNotificationCount();
 
   // Close menu on route change
   useEffect(() => {
@@ -80,7 +82,14 @@ export function SiteHeader() {
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 )}
               >
-                <item.icon className="h-4 w-4" />
+                <span className="relative">
+                  <item.icon className="h-4 w-4" />
+                  {item.to === '/notifications' && unreadCount > 0 && (
+                    <span className="absolute -top-2 -right-2.5 flex items-center justify-center min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[10px] font-bold leading-none">
+                      {getUnreadDisplay(unreadCount)}
+                    </span>
+                  )}
+                </span>
                 <span>{item.label}</span>
               </Link>
             ))}
@@ -160,7 +169,14 @@ export function SiteHeader() {
                       : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                   )}
                 >
-                  <item.icon className="h-5 w-5" />
+                  <span className="relative">
+                    <item.icon className="h-5 w-5" />
+                    {item.to === '/notifications' && unreadCount > 0 && (
+                      <span className="absolute -top-1.5 -right-2 flex items-center justify-center min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[10px] font-bold leading-none">
+                        {getUnreadDisplay(unreadCount)}
+                      </span>
+                    )}
+                  </span>
                   <span>{item.label}</span>
                 </Link>
               ))}

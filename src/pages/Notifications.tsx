@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Bell, MessageSquare, Zap, Heart, Loader2, LogIn } from 'lucide-react';
 import { useSeoMeta } from '@unhead/react';
@@ -19,6 +19,13 @@ export default function Notifications() {
   const { user } = useCurrentUser();
   const { notifications, replies, zaps, reactions, isLoading } = useNotifications({ limit: 50 });
   const [tab, setTab] = useState<TabValue>('all');
+
+  // Mark notifications as seen when the page is visited
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem('foxhole:lastSeenNotifications', Date.now().toString());
+    }
+  }, [user]);
 
   useSeoMeta({
     title: 'Notifications — Foxhole',
