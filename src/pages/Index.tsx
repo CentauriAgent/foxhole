@@ -1,13 +1,15 @@
 import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
-import { SiteHeader, Sidebar, PopularPostCard } from '@/components/foxhole';
+import { SiteHeader, Sidebar, PopularPostCard, SortTabs } from '@/components/foxhole';
+import type { SortMode } from '@/components/foxhole';
 import { FoxIcon } from '@/components/foxhole/FoxIcon';
 import { useRecentPostsInfinite } from '@/hooks/useRecentPostsInfinite';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useCommunitySubscriptions } from '@/hooks/useCommunitySubscriptions';
 import { useMuteList } from '@/hooks/useMuteList';
 import { getPostIdentifier } from '@/lib/foxhole';
+import { calculateHotScore } from '@/lib/hotScore';
 import { Button } from '@/components/ui/button';
 import { PenSquare } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -15,6 +17,7 @@ import { useInView } from 'react-intersection-observer';
 
 const Index = () => {
   const [feedTab, setFeedTab] = useState<'all' | 'yours'>('all');
+  const [sortMode, setSortMode] = useState<SortMode>('hot');
   const { user } = useCurrentUser();
   const { data: subscriptions } = useCommunitySubscriptions();
   const { data: mutedPubkeys } = useMuteList();
@@ -43,8 +46,25 @@ const Index = () => {
         return id ? subscriptions.includes(id) : false;
       });
     }
-    return filtered;
-  }, [posts, feedTab, subscriptions, mutedPubkeys]);
+    // Apply sort
+    const sorted = [...filtered];
+    switch (sortMode) {
+      case 'hot':
+        sorted.sort((a, b) => calculateHotScore(b.metrics) - calculateHotScore(a.metrics));
+        break;
+      case 'new':
+        sorted.sort((a, b) => b.event.created_at - a.event.created_at);
+        break;
+      case 'top':
+        sorted.sort((a, b) => {
+          const scoreA = a.metrics.upvotes - a.metrics.downvotes + a.metrics.totalSats * 0.1 + a.metrics.replyCount * 2;
+          const scoreB = b.metrics.upvotes - b.metrics.downvotes + b.metrics.totalSats * 0.1 + b.metrics.replyCount * 2;
+          return scoreB - scoreA;
+        });
+        break;
+    }
+    return sorted;
+  }, [posts, feedTab, subscriptions, mutedPubkeys, sortMode]);
 
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
@@ -121,7 +141,7 @@ const Index = () => {
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
           <div className="space-y-6">
             <section>
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
                 <div className="flex items-center gap-4">
                   <button
                     onClick={() => setFeedTab('all')}
@@ -138,6 +158,7 @@ const Index = () => {
                     </button>
                   )}
                 </div>
+                <SortTabs value={sortMode} onChange={setSortMode} />
               </div>
               
               <div className="rounded-lg border border-border bg-card divide-y divide-border/50">

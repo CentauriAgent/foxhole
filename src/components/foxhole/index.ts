@@ -14,7 +14,9 @@ export { NostrCommentForm } from './NostrCommentForm';
 export { PostOverflowMenu } from './PostOverflowMenu';
 export { ImageUpload, buildImetaTags, appendImageUrls } from './ImageUpload';
 
-// Popular page components
+// Sort & filter components
+export { SortTabs } from './SortTabs';
+export type { SortMode } from './SortTabs';
 export { TimeRangeTabs } from './TimeRangeTabs';
 export { PopularPostCard } from './PopularPostCard';
 export { UserCard } from './UserCard';

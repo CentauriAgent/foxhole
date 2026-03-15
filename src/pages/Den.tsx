@@ -1,12 +1,14 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
-import { SiteHeader, Sidebar, PopularPostCard } from '@/components/foxhole';
+import { SiteHeader, Sidebar, PopularPostCard, SortTabs } from '@/components/foxhole';
+import type { SortMode } from '@/components/foxhole';
 import { FoxIcon } from '@/components/foxhole/FoxIcon';
 import { useDenPostsInfinite } from '@/hooks/useDenPostsInfinite';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useCommunitySubscriptions, useSubscribeToCommunity, useUnsubscribeFromCommunity } from '@/hooks/useCommunitySubscriptions';
 import { denToIdentifier } from '@/lib/foxhole';
+import { calculateHotScore } from '@/lib/hotScore';
 import { Button } from '@/components/ui/button';
 import { PenSquare } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -17,6 +19,7 @@ import NotFound from './NotFound';
 export default function Den() {
   const { den } = useParams<{ den: string }>();
   const denName = den;
+  const [sortMode, setSortMode] = useState<SortMode>('hot');
   
   const { 
     data: posts, 
@@ -33,9 +36,29 @@ export default function Den() {
 
   const filteredPosts = useMemo(() => {
     if (!posts) return [];
-    if (!mutedPubkeys?.size) return posts;
-    return posts.filter(post => !mutedPubkeys.has(post.event.pubkey));
-  }, [posts, mutedPubkeys]);
+    let result = posts;
+    if (mutedPubkeys?.size) {
+      result = result.filter(post => !mutedPubkeys.has(post.event.pubkey));
+    }
+    // Apply sort
+    const sorted = [...result];
+    switch (sortMode) {
+      case 'hot':
+        sorted.sort((a, b) => calculateHotScore(b.metrics) - calculateHotScore(a.metrics));
+        break;
+      case 'new':
+        sorted.sort((a, b) => b.event.created_at - a.event.created_at);
+        break;
+      case 'top':
+        sorted.sort((a, b) => {
+          const scoreA = a.metrics.upvotes - a.metrics.downvotes + a.metrics.totalSats * 0.1 + a.metrics.replyCount * 2;
+          const scoreB = b.metrics.upvotes - b.metrics.downvotes + b.metrics.totalSats * 0.1 + b.metrics.replyCount * 2;
+          return scoreB - scoreA;
+        });
+        break;
+    }
+    return sorted;
+  }, [posts, mutedPubkeys, sortMode]);
   const { data: subscriptions } = useCommunitySubscriptions();
   const { mutate: subscribe, isPending: isSubscribing } = useSubscribeToCommunity();
   const { mutate: unsubscribe, isPending: isUnsubscribing } = useUnsubscribeFromCommunity();
@@ -102,9 +125,7 @@ export default function Den() {
 
             <section>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-                  Posts
-                </h2>
+                <SortTabs value={sortMode} onChange={setSortMode} />
               </div>
               
               <div className="rounded-lg border border-border bg-card divide-y divide-border/50">
