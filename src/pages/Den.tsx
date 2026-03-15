@@ -7,6 +7,7 @@ import { FoxIcon } from '@/components/foxhole/FoxIcon';
 import { useDenPostsInfinite } from '@/hooks/useDenPostsInfinite';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useCommunitySubscriptions, useSubscribeToCommunity, useUnsubscribeFromCommunity } from '@/hooks/useCommunitySubscriptions';
+import { useDenMetadata } from '@/hooks/useDenMetadata';
 import { denToIdentifier } from '@/lib/foxhole';
 import { calculateHotScore } from '@/lib/hotScore';
 import { Button } from '@/components/ui/button';
@@ -59,6 +60,7 @@ export default function Den() {
     }
     return sorted;
   }, [posts, mutedPubkeys, sortMode]);
+  const { data: denMetadata } = useDenMetadata(denName);
   const { data: subscriptions } = useCommunitySubscriptions();
   const { mutate: subscribe, isPending: isSubscribing } = useSubscribeToCommunity();
   const { mutate: unsubscribe, isPending: isUnsubscribing } = useUnsubscribeFromCommunity();
@@ -98,7 +100,7 @@ export default function Den() {
                 <div className="flex-1 min-w-0">
                   <h1 className="text-xl sm:text-2xl font-bold text-[hsl(var(--brand))] truncate">d/{denName}</h1>
                   <p className="text-muted-foreground text-sm">
-                    Discussions about {denName}
+                    {denMetadata?.description || `Discussions about ${denName}`}
                   </p>
                   <div className="flex items-center gap-2 mt-3">
                     {user && (

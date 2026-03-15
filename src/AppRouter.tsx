@@ -12,6 +12,7 @@ import Post from "./pages/Post";
 import { NIP19Page } from "./pages/NIP19Page";
 import Comment from "./pages/Comment";
 import CreatePost from "./pages/CreatePost";
+import CreateDen from "./pages/CreateDen";
 import Dens from "./pages/Dens";
 import NotFound from "./pages/NotFound";
 import Settings from "./pages/Settings";
@@ -49,6 +50,7 @@ export function AppRouter() {
         <Route path="/dens" element={<Dens />} />
         <Route path="/search" element={<Search />} />
         <Route path="/create" element={<CreatePost />} />
+        <Route path="/create-den" element={<CreateDen />} />
         <Route path="/d/:den" element={<Den />} />
         <Route path="/d/:den/post/:eventId" element={<Post />} />
         <Route path="/d/:den/comment/:eventId" element={<Comment />} />

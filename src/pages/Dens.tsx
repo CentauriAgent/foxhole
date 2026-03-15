@@ -1,10 +1,12 @@
 import { useState, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
-import { Search } from 'lucide-react';
+import { Search, Tent } from 'lucide-react';
 import { SiteHeader } from '@/components/foxhole';
 import { DenCard } from '@/components/foxhole/DenCard';
 import { usePopularDens } from '@/hooks/usePopularDens';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const Dens = () => {
@@ -27,11 +29,19 @@ const Dens = () => {
       <SiteHeader />
 
       <div className="container py-8 max-w-4xl">
-        <div className="space-y-1 mb-6">
-          <h1 className="text-3xl font-bold tracking-tight">Browse Dens</h1>
-          <p className="text-muted-foreground">
-            Explore communities and find your people.
-          </p>
+        <div className="flex items-start justify-between mb-6">
+          <div className="space-y-1">
+            <h1 className="text-3xl font-bold tracking-tight">Browse Dens</h1>
+            <p className="text-muted-foreground">
+              Explore communities and find your people.
+            </p>
+          </div>
+          <Link to="/create-den">
+            <Button className="gap-2 bg-[hsl(var(--brand))] hover:bg-[hsl(var(--brand))]/90 text-[hsl(var(--brand-foreground))]">
+              <Tent className="h-4 w-4" />
+              Create Den
+            </Button>
+          </Link>
         </div>
 
         <div className="relative mb-6">

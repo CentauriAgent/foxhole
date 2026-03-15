@@ -9,6 +9,7 @@ import { usePopularDens } from '@/hooks/usePopularDens';
 import { useRecentZaps } from '@/hooks/useRecentZaps';
 import { useSubscribedDens } from '@/hooks/useCommunitySubscriptions';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useDenMetadata } from '@/hooks/useDenMetadata';
 
 interface SidebarProps {
   den?: string;
@@ -35,6 +36,8 @@ export function Sidebar({ den, className }: SidebarProps) {
 }
 
 function DenInfoCard({ den }: { den: string }) {
+  const { data: metadata } = useDenMetadata(den);
+
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -45,9 +48,20 @@ function DenInfoCard({ den }: { den: string }) {
       </CardHeader>
       <CardContent className="text-sm text-muted-foreground">
         <p>
-          A community den for discussing{' '}
-          <span className="font-medium text-foreground">{den}</span>.
+          {metadata?.description || (
+            <>A community den for discussing{' '}
+            <span className="font-medium text-foreground">{den}</span>.</>
+          )}
         </p>
+        {metadata?.rules && (
+          <>
+            <Separator className="my-4" />
+            <div className="space-y-1">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Rules</h4>
+              <p className="text-xs whitespace-pre-line">{metadata.rules}</p>
+            </div>
+          </>
+        )}
         <Separator className="my-4" />
         <div className="text-xs">
           <p>
