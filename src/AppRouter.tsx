@@ -1,5 +1,8 @@
+import { useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ScrollToTop } from "./components/ScrollToTop";
+import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
+import { KeyboardShortcutsDialog } from "./components/foxhole/KeyboardShortcutsDialog";
 
 import Index from "./pages/Index";
 import Popular from "./pages/Popular";
@@ -21,10 +24,24 @@ import DocsIndex from "./pages/docs/DocsIndex";
 import DocsTechnical from "./pages/docs/DocsTechnical";
 import DocsAbout from "./pages/docs/DocsAbout";
 
+/** Global keyboard shortcuts wrapper (must be inside BrowserRouter) */
+function KeyboardShortcutsProvider({ children }: { children: React.ReactNode }) {
+  const [helpOpen, setHelpOpen] = useState(false);
+  useKeyboardShortcuts({ onShowHelp: () => setHelpOpen(true) });
+
+  return (
+    <>
+      {children}
+      <KeyboardShortcutsDialog open={helpOpen} onOpenChange={setHelpOpen} />
+    </>
+  );
+}
+
 export function AppRouter() {
   return (
     <BrowserRouter>
       <ScrollToTop />
+      <KeyboardShortcutsProvider>
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/popular" element={<Popular />} />
@@ -47,6 +64,7 @@ export function AppRouter() {
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
+      </KeyboardShortcutsProvider>
     </BrowserRouter>
   );
 }

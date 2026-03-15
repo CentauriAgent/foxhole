@@ -24,3 +24,6 @@ export { ZapActivityItem } from './ZapActivityItem';
 
 // Search page components
 export { SearchResultCard } from './SearchResultCard';
+
+// Keyboard shortcuts
+export { KeyboardShortcutsDialog } from './KeyboardShortcutsDialog';
