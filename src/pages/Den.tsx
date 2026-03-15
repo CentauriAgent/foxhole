@@ -8,10 +8,13 @@ import { useDenPostsInfinite } from '@/hooks/useDenPostsInfinite';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useCommunitySubscriptions, useSubscribeToCommunity, useUnsubscribeFromCommunity } from '@/hooks/useCommunitySubscriptions';
 import { useDenMetadata } from '@/hooks/useDenMetadata';
+import { useDenPins } from '@/hooks/useDenPins';
+import { usePinnedPosts } from '@/hooks/usePinnedPosts';
 import { denToIdentifier } from '@/lib/foxhole';
 import { calculateHotScore } from '@/lib/hotScore';
 import { Button } from '@/components/ui/button';
-import { PenSquare } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { PenSquare, Pin } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useInView } from 'react-intersection-observer';
 import { useMuteList } from '@/hooks/useMuteList';
@@ -58,9 +61,13 @@ export default function Den() {
         });
         break;
     }
-    return sorted;
-  }, [posts, mutedPubkeys, sortMode]);
+    // Filter out pinned posts from the regular feed (they appear at top separately)
+    const pinnedIds = new Set(pins);
+    return sorted.filter(post => !pinnedIds.has(post.event.id));
+  }, [posts, mutedPubkeys, sortMode, pins]);
   const { data: denMetadata } = useDenMetadata(denName);
+  const { pins, isPinned: isPinnedPost } = useDenPins(denName);
+  const { data: pinnedPosts } = usePinnedPosts(pins, denName);
   const { data: subscriptions } = useCommunitySubscriptions();
   const { mutate: subscribe, isPending: isSubscribing } = useSubscribeToCommunity();
   const { mutate: unsubscribe, isPending: isUnsubscribing } = useUnsubscribeFromCommunity();
@@ -153,6 +160,18 @@ export default function Den() {
                   ))
                 ) : filteredPosts && filteredPosts.length > 0 ? (
                   <>
+                    {pinnedPosts && pinnedPosts.length > 0 && pinnedPosts.map((post) => (
+                      <div key={`pinned-${post.event.id}`} className="relative">
+                        <Badge variant="secondary" className="absolute top-2 right-2 z-10 gap-1 text-xs font-normal">
+                          <Pin className="h-3 w-3" />
+                          Pinned
+                        </Badge>
+                        <PopularPostCard
+                          post={post.event}
+                          metrics={post.metrics}
+                        />
+                      </div>
+                    ))}
                     {filteredPosts.map((post) => (
                       <PopularPostCard
                         key={post.event.id}

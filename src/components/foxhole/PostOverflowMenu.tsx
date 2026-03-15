@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MoreHorizontal, Link2, UserPlus, UserMinus, VolumeX, Volume2, Flag } from 'lucide-react';
+import { MoreHorizontal, Link2, UserPlus, UserMinus, VolumeX, Volume2, Flag, Pin, PinOff } from 'lucide-react';
 import type { NostrEvent } from '@nostrify/nostrify';
 import { Button } from '@/components/ui/button';
 import {
@@ -23,6 +23,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useIsFollowing, useFollow, useUnfollow } from '@/hooks/useFollows';
 import { useIsMuted, useMute, useUnmute } from '@/hooks/useMuteList';
 import { useReport } from '@/hooks/useReport';
+import { useDenPins } from '@/hooks/useDenPins';
 import { useToast } from '@/hooks/useToast';
 import { getPostDen } from '@/lib/foxhole';
 
@@ -51,6 +52,23 @@ export function PostOverflowMenu({ post, className }: PostOverflowMenuProps) {
 
   const den = getPostDen(post);
   const postUrl = den ? `/d/${den}/post/${post.id}` : null;
+  const { canPin, isPinned, addPin, removePin, isAtLimit } = useDenPins(den || undefined);
+
+  const postIsPinned = isPinned(post.id);
+
+  const handlePin = async () => {
+    if (postIsPinned) {
+      await removePin(post.id);
+      toast({ title: 'Unpinned', description: 'Post has been unpinned from this den' });
+    } else {
+      if (isAtLimit) {
+        toast({ title: 'Max 3 pins reached', description: 'Unpin one first.', variant: 'destructive' });
+        return;
+      }
+      await addPin(post.id);
+      toast({ title: 'Pinned', description: 'Post has been pinned to this den' });
+    }
+  };
 
   const handleCopyLink = () => {
     const fullUrl = postUrl ? `${window.location.origin}${postUrl}` : window.location.href;
@@ -118,6 +136,26 @@ export function PostOverflowMenu({ post, className }: PostOverflowMenuProps) {
             <Link2 className="h-4 w-4 mr-2" />
             Copy link
           </DropdownMenuItem>
+
+          {/* Pin/Unpin - only for den creator */}
+          {canPin && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handlePin}>
+                {postIsPinned ? (
+                  <>
+                    <PinOff className="h-4 w-4 mr-2" />
+                    Unpin post
+                  </>
+                ) : (
+                  <>
+                    <Pin className="h-4 w-4 mr-2" />
+                    Pin post
+                  </>
+                )}
+              </DropdownMenuItem>
+            </>
+          )}
 
           {/* Follow/Unfollow - only when logged in and not own post */}
           {user && !isOwnPost && (
