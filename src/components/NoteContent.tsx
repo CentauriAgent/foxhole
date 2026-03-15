@@ -5,19 +5,58 @@ import { nip19 } from 'nostr-tools';
 import { useAuthor } from '@/hooks/useAuthor';
 import { genUserName } from '@/lib/genUserName';
 import { cn } from '@/lib/utils';
+import { hasMarkdown, renderMarkdown } from '@/lib/markdown';
 
 interface NoteContentProps {
   event: NostrEvent;
   className?: string;
 }
 
-/** Parses content of text note events so that URLs and hashtags are linkified. */
+/** Parses content of text note events so that URLs and hashtags are linkified. 
+ *  Supports markdown rendering when content contains markdown formatting. */
 export function NoteContent({
   event, 
   className, 
-}: NoteContentProps) {  
-  // Process the content to render mentions, links, etc.
+}: NoteContentProps) {
+  const isMarkdown = useMemo(() => hasMarkdown(event.content), [event.content]);
+
+  // Markdown rendering path
+  const markdownHtml = useMemo(() => {
+    if (!isMarkdown) return '';
+    let html = renderMarkdown(event.content);
+    
+    // Post-process: convert nostr: references to links
+    html = html.replace(
+      /nostr:(npub1|note1|nprofile1|nevent1|naddr1)([023456789acdefghjklmnpqrstuvwxyz]+)/g,
+      (match, prefix, data) => {
+        const id = `${prefix}${data}`;
+        if (prefix === 'npub1' || prefix === 'nprofile1') {
+          return `<a href="/${id}" class="text-[hsl(var(--brand))] font-medium hover:underline">@${id.slice(0, 12)}…</a>`;
+        }
+        return `<a href="/${id}" class="text-[hsl(var(--brand))] hover:underline break-all">${match}</a>`;
+      }
+    );
+
+    // Post-process: convert hashtags to den links (but not inside HTML tags or code blocks)
+    html = html.replace(
+      /(?<![&\w/])#(\w+)/g,
+      (match, tag) => {
+        return `<a href="/d/${tag.toLowerCase()}" class="text-[hsl(var(--brand))] hover:underline">${match}</a>`;
+      }
+    );
+
+    // Make external links open in new tab
+    html = html.replace(
+      /<a href="(https?:\/\/[^"]+)"/g,
+      '<a href="$1" target="_blank" rel="noopener noreferrer"'
+    );
+
+    return html;
+  }, [event.content, isMarkdown]);
+  
+  // Plain text rendering path (original logic)
   const content = useMemo(() => {
+    if (isMarkdown) return [];
     const text = event.content;
     
     // Regex to find URLs, Nostr references, and hashtags
@@ -55,7 +94,6 @@ export function NoteContent({
               />
             </a>
           );
-          // Add any stripped trailing chars back as text
           if (cleanUrl.length < url.length) {
             parts.push(url.slice(cleanUrl.length));
           }
@@ -86,7 +124,6 @@ export function NoteContent({
           );
         }
       } else if (nostrPrefix && nostrData) {
-        // Handle Nostr references
         try {
           const nostrId = `${nostrPrefix}${nostrData}`;
           const decoded = nip19.decode(nostrId);
@@ -102,7 +139,6 @@ export function NoteContent({
               <NostrMention key={`mention-${keyCounter++}`} pubkey={pubkey} />
             );
           } else {
-            // For other types, just show as a link
             parts.push(
               <Link 
                 key={`nostr-${keyCounter++}`}
@@ -114,12 +150,10 @@ export function NoteContent({
             );
           }
         } catch {
-          // If decoding fails, just render as text
           parts.push(fullMatch);
         }
       } else if (hashtag) {
-        // Handle hashtags - link to den
-        const tag = hashtag.slice(1).toLowerCase(); // Remove the # and lowercase
+        const tag = hashtag.slice(1).toLowerCase();
         parts.push(
           <Link 
             key={`hashtag-${keyCounter++}`}
@@ -134,18 +168,34 @@ export function NoteContent({
       lastIndex = index + fullMatch.length;
     }
     
-    // Add any remaining text
     if (lastIndex < text.length) {
       parts.push(text.substring(lastIndex));
     }
     
-    // If no special content was found, just use the plain text
     if (parts.length === 0) {
       parts.push(text);
     }
     
     return parts;
-  }, [event.content]);
+  }, [event.content, isMarkdown]);
+
+  if (isMarkdown) {
+    return (
+      <div 
+        className={cn(
+          "prose prose-sm dark:prose-invert max-w-none break-words",
+          "prose-headings:font-semibold prose-headings:tracking-tight",
+          "prose-a:text-[hsl(var(--brand))] prose-a:no-underline hover:prose-a:underline",
+          "prose-code:rounded prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:text-sm",
+          "prose-pre:bg-muted prose-pre:border prose-pre:border-border prose-pre:rounded-lg",
+          "prose-blockquote:border-l-[hsl(var(--brand))] prose-blockquote:text-muted-foreground",
+          "prose-img:rounded-lg prose-img:border prose-img:border-border",
+          className
+        )}
+        dangerouslySetInnerHTML={{ __html: markdownHtml }}
+      />
+    );
+  }
 
   return (
     <div className={cn("whitespace-pre-wrap break-words", className)}>

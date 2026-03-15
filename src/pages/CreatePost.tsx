@@ -12,17 +12,17 @@ import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { MiniAccountSelector } from '@/components/auth/MiniAccountSelector';
 import LoginDialog from '@/components/auth/LoginDialog';
 import { createPostTags } from '@/lib/foxhole';
-import { PenSquare, Send } from 'lucide-react';
+import { PenSquare, Send, FileText, Trash2 } from 'lucide-react';
 import { FoxIcon } from '@/components/foxhole/FoxIcon';
 import { ImageUpload, buildImetaTags, appendImageUrls } from '@/components/foxhole/ImageUpload';
 import type { UploadedImage } from '@/components/foxhole/ImageUpload';
+import { usePostDraft } from '@/hooks/usePostDraft';
 
 export default function CreatePost() {
   const [searchParams] = useSearchParams();
   const defaultDen = searchParams.get('den') || '';
   
-  const [den, setDen] = useState(defaultDen);
-  const [content, setContent] = useState('');
+  const { den, setDen, content, setContent, hasDraft, clearDraft, discardDraft } = usePostDraft(defaultDen);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [error, setError] = useState('');
   const [attachedImages, setAttachedImages] = useState<UploadedImage[]>([]);
@@ -71,6 +71,7 @@ export default function CreatePost() {
       },
       {
         onSuccess: (event) => {
+          clearDraft();
           queryClient.invalidateQueries({ queryKey: ['foxhole'] });
           navigate(`/d/${trimmedDen}/post/${event.id}`);
         },
@@ -118,6 +119,25 @@ export default function CreatePost() {
                   <span className="text-xs text-muted-foreground">Posting as</span>
                   <MiniAccountSelector onAddAccountClick={() => setShowLoginDialog(true)} />
                 </div>
+
+                {hasDraft && (
+                  <div className="flex items-center justify-between bg-muted/50 rounded-md px-3 py-2 text-xs">
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <FileText className="h-3.5 w-3.5" />
+                      <span>Draft restored from autosave</span>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 px-2 text-xs text-muted-foreground hover:text-destructive"
+                      onClick={discardDraft}
+                    >
+                      <Trash2 className="h-3 w-3 mr-1" />
+                      Discard
+                    </Button>
+                  </div>
+                )}
 
                 <div className="space-y-2">
                   <label htmlFor="den" className="text-sm font-medium">
