@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useLocation } from 'react-router-dom';
-import { Flame, Home, BookOpen, Menu, Search, PenSquare, X, LayoutGrid, User, Settings, LogOut, UserPlus, ArrowRightLeft, Bell, Bookmark, Users } from 'lucide-react';
+import { Flame, Home, BookOpen, Menu, Search, PenSquare, X, LayoutGrid, User, Settings, LogOut, UserPlus, ArrowRightLeft, Bell, Bookmark, Users, Sun, Moon, Monitor } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { nip19 } from 'nostr-tools';
 import { FoxIcon } from './FoxIcon';
@@ -12,6 +12,8 @@ import { useLoggedInAccounts } from '@/hooks/useLoggedInAccounts';
 import { useUnreadNotificationCount, getUnreadDisplay } from '@/hooks/useUnreadNotificationCount';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { genUserName } from '@/lib/genUserName';
+import { useTheme } from '@/hooks/useTheme';
+import type { Theme } from '@/contexts/AppContext';
 
 const navItems = [
   { to: '/', label: 'Home', icon: Home },
@@ -33,6 +35,17 @@ export function SiteHeader() {
   const [mobileLoginOpen, setMobileLoginOpen] = useState(false);
   const { currentUser, otherUsers, setLogin, removeLogin } = useLoggedInAccounts();
   const { count: unreadCount } = useUnreadNotificationCount();
+  const { theme, setTheme } = useTheme();
+
+  const themeOrder: Theme[] = ['dark', 'light', 'system'];
+  const cycleTheme = () => {
+    const currentIndex = themeOrder.indexOf(theme);
+    const nextTheme = themeOrder[(currentIndex + 1) % themeOrder.length];
+    setTheme(nextTheme);
+  };
+
+  const ThemeIcon = theme === 'dark' ? Moon : theme === 'light' ? Sun : Monitor;
+  const themeLabel = theme === 'dark' ? 'Dark' : theme === 'light' ? 'Light' : 'System';
 
   // Close menu on route change
   useEffect(() => {
@@ -107,6 +120,18 @@ export function SiteHeader() {
               <span>New Post</span>
             </Button>
           </Link>
+
+          {/* Theme Toggle */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="hidden sm:inline-flex h-9 w-9 p-0"
+            aria-label={`Theme: ${themeLabel}. Click to cycle.`}
+            title={`Theme: ${themeLabel}`}
+            onClick={cycleTheme}
+          >
+            <ThemeIcon className="h-4 w-4" />
+          </Button>
 
           {/* Login Area - hidden on mobile */}
           <LoginArea className="hidden sm:inline-flex" />
@@ -264,6 +289,17 @@ export function SiteHeader() {
               ) : (
                 <LoginArea className="w-full" />
               )}
+            </div>
+
+            {/* Theme Toggle */}
+            <div className="mt-6 pt-6 border-t border-border">
+              <button
+                onClick={cycleTheme}
+                className="flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors w-full text-left"
+              >
+                <ThemeIcon className="h-5 w-5" />
+                <span>Theme: {themeLabel}</span>
+              </button>
             </div>
 
             {/* Community badge */}
