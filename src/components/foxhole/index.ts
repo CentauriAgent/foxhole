@@ -27,3 +27,6 @@ export { SearchResultCard } from './SearchResultCard';
 
 // Keyboard shortcuts
 export { KeyboardShortcutsDialog } from './KeyboardShortcutsDialog';
+
+// Follow suggestions
+export { WhoToFollowCard } from './WhoToFollowCard';

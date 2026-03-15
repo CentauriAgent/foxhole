@@ -5,6 +5,7 @@ import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DenCardCompact } from './DenCard';
 import { ZapActivityItem } from './ZapActivityItem';
+import { WhoToFollowCard } from './WhoToFollowCard';
 import { usePopularDens } from '@/hooks/usePopularDens';
 import { useRecentZaps } from '@/hooks/useRecentZaps';
 import { useSubscribedDens } from '@/hooks/useCommunitySubscriptions';
@@ -29,6 +30,7 @@ export function Sidebar({ den, className }: SidebarProps) {
       )}
       
       <YourDensCard currentDen={den} />
+      <WhoToFollowCard />
       <PopularDensCard currentDen={den} />
       <RecentZapsCard />
     </aside>
