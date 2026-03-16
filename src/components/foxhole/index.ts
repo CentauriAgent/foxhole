@@ -30,3 +30,6 @@ export { KeyboardShortcutsDialog } from './KeyboardShortcutsDialog';
 
 // Follow suggestions
 export { WhoToFollowCard } from './WhoToFollowCard';
+
+// Trending
+export { TrendingPostsCard } from './TrendingPostsCard';

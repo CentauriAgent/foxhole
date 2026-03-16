@@ -14,6 +14,7 @@ import Comment from "./pages/Comment";
 import CreatePost from "./pages/CreatePost";
 import CreateDen from "./pages/CreateDen";
 import Dens from "./pages/Dens";
+import Discover from "./pages/Discover";
 import NotFound from "./pages/NotFound";
 import Settings from "./pages/Settings";
 import Notifications from "./pages/Notifications";
@@ -48,6 +49,7 @@ export function AppRouter() {
         <Route path="/popular" element={<Popular />} />
         <Route path="/following" element={<Following />} />
         <Route path="/dens" element={<Dens />} />
+        <Route path="/discover" element={<Discover />} />
         <Route path="/search" element={<Search />} />
         <Route path="/create" element={<CreatePost />} />
         <Route path="/create-den" element={<CreateDen />} />

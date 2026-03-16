@@ -1,4 +1,5 @@
-import { Zap } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Compass, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -6,6 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { DenCardCompact } from './DenCard';
 import { ZapActivityItem } from './ZapActivityItem';
 import { WhoToFollowCard } from './WhoToFollowCard';
+import { TrendingPostsCard } from './TrendingPostsCard';
 import { usePopularDens } from '@/hooks/usePopularDens';
 import { useRecentZaps } from '@/hooks/useRecentZaps';
 import { useSubscribedDens } from '@/hooks/useCommunitySubscriptions';
@@ -31,6 +33,7 @@ export function Sidebar({ den, className }: SidebarProps) {
       
       <YourDensCard currentDen={den} />
       <WhoToFollowCard />
+      <TrendingPostsCard denName={den} />
       <PopularDensCard currentDen={den} />
       <RecentZapsCard />
     </aside>
@@ -154,6 +157,22 @@ function YourDensCard({ currentDen }: { currentDen?: string }) {
           {allDens.map((den) => (
             <DenCardCompact key={den} name={den} postCount={denCountMap.get(den) ?? 0} />
           ))}
+        </div>
+        <Separator className="my-2" />
+        <div className="space-y-0.5 px-2">
+          <Link
+            to="/dens"
+            className="flex items-center gap-2 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Browse Dens
+          </Link>
+          <Link
+            to="/discover"
+            className="flex items-center gap-2 py-1.5 text-sm text-muted-foreground hover:text-[hsl(var(--brand))] transition-colors"
+          >
+            <Compass className="h-3.5 w-3.5" />
+            Discover Dens
+          </Link>
         </div>
       </CardContent>
     </Card>
