@@ -37,6 +37,9 @@ export default function Den() {
   const { ref, inView } = useInView();
   const { user } = useCurrentUser();
   const { data: mutedPubkeys } = useMuteList();
+  const { data: denMetadata } = useDenMetadata(denName);
+  const { pins, isPinned: isPinnedPost } = useDenPins(denName);
+  const { data: pinnedPosts } = usePinnedPosts(pins, denName);
 
   const filteredPosts = useMemo(() => {
     if (!posts) return [];
@@ -65,9 +68,6 @@ export default function Den() {
     const pinnedIds = new Set(pins);
     return sorted.filter(post => !pinnedIds.has(post.event.id));
   }, [posts, mutedPubkeys, sortMode, pins]);
-  const { data: denMetadata } = useDenMetadata(denName);
-  const { pins, isPinned: isPinnedPost } = useDenPins(denName);
-  const { data: pinnedPosts } = usePinnedPosts(pins, denName);
   const { data: subscriptions } = useCommunitySubscriptions();
   const { mutate: subscribe, isPending: isSubscribing } = useSubscribeToCommunity();
   const { mutate: unsubscribe, isPending: isUnsubscribing } = useUnsubscribeFromCommunity();
