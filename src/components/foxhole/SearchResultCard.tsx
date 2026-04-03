@@ -31,7 +31,7 @@ export function SearchResultCard({ event, className }: SearchResultCardProps) {
   // Don't treat bare image URLs as titles
   const lines = event.content.split('\n').filter(l => l.trim());
   const firstLine = lines[0] || '';
-  const hasTitle = firstLine.length <= 120 && !firstLine.match(/[.!?]$/) && !isImageUrl(firstLine.trim()) && !isVideoUrl(firstLine.trim());
+  const hasTitle = firstLine.length <= 120 && !firstLine.match(/[.!?]$/) && !isImageUrl(firstLine.trim()) && !isVideoUrl(firstLine.trim()) && !firstLine.trim().match(/^https?:\/\//);
   const rawTitle = hasTitle ? firstLine : null;
   const title = rawTitle ? stripMediaUrls(rawTitle) || null : null;
   const bodyContent = hasTitle && lines.length > 1 
@@ -75,7 +75,7 @@ export function SearchResultCard({ event, className }: SearchResultCardProps) {
         <Link to={eventUrl} className="block">
           {title ? (
             <>
-              <h3 className="font-semibold text-base text-foreground group-hover:text-[hsl(var(--brand))] transition-colors mb-1">
+              <h3 className="font-semibold text-base text-foreground group-hover:text-[hsl(var(--brand))] transition-colors break-words mb-1">
                 {title}
               </h3>
               {bodyContent && (

@@ -37,7 +37,7 @@ export const PopularPostCard = memo(function PopularPostCard({
   // Don't treat bare image URLs as titles
   const lines = post.content.split('\n').filter(l => l.trim());
   const firstLine = lines[0] || '';
-  const hasTitle = firstLine.length <= 120 && !firstLine.match(/[.!?]$/) && !isImageUrl(firstLine.trim()) && !isVideoUrl(firstLine.trim());
+  const hasTitle = firstLine.length <= 120 && !firstLine.match(/[.!?]$/) && !isImageUrl(firstLine.trim()) && !isVideoUrl(firstLine.trim()) && !firstLine.trim().match(/^https?:\/\//);
   const rawTitle = hasTitle ? firstLine : null;
   const title = rawTitle ? stripMediaUrls(rawTitle) || null : null;
   const bodyContent = hasTitle && lines.length > 1 
@@ -81,7 +81,7 @@ export const PopularPostCard = memo(function PopularPostCard({
         <Link to={postUrl} className="block">
           {title ? (
             <>
-              <h3 className="font-semibold text-sm text-foreground group-hover:text-[hsl(var(--brand))] transition-colors">
+              <h3 className="font-semibold text-sm text-foreground group-hover:text-[hsl(var(--brand))] transition-colors break-words">
                 {title}
               </h3>
               {bodyContent && (

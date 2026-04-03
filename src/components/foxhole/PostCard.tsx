@@ -50,7 +50,7 @@ export function PostCard({
   // Don't treat bare image URLs as titles
   const lines = post.content.split('\n').filter(l => l.trim());
   const firstLine = lines[0] || '';
-  const hasTitle = firstLine.length <= 120 && !firstLine.match(/[.!?]$/) && !isImageUrl(firstLine.trim()) && !isVideoUrl(firstLine.trim());
+  const hasTitle = firstLine.length <= 120 && !firstLine.match(/[.!?]$/) && !isImageUrl(firstLine.trim()) && !isVideoUrl(firstLine.trim()) && !firstLine.trim().match(/^https?:\/\//);
   const rawTitle = hasTitle ? firstLine : null;
   // Strip image URLs from the title so rendered images aren't duplicated as text
   const title = rawTitle ? stripMediaUrls(rawTitle) || null : null;
@@ -91,7 +91,7 @@ export function PostCard({
           {title ? (
             <>
               <h3 className={cn(
-                "font-semibold text-foreground group-hover:text-[hsl(var(--brand))] transition-colors",
+                "font-semibold text-foreground group-hover:text-[hsl(var(--brand))] transition-colors break-words",
                 compact ? "text-sm" : "text-base"
               )}>
                 {title}
