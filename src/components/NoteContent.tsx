@@ -98,7 +98,7 @@ export function NoteContent({
         const lower = cleanUrl.toLowerCase();
         const isImage = /\.(jpg|jpeg|png|gif|webp|svg|avif)(\?.*)?$/.test(lower) ||
           lower.includes('nostr.build') && /\.(jpg|jpeg|png|gif|webp)/.test(lower);
-        const isVideo = /\.(mp4|webm|mov|ogg)(\?.*)?$/.test(lower);
+        const isVideo = /\.(mp4|webm|mov|ogg|m4v|mkv)(\?.*)?$/.test(lower);
 
         if (isImage) {
           parts.push(

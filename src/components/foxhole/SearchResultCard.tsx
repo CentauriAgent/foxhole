@@ -5,7 +5,7 @@ import { formatRelativeTime, getPostDen, isTopLevelPost } from '@/lib/foxhole';
 import { AuthorBadge } from './AuthorBadge';
 import { DenBadge } from './DenBadge';
 import { NoteContent } from '@/components/NoteContent';
-import { stripImageUrls, isImageUrl } from '@/lib/media';
+import { stripMediaUrls, isImageUrl, isVideoUrl } from '@/lib/media';
 
 interface SearchResultCardProps {
   event: NostrEvent;
@@ -31,9 +31,9 @@ export function SearchResultCard({ event, className }: SearchResultCardProps) {
   // Don't treat bare image URLs as titles
   const lines = event.content.split('\n').filter(l => l.trim());
   const firstLine = lines[0] || '';
-  const hasTitle = firstLine.length <= 120 && !firstLine.match(/[.!?]$/) && !isImageUrl(firstLine.trim());
+  const hasTitle = firstLine.length <= 120 && !firstLine.match(/[.!?]$/) && !isImageUrl(firstLine.trim()) && !isVideoUrl(firstLine.trim());
   const rawTitle = hasTitle ? firstLine : null;
-  const title = rawTitle ? stripImageUrls(rawTitle) || null : null;
+  const title = rawTitle ? stripMediaUrls(rawTitle) || null : null;
   const bodyContent = hasTitle && lines.length > 1 
     ? lines.slice(1).join('\n').trim() 
     : event.content;

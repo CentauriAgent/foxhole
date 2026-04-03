@@ -13,7 +13,7 @@ import { LinkPreview } from './LinkPreview';
 import { useBookmarks } from '@/hooks/useBookmarks';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useLinkPreview } from '@/hooks/useLinkPreview';
-import { stripImageUrls, isImageUrl } from '@/lib/media';
+import { stripMediaUrls, isImageUrl, isVideoUrl } from '@/lib/media';
 
 interface PostCardProps {
   post: NostrEvent;
@@ -50,10 +50,10 @@ export function PostCard({
   // Don't treat bare image URLs as titles
   const lines = post.content.split('\n').filter(l => l.trim());
   const firstLine = lines[0] || '';
-  const hasTitle = firstLine.length <= 120 && !firstLine.match(/[.!?]$/) && !isImageUrl(firstLine.trim());
+  const hasTitle = firstLine.length <= 120 && !firstLine.match(/[.!?]$/) && !isImageUrl(firstLine.trim()) && !isVideoUrl(firstLine.trim());
   const rawTitle = hasTitle ? firstLine : null;
   // Strip image URLs from the title so rendered images aren't duplicated as text
-  const title = rawTitle ? stripImageUrls(rawTitle) || null : null;
+  const title = rawTitle ? stripMediaUrls(rawTitle) || null : null;
   const bodyContent = hasTitle && lines.length > 1 
     ? lines.slice(1).join('\n').trim() 
     : post.content;
