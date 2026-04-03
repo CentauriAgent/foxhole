@@ -10,6 +10,7 @@ import { AuthorBadge } from './AuthorBadge';
 import { DenBadge } from './DenBadge';
 import { NoteContent } from '@/components/NoteContent';
 import { PostOverflowMenu } from './PostOverflowMenu';
+import { stripImageUrls, isImageUrl } from '@/lib/media';
 import type { PopularPostMetrics } from '@/hooks/usePopularPageData';
 
 interface PopularPostCardProps {
@@ -33,10 +34,12 @@ export const PopularPostCard = memo(function PopularPostCard({
   const postUrl = den ? `/d/${den}/post/${post.id}` : '#';
 
   // Extract title from first line if it looks like a title
+  // Don't treat bare image URLs as titles
   const lines = post.content.split('\n').filter(l => l.trim());
   const firstLine = lines[0] || '';
-  const hasTitle = firstLine.length <= 120 && !firstLine.match(/[.!?]$/);
-  const title = hasTitle ? firstLine : null;
+  const hasTitle = firstLine.length <= 120 && !firstLine.match(/[.!?]$/) && !isImageUrl(firstLine.trim());
+  const rawTitle = hasTitle ? firstLine : null;
+  const title = rawTitle ? stripImageUrls(rawTitle) || null : null;
   const bodyContent = hasTitle && lines.length > 1 
     ? lines.slice(1).join('\n').trim() 
     : post.content;

@@ -13,6 +13,7 @@ import { LinkPreview } from './LinkPreview';
 import { useBookmarks } from '@/hooks/useBookmarks';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useLinkPreview } from '@/hooks/useLinkPreview';
+import { stripImageUrls, isImageUrl } from '@/lib/media';
 
 interface PostCardProps {
   post: NostrEvent;
@@ -46,10 +47,13 @@ export function PostCard({
   const postUrl = den ? `/d/${den}/post/${post.id}` : '#';
 
   // Extract title from first line if it looks like a title (short, no punctuation at end)
+  // Don't treat bare image URLs as titles
   const lines = post.content.split('\n').filter(l => l.trim());
   const firstLine = lines[0] || '';
-  const hasTitle = firstLine.length <= 120 && !firstLine.match(/[.!?]$/);
-  const title = hasTitle ? firstLine : null;
+  const hasTitle = firstLine.length <= 120 && !firstLine.match(/[.!?]$/) && !isImageUrl(firstLine.trim());
+  const rawTitle = hasTitle ? firstLine : null;
+  // Strip image URLs from the title so rendered images aren't duplicated as text
+  const title = rawTitle ? stripImageUrls(rawTitle) || null : null;
   const bodyContent = hasTitle && lines.length > 1 
     ? lines.slice(1).join('\n').trim() 
     : post.content;

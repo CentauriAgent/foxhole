@@ -24,6 +24,23 @@ export function NoteContent({
   const markdownHtml = useMemo(() => {
     if (!isMarkdown) return '';
     let html = renderMarkdown(event.content);
+
+    // Post-process: convert bare image URLs (inside <a> tags) to inline <img> elements
+    // Matches <a href="imageUrl">imageUrl</a> and replaces with <a><img></a>
+    html = html.replace(
+      /<a\s+href="(https?:\/\/[^"]+?\.(jpg|jpeg|png|gif|webp|svg|avif)(\?[^"]*)?)"[^>]*>\s*https?:\/\/[^<]+?\.(jpg|jpeg|png|gif|webp|svg|avif)(\?[^<]*)?\s*<\/a>/gi,
+      (_, url) => {
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="block my-2"><img src="${url}" alt="" loading="lazy" class="max-w-full max-h-[500px] rounded-lg border border-border object-contain" /></a>`;
+      }
+    );
+
+    // Also handle bare image URLs not yet wrapped in <a> tags (e.g. in <p> tags)
+    html = html.replace(
+      /(?<!href="|src=")(https?:\/\/[^\s"<]+?\.(jpg|jpeg|png|gif|webp|svg|avif)(\?[^\s"<]*)?)/gi,
+      (url) => {
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="block my-2"><img src="${url}" alt="" loading="lazy" class="max-w-full max-h-[500px] rounded-lg border border-border object-contain" /></a>`;
+      }
+    );
     
     // Post-process: convert nostr: references to links
     html = html.replace(
