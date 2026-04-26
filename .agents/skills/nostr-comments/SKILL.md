@@ -5,7 +5,43 @@ description: Implement Nostr comment systems, add discussion features to posts/a
 
 # Adding Nostr Comments Sections
 
-The project includes a complete commenting system using NIP-22 (kind 1111) comments that can be added to any Nostr event, URL, hashtag, or NIP-73 external content identifier. The `CommentsSection` component provides a full-featured commenting interface with threaded replies, user authentication, and real-time updates.
+This skill provides a complete commenting system using NIP-22 (kind 1111) comments that can be added to any Nostr event, URL, hashtag, or NIP-73 external content identifier. The `CommentsSection` component provides a full-featured commenting interface with threaded replies, user authentication, and real-time updates.
+
+**The comment system is not included in the project by default.** When the user wants comment functionality, follow the setup instructions below to install the files.
+
+## Files Provided by This Skill
+
+All files live under `.agents/skills/nostr-comments/files/` and must be copied into `src/` preserving the directory structure:
+
+| Skill file | Copy to |
+|---|---|
+| `files/hooks/useComments.ts` | `src/hooks/useComments.ts` |
+| `files/hooks/usePostComment.ts` | `src/hooks/usePostComment.ts` |
+| `files/components/comments/Comment.tsx` | `src/components/comments/Comment.tsx` |
+| `files/components/comments/CommentForm.tsx` | `src/components/comments/CommentForm.tsx` |
+| `files/components/comments/CommentsSection.tsx` | `src/components/comments/CommentsSection.tsx` |
+
+## Setup Instructions
+
+### 1. Dependencies
+
+No extra npm packages are required — the skill uses only packages already present in the template (`@nostrify/nostrify`, `@nostrify/react`, `@tanstack/react-query`, `nostr-tools`, `date-fns`, `lucide-react`, `react-router-dom`, and shadcn/ui components).
+
+### 2. Copy the Skill Files Into `src/`
+
+Copy every file listed in the table above from `.agents/skills/nostr-comments/files/` into its corresponding location under `src/`. Preserve the exact paths — the files use `@/hooks/...` and `@/components/...` imports that depend on these locations.
+
+### 3. Required Project Components
+
+The comment components depend on pieces that already ship with the template:
+
+- `@/components/NoteContent` — renders comment text (used by `Comment.tsx`)
+- `@/components/auth/LoginArea` — shown to logged-out users (used by `CommentForm.tsx`)
+- `@/hooks/useAuthor` — fetches comment author profile (used by `Comment.tsx`)
+- `@/hooks/useCurrentUser` — determines whether to show the composer (used by `CommentForm.tsx`)
+- `@/hooks/useNostrPublish` — publishes kind 1111 events (used by `usePostComment.ts`)
+
+All of these are standard in the template; no extra work is needed beyond copying the skill files.
 
 ## Basic Usage
 
