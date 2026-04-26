@@ -890,24 +890,10 @@ The app uses NIP-65 compatible relay management with automatic sync when users l
 
 The project includes a complete NIP-65 relay management system:
 
-- **RelayListManager**: Component for managing multiple relays with read/write permissions
 - **NostrSync**: Automatically syncs user's NIP-65 relay list when they log in
 - **Automatic Publishing**: Changes to relay configuration are automatically published as NIP-65 events when the user is logged in
 
-Use the `RelayListManager` component to provide relay management interfaces:
-
-```tsx
-import { RelayListManager } from '@/components/RelayListManager';
-
-function SettingsPage() {
-  return (
-    <div>
-      <h2>Relay Settings</h2>
-      <RelayListManager />
-    </div>
-  );
-}
-```
+A drop-in settings UI for editing the relay list (`RelayListManager`) is available as the `relay-management` skill.
 
 ## Routing
 
