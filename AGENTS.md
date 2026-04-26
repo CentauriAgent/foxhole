@@ -31,7 +31,6 @@ This project is a Nostr client application built with React 19.x, TailwindCSS 3.
   - `useLoggedInAccounts`: Manage multiple accounts
   - `useLoginActions`: Authentication actions
   - `useIsMobile`: Responsive design helper
-  - `useShakespeare`: AI chat completions with Shakespeare AI API
 - `/src/pages/`: Page components used by React Router (Index, NotFound)
 - `/src/lib/`: Utility functions and shared logic
 - `/src/contexts/`: React context providers (AppContext)

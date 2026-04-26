@@ -5,6 +5,28 @@ description: Build AI-powered chat interfaces, implement streaming responses, or
 
 # AI Integration with Shakespeare API
 
+This skill provides the `useShakespeare` hook for AI chat completions with Nostr authentication against the Shakespeare AI API. The API dynamically provides available models, so you should query them at runtime rather than hardcoding model names.
+
+**The Shakespeare integration is not included in the project by default.** When the user wants AI chat functionality, follow the setup instructions below to install the hook.
+
+## Files Provided by This Skill
+
+| Skill file | Copy to |
+|---|---|
+| `files/hooks/useShakespeare.ts` | `src/hooks/useShakespeare.ts` |
+
+## Setup Instructions
+
+### 1. Dependencies
+
+No extra npm packages are required — the hook uses only packages already present in the template (`react`, `@nostrify/react/login` via the existing `useCurrentUser` hook).
+
+### 2. Copy the Skill File Into `src/`
+
+Copy `.agents/skills/ai-chat/files/hooks/useShakespeare.ts` into `src/hooks/useShakespeare.ts`. The hook uses `@/hooks/useCurrentUser` and `@nostrify/react/login` types — both already present in the template — so no further wiring is required.
+
+## Usage
+
 Use the `useShakespeare` hook for AI chat completions with Nostr authentication. The API dynamically provides available models, so you should query them at runtime rather than hardcoding model names.
 
 ```tsx
