@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.2.6",
-    "@getalby/sdk": "^5.1.1",
     "@hookform/resolvers": "^5.2.2",
     "@nostrify/nostrify": "^0.51.0",
     "@nostrify/react": "^0.4.0",
@@ -80,7 +79,6 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
-    "@webbtc/webln-types": "^3.0.0",
     "autoprefixer": "^10.4.20",
     "eslint": "^9.9.0",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",

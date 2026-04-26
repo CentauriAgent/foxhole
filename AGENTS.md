@@ -19,7 +19,6 @@ This project is a Nostr client application built with React 19.x, TailwindCSS 3.
   - `/src/components/ui/`: shadcn/ui components (48+ components available)
   - `/src/components/auth/`: Authentication-related components (LoginArea, LoginDialog, etc.)
   - `/src/components/dm/`: Direct messaging UI components (DMMessagingInterface, DMConversationList, DMChatArea)
-  - Zap components: `ZapButton`, `ZapDialog`, `WalletModal` for Lightning payments
 - `/src/hooks/`: Custom hooks including:
   - `useNostr`: Core Nostr protocol integration
   - `useAuthor`: Fetch user profile data by pubkey
@@ -33,14 +32,10 @@ This project is a Nostr client application built with React 19.x, TailwindCSS 3.
   - `useLoggedInAccounts`: Manage multiple accounts
   - `useLoginActions`: Authentication actions
   - `useIsMobile`: Responsive design helper
-  - `useZaps`: Lightning zap functionality with payment processing
-  - `useWallet`: Unified wallet detection (WebLN + NWC)
-  - `useNWC`: Nostr Wallet Connect connection management
-  - `useNWCContext`: Access NWC context provider
   - `useShakespeare`: AI chat completions with Shakespeare AI API
 - `/src/pages/`: Page components used by React Router (Index, NotFound)
 - `/src/lib/`: Utility functions and shared logic
-- `/src/contexts/`: React context providers (AppContext, NWCContext, DMContext)
+- `/src/contexts/`: React context providers (AppContext, DMContext)
   - `useDMContext`: Hook exported from DMContext for direct messaging (NIP-04 & NIP-17)
   - `useConversationMessages`: Hook exported from DMContext for paginated messages
 - `/src/test/`: Testing utilities including TestApp component
