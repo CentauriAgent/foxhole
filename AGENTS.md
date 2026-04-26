@@ -846,26 +846,6 @@ const encrypted = await user.signer.nip44.encrypt(user.pubkey, "hello world");
 const decrypted = await user.signer.nip44.decrypt(user.pubkey, encrypted) // "hello world"
 ```
 
-### Rendering Rich Text Content
-
-Nostr text notes (kind 1, 11, and 1111) have a plaintext `content` field that may contain URLs, hashtags, and Nostr URIs. These events should render their content using the `NoteContent` component:
-
-```tsx
-import { NoteContent } from "@/components/NoteContent";
-
-export function Post(/* ...props */) {
-  // ...
-
-  return (
-    <CardContent className="pb-2">
-      <div className="whitespace-pre-wrap break-words">
-        <NoteContent event={post} className="text-sm" />
-      </div>
-    </CardContent>
-  );
-}
-```
-
 ## App Configuration
 
 The project includes an `AppProvider` that manages global application state including theme and NIP-65 relay configuration. The default configuration includes:
