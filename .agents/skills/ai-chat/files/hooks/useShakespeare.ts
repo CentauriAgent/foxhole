@@ -204,7 +204,7 @@ export function useShakespeare() {
       }
       
       setError(errorMessage);
-      throw new Error(errorMessage);
+      throw new Error(errorMessage, { cause: err });
     } finally {
       setIsLoading(false);
     }
@@ -302,7 +302,7 @@ export function useShakespeare() {
       }
       
       setError(errorMessage);
-      throw new Error(errorMessage);
+      throw new Error(errorMessage, { cause: err });
     } finally {
       setIsLoading(false);
     }
@@ -351,7 +351,7 @@ export function useShakespeare() {
       }
       
       setError(errorMessage);
-      throw new Error(errorMessage);
+      throw new Error(errorMessage, { cause: err });
     } finally {
       setIsLoading(false);
     }

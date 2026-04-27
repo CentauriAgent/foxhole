@@ -93,6 +93,9 @@ function Carousel({
 
   React.useEffect(() => {
     if (!api) return
+    // Prime state from the external carousel API, then subscribe for updates.
+    // This is the canonical external-system sync pattern for useEffect.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     onSelect(api)
     api.on("reInit", onSelect)
     api.on("select", onSelect)

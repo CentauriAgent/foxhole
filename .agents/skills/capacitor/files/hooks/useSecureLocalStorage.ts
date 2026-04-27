@@ -59,7 +59,9 @@ export function useSecureLocalStorage<T>(
   // Track the most-recently-requested key so stale async reads don't clobber
   // state after the caller swapped to a different key.
   const currentKeyRef = useRef(key);
-  currentKeyRef.current = key;
+  useEffect(() => {
+    currentKeyRef.current = key;
+  }, [key]);
 
   useEffect(() => {
     let cancelled = false;
@@ -87,6 +89,9 @@ export function useSecureLocalStorage<T>(
       }
     }
 
+    // Reset `ready` before kicking off the new async load — this is a
+    // deliberate external-system sync pattern.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setReady(false);
     load();
 

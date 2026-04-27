@@ -98,7 +98,9 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
   const login = useLoginActions();
   // Stable ref so the nostrconnect effect doesn't restart on every render.
   const loginRef = useRef(login);
-  loginRef.current = login;
+  useEffect(() => {
+    loginRef.current = login;
+  }, [login]);
 
   const { mutateAsync: publishEvent, isPending: isPublishing } = useNostrPublish();
   const { mutateAsync: uploadFile, isPending: isUploading } = useUploadFile();
@@ -110,8 +112,13 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
   const hasExtension = typeof window !== 'undefined' && 'nostr' in window;
 
   // Reset state when the dialog closes.
+  // This is the "reset state when a prop changes" pattern; the usual
+  // React-preferred alternative is a `key` prop on the caller, but the
+  // public API of this component is a simple open/close boolean, so we
+  // reset here. The multiple setState calls are intentional.
   useEffect(() => {
     if (!isOpen) {
+      /* eslint-disable react-hooks/set-state-in-effect */
       setStep('welcome');
       setNsec('');
       setLoginNsec('');
@@ -128,6 +135,7 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
       setUriCopied(false);
       setShowBunkerInput(false);
       setBunkerUri('');
+      /* eslint-enable react-hooks/set-state-in-effect */
       abortControllerRef.current?.abort();
       abortControllerRef.current = null;
     }

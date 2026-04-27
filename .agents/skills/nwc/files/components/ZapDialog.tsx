@@ -251,6 +251,7 @@ export function ZapDialog({ target, children, className }: ZapDialogProps) {
 
   useEffect(() => {
     if (target) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setComment('Zapped with MKStack!');
     }
   }, [target]);
@@ -312,6 +313,10 @@ export function ZapDialog({ target, children, className }: ZapDialogProps) {
   };
 
   useEffect(() => {
+    // Reset dialog state when opened/closed. The canonical React pattern
+    // for this is a `key` prop on the caller, but the dialog's public API
+    // is a simple open/close boolean.
+    /* eslint-disable react-hooks/set-state-in-effect */
     if (open) {
       setAmount(100);
       setInvoice(null);
@@ -324,6 +329,7 @@ export function ZapDialog({ target, children, className }: ZapDialogProps) {
       setCopied(false);
       setQrCodeUrl('');
     }
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [open, setInvoice]);
 
   const handleZap = () => {

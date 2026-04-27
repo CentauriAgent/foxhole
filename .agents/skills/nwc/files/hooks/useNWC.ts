@@ -170,7 +170,7 @@ export function useNWCInternal() {
       client = new LN(connection.connectionString);
     } catch (error) {
       console.error('Failed to create NWC client:', error);
-      throw new Error(`Failed to create NWC client: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(`Failed to create NWC client: ${error instanceof Error ? error.message : 'Unknown error'}`, { cause: error });
     }
 
     try {
@@ -194,17 +194,17 @@ export function useNWCInternal() {
 
       if (error instanceof Error) {
         if (error.message.includes('timeout')) {
-          throw new Error('Payment timed out. Please try again.');
+          throw new Error('Payment timed out. Please try again.', { cause: error });
         } else if (error.message.includes('insufficient')) {
-          throw new Error('Insufficient balance in connected wallet.');
+          throw new Error('Insufficient balance in connected wallet.', { cause: error });
         } else if (error.message.includes('invalid')) {
-          throw new Error('Invalid invoice or connection. Please check your wallet.');
+          throw new Error('Invalid invoice or connection. Please check your wallet.', { cause: error });
         } else {
-          throw new Error(`Payment failed: ${error.message}`);
+          throw new Error(`Payment failed: ${error.message}`, { cause: error });
         }
       }
 
-      throw new Error('Payment failed with unknown error');
+      throw new Error('Payment failed with unknown error', { cause: error });
     }
   }, []);
 
