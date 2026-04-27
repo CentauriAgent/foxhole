@@ -74,12 +74,18 @@ Kinds below 1000 are "legacy"; their storage behavior is per-kind (e.g. kind 1 i
 
 ### Nostr Security Model
 
-**CRITICAL:** Nostr is permissionless — anyone can publish any event. Signatures prove authorship, not trustworthiness. Any feature that implies trust MUST filter queries by `authors`.
+**CRITICAL:** Nostr private keys (`nsec`) are stored **in plaintext in `localStorage`**. Any JavaScript running on the origin can steal them. A single XSS = permanent, unrecoverable key theft across every Nostr client the user ever touches. **Treat XSS mitigation as the top-priority security concern.**
+
+- **Never** use `dangerouslySetInnerHTML`, `innerHTML`, or `document.write` with event data, URL params, or other untrusted strings.
+- **CSP is defense-in-depth**, not primary defense. `index.html` ships a restrictive CSP (`script-src 'self'`, `default-src 'none'`). Never relax it with `'unsafe-eval'`, `'unsafe-inline'` on `script-src`, or wildcard sources.
+- **Sanitize every event-sourced URL** (`sanitizeUrl()` — https-only allowlist) before using it as `href`, `src`, iframe `src`, or CSS `url()`.
+- **Sanitize every event-sourced string interpolated into CSS**. A malicious `font-family` or `url()` value can break out of the CSS context and inject rules.
+
+Beyond XSS, Nostr is permissionless — signatures prove authorship, not trustworthiness. Filter by `authors` whenever trust is implied:
 
 - **Admin/moderator/owner queries** — filter by trusted pubkeys.
 - **Addressable events (kinds 30000–39999)** and **user-owned replaceable events** — filter by `authors`; the `d` tag alone is not a trust boundary.
 - **Routes for addressable/replaceable events** — include the author in the URL (e.g. `/article/:npub/:slug`) so the filter can constrain on author.
-- **URLs from event data** — treat as untrusted input; validate before rendering as `href`, `src`, or CSS `url()`.
 - **Public UGC** (kind 1 notes, reactions, public feeds, discovery) — author filtering NOT required.
 
 ```ts
@@ -89,7 +95,7 @@ nostr.query([{ kinds: [30078], '#d': ['pathos-organizers'], limit: 1 }]);
 nostr.query([{ kinds: [30078], authors: ADMIN_PUBKEYS, '#d': ['pathos-organizers'], limit: 1 }]);
 ```
 
-For the full model — NIP-72 community moderation, URL sanitization patterns, and CSS injection prevention when interpolating event data into styles — load the **`nostr-security`** skill.
+For the full threat model — CSP walkthrough, `sanitizeUrl` / `sanitizeCssString` implementations, NIP-72 community moderation, and the pre-merge checklist — load the **`nostr-security`** skill.
 
 ### The `useNostr` Hook
 
