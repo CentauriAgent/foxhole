@@ -74,44 +74,22 @@ Kinds below 1000 are "legacy"; their storage behavior is per-kind (e.g. kind 1 i
 
 ### Nostr Security Model
 
-**CRITICAL:** Nostr is permissionless — anyone can publish any event. Any feature that implies trust (admin actions, moderator decisions, addressable events owned by a specific user) MUST filter queries by the `authors` field.
+**CRITICAL:** Nostr is permissionless — anyone can publish any event. Signatures prove authorship, not trustworthiness. Any feature that implies trust MUST filter queries by `authors`.
+
+- **Admin/moderator/owner queries** — filter by trusted pubkeys.
+- **Addressable events (kinds 30000–39999)** and **user-owned replaceable events** — filter by `authors`; the `d` tag alone is not a trust boundary.
+- **Routes for addressable/replaceable events** — include the author in the URL (e.g. `/article/:npub/:slug`) so the filter can constrain on author.
+- **URLs from event data** — treat as untrusted input; validate before rendering as `href`, `src`, or CSS `url()`.
+- **Public UGC** (kind 1 notes, reactions, public feeds, discovery) — author filtering NOT required.
 
 ```ts
-// ❌ Anyone can spoof this event and become an "organizer"
+// ❌ Anyone can spoof this event
 nostr.query([{ kinds: [30078], '#d': ['pathos-organizers'], limit: 1 }]);
-
 // ✅ Only trust admin authors
-nostr.query([{
-  kinds: [30078],
-  authors: ADMIN_PUBKEYS,
-  '#d': ['pathos-organizers'],
-  limit: 1,
-}]);
+nostr.query([{ kinds: [30078], authors: ADMIN_PUBKEYS, '#d': ['pathos-organizers'], limit: 1 }]);
 ```
 
-**Addressable events (kinds 30000–39999) MUST include `authors`** — `d`-tag alone is not a trust boundary:
-
-```ts
-nostr.query([{
-  kinds: [30023],
-  authors: [authorPubkey], // prevents d-tag spoofing
-  '#d': ['my-article-slug'],
-  limit: 1,
-}]);
-```
-
-**URL routes for addressable/replaceable events MUST include the author**:
-
-```tsx
-// ❌ Anyone can publish an event with this d-tag
-<Route path="/article/:slug" element={<Article />} />
-// ✅ Author is in the URL; filter can include `authors`
-<Route path="/article/:npub/:slug" element={<Article />} />
-```
-
-**NIP-72 moderated communities**: fetch the community definition filtered by the community owner, extract moderator pubkeys from `p` tags with role `moderator`, and filter approval events (kind 4550) by `authors: moderatorPubkeys`. Without that, anyone can publish a "moderator approval".
-
-**When author filtering is NOT required**: public user-generated content where anyone should be able to post — kind 1 notes, reactions, public feeds, discovery queries.
+For the full model — NIP-72 community moderation, URL sanitization patterns, and CSS injection prevention when interpolating event data into styles — load the **`nostr-security`** skill.
 
 ### The `useNostr` Hook
 
