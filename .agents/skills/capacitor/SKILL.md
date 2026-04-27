@@ -74,24 +74,13 @@ npm install @capacitor/core @capacitor/app @capacitor/filesystem \
 # Capacitor toolchain (dev)
 npm install -D @capacitor/cli @capacitor/android @capacitor/ios
 
-# Safe-area Tailwind plugin — VERSION DEPENDS ON YOUR TAILWIND MAJOR:
-#   Tailwind v3 (this project):  tailwindcss-safe-area@0.8.0   (last v3-compat release)
-#   Tailwind v4 (newer stacks):  tailwindcss-safe-area@latest  (>=1.0.0)
-npm install -D tailwindcss-safe-area@0.8.0
+# Safe-area utilities (Tailwind v4 — this project)
+npm install -D tailwindcss-safe-area
 ```
 
-**Why the pinned version for `tailwindcss-safe-area`?** The plugin's API
-changed between v0.x and v1.x to match Tailwind's own v3→v4 transition:
+mkstack ships **Tailwind v4** with a CSS-first configuration (`@import "tailwindcss"` in `src/index.css`, no `tailwind.config.ts`). The safe-area plugin is registered via a CSS import, not a JS plugins array — see step 3.
 
-| Plugin version | Tailwind version | How to register |
-|---|---|---|
-| `^0.8.0` | 3.x | Import in `tailwind.config.ts` as a plugin (this project) |
-| `>=1.0.0` | 4.x | `@import "tailwindcss-safe-area";` in your main CSS |
-
-mkstack ships Tailwind **3.4.x**, so pin to `0.8.0`. Using `@latest`
-on a Tailwind v3 project silently produces no utilities. If you later
-upgrade the project to Tailwind v4, bump this dependency at the same
-time and switch from the `plugins:` array to a CSS `@import`.
+If you're porting these instructions to a Tailwind v3 project, install `tailwindcss-safe-area@0.8.0` instead and register it in `tailwind.config.ts`'s `plugins` array. On v4 the `0.8.0` version emits no utilities.
 
 Each runtime package:
 
@@ -117,26 +106,24 @@ Each runtime package:
 Copy every file listed in the tables above from
 `.agents/skills/capacitor/files/` into its corresponding location.
 
-### 3. Register the Tailwind Safe-Area Plugin
+### 3. Register the Safe-Area Plugin (Tailwind v4 CSS import)
 
-Edit `tailwind.config.ts` to import the plugin and append it to the
-`plugins` array:
+Add a second `@import` line to `src/index.css`, directly after the existing `@import "tailwindcss";`:
 
-```ts
-// tailwind.config.ts
-import type { Config } from "tailwindcss";
-import tailwindcssAnimate from "tailwindcss-animate";
-import safeArea from "tailwindcss-safe-area";   // add this
+```css
+/* src/index.css */
+@import "tailwindcss";
+@import "tailwindcss-safe-area";
+@import "tw-animate-css";
 
-export default {
-  // ...existing config...
-  plugins: [tailwindcssAnimate, safeArea],      // append safeArea
-} satisfies Config;
+/* …existing @theme, @custom-variant, @layer rules unchanged… */
 ```
 
+**Use `@import`, not `@plugin`.** The safe-area package ships a plain CSS file for Tailwind v4, not a JS plugin entry point — `@plugin "tailwindcss-safe-area";` will fail to resolve.
+
 This unlocks utilities like `pt-safe`, `pb-safe`, `px-safe`, `top-safe`,
-`bottom-safe`, `h-dvh-safe`, `min-h-dvh-safe`, plus the `-offset-{n}` /
-`-or-{n}` variants (e.g. `pb-safe-offset-4` = safe area + 1rem;
+`bottom-safe`, `h-dvh-safe`, `min-h-dvh-safe`, `border-t-safe`, plus the
+`-offset-{n}` and `-or-{n}` variants (e.g. `pb-safe-offset-4` = safe area + 1rem;
 `pb-safe-or-8` = max of safe area and 2rem). See the plugin's
 [README](https://github.com/mvllow/tailwindcss-safe-area) for the full
 utility list.
@@ -359,16 +346,20 @@ Common utilities:
 
 | Utility | Meaning |
 |---|---|
-| `pt-safe`, `pr-safe`, `pb-safe`, `pl-safe` | Padding on one side |
+| `pt-safe`, `pr-safe`, `pb-safe`, `pl-safe`, `ps-safe`, `pe-safe` | Padding on one side (physical + logical) |
 | `px-safe`, `py-safe`, `p-safe` | Padding on multiple sides |
-| `mt-safe`, …, `m-safe` | Margin equivalents |
-| `top-safe`, `bottom-safe`, `left-safe`, `right-safe` | Absolute / fixed positioning |
+| `mt-safe`, …, `m-safe`, `ms-safe`, `me-safe` | Margin equivalents |
+| `top-safe`, `bottom-safe`, `left-safe`, `right-safe`, `start-safe`, `end-safe` | Absolute / fixed positioning |
 | `inset-safe`, `inset-x-safe`, `inset-y-safe` | All-side inset |
-| `h-dvh-safe`, `min-h-dvh-safe`, `max-h-dvh-safe` | Dynamic viewport height minus insets |
+| `border-t-safe`, …, `border-safe`, `border-x-safe`, `border-y-safe` | Border width sized to the inset |
+| `h-dvh-safe`, `h-svh-safe`, `h-lvh-safe`, `h-vh-safe` | Viewport heights minus insets (dynamic / small / large / static) |
+| `min-h-dvh-safe`, `max-h-dvh-safe`, etc. | min/max variants of the above |
 | `h-screen-safe` | Classic viewport height minus insets |
+| `h-fill-safe` | `-webkit-fill-available` minus insets |
 | `{prop}-safe-offset-{n}` | Safe area + `{n}` (e.g. `pb-safe-offset-4`) |
 | `{prop}-safe-or-{n}` | `max(safe-area, {n})` (e.g. `pb-safe-or-8`) |
 | `scroll-p-safe`, `scroll-m-safe`, … | Scroll padding / margin |
+| `safe`, `safe-x`, `safe-y`, `safe-t`, …, `safe-none`, … | Toggle safe-area handling on/off per axis or side |
 
 See the [plugin README](https://github.com/mvllow/tailwindcss-safe-area)
 for the full list.
@@ -407,23 +398,23 @@ for the full list.
   `env(safe-area-inset-*)` as `0`. The `SystemBars` plugin with
   `insetsHandling: 'css'` (already set in the skill's
   `capacitor.config.ts`) injects `--safe-area-inset-*` CSS variables
-  with the correct values, but the `tailwindcss-safe-area@0.8.0`
-  plugin uses `env(…)` directly and can't see them. Two fixes:
+  with the correct values, but the `tailwindcss-safe-area` package
+  emits rules that use `env(…)` directly and can't see them. Two fixes:
   1. **Preferred:** ensure your target Android devices are on WebView
      140+ (released Aug 2025). Any actively-updated Android >=7 should
      be, since WebView auto-updates via Play Services.
   2. **Fallback:** copy `files/safe-area-shim.css` into `src/` and
-     `@import` it after `@tailwind utilities;` in `src/index.css` —
-     it re-declares the common utilities with
+     `@import` it **after** `@import "tailwindcss-safe-area";` in
+     `src/index.css` — it re-declares the common utilities with
      `var(--safe-area-inset-*, env(…, 0px))` so the SystemBars-injected
-     variables take over when `env()` reports 0. See the file's header
-     comment for details.
-- **`pt-safe` doesn't exist at all** — the Tailwind plugin isn't
-  registered. Verify `import safeArea from "tailwindcss-safe-area"` and
-  that `safeArea` is listed in the `plugins` array of
-  `tailwind.config.ts`. Also verify you installed the **0.8.0** version
-  specifically (`npm ls tailwindcss-safe-area`). Version `1.x` is for
-  Tailwind v4 and emits no utilities on v3.
+     variables take over when `env()` reports 0.
+- **`pt-safe` doesn't exist at all** — the CSS import is missing or
+  in the wrong position. Verify `src/index.css` contains
+  `@import "tailwindcss-safe-area";` **after** `@import "tailwindcss";`
+  (source order matters in Tailwind v4). Also verify you installed the
+  v4-compatible version: `npm ls tailwindcss-safe-area` should show
+  `>=1.0.0`. Version `0.8.0` is a JS plugin for Tailwind v3 and emits
+  nothing on v4.
 - **Safe-area utilities have 0px on iOS Safari/Xcode simulator** —
   missing `viewport-fit=cover` in your `<meta name="viewport">` tag.
   Without it iOS doesn't expose the insets.
