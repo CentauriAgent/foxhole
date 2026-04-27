@@ -344,33 +344,9 @@ For font installation, color-scheme changes, light/dark theming, or the `isolate
 
 ## Writing Tests vs. Running Tests
 
-**Writing (creating new test files) — don't, unless asked.** Only create new tests when:
-
-1. The user explicitly asks for tests.
-2. The user describes a specific bug and asks for tests to diagnose it.
-3. The user says a problem persists after you tried to fix it.
-
-Never write tests because tool results show failures, because you think tests would be helpful, or because you added a new feature.
-
 **Running the existing test script — always do it.** After any code change, run the project's test/validation script. **Your task is not complete until it passes.** The script typically covers TypeScript compilation, ESLint, and existing tests.
 
-### Test Setup
-
-Vitest + jsdom, with React Testing Library and jest-dom matchers. Mocked browser APIs: `matchMedia`, `scrollTo`, `IntersectionObserver`, `ResizeObserver`. Wrap components in `TestApp` to provide context providers:
-
-```tsx
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import { TestApp } from '@/test/TestApp';
-import { MyComponent } from './MyComponent';
-
-describe('MyComponent', () => {
-  it('renders correctly', () => {
-    render(<TestApp><MyComponent /></TestApp>);
-    expect(screen.getByText('Expected text')).toBeInTheDocument();
-  });
-});
-```
+**Writing new test files — don't, unless the user asks.** If the user explicitly requests tests, describes a bug to diagnose with a test, or reports that a problem persists after a fix, load the **`testing`** skill for the project's Vitest + `TestApp` setup and policy.
 
 ## Validating Your Changes
 
