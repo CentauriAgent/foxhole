@@ -17,13 +17,7 @@ A successful XSS on any page of the app = instant, silent, irreversible key thef
 
 **Every security practice in this skill exists to make XSS harder to achieve.** The stakes for a Nostr client are substantially higher than for a typical web app — treat every bit of untrusted data (event tags, `content`, metadata fields, URL parameters, relay responses) as a potential script injection vector.
 
-### Why localStorage at all?
-
-NIP-07 browser extensions and NIP-46 remote signers keep keys out of the web app's origin and are strongly preferred. But the app still has to support users who log in via `nsec` or who generate a new keypair in-browser, and those end up in `localStorage`. The mitigation story is therefore:
-
-1. **Encourage NIP-07 / NIP-46** in the login UI (already done by `LoginArea`).
-2. **Make XSS as hard as possible** via CSP + sanitization + avoiding `dangerouslySetInnerHTML`.
-3. **Filter trust-sensitive queries by author** so an attacker can't trick the UI into acting on forged "admin" events (still a form of impersonation, even if no key is stolen).
+NIP-07 browser extensions and NIP-46 remote signers keep the key material outside the web app's origin, but they don't change this threat model: a successful XSS can still ask an active signer to sign arbitrary events, drain funds via zap requests, publish malicious content under the user's identity, or scrape plaintext DMs as they're decrypted. The mitigation story is the same regardless of login method — make XSS hard, and filter trust-sensitive queries by author.
 
 ## Defense-in-depth layers
 
