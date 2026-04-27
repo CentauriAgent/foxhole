@@ -5,39 +5,27 @@ description: Wrap the mkstack web app as a native iOS and Android application us
 
 # Capacitor Native Wrapper
 
-This skill turns the web app into a native iOS and Android binary using
-[Capacitor](https://capacitorjs.com/) — no Swift or Kotlin required for the
-basics. The React UI runs unchanged inside a native WebView; this skill
-provides the cross-platform primitives that let the app feel native:
-haptics, OS-level secure storage, a working file download, the share sheet,
-deep-link routing, safe-area handling, and automatic status-bar theming.
+This skill turns the web app into a native iOS and Android binary using [Capacitor](https://capacitorjs.com/) — no Swift or Kotlin required for the basics. The React UI runs unchanged inside a native WebView; the helpers below provide the cross-platform primitives that make it feel native.
 
-**This functionality is not included in the project by default.** When the
-user wants to ship the app to the App Store or Google Play (or build an
-`.apk` / `.ipa`), follow the setup instructions below.
+**Not included in the project by default.** Run the setup below when the user wants to ship to an app store or produce an `.apk` / `.ipa`.
 
-## What This Skill Provides
+## What this skill provides
 
 | Capability | Web behavior | Native behavior |
 |---|---|---|
-| **Haptics** (`impactLight`, `notificationSuccess`, `selectionChanged`, …) | `navigator.vibrate()` (Android browsers) | Taptic engine / Android haptics |
+| **Haptics** (`impactLight`, `notificationSuccess`, …) | `navigator.vibrate()` on Android browsers | Taptic engine / Android haptics |
 | **`downloadTextFile(filename, content)`** | `<a download>` click | Writes to app Documents directory |
-| **`openUrl(url)`** | `window.open(url, '_blank')` | Presents the native share sheet |
-| **`secureStorage` / `useSecureLocalStorage`** | `localStorage` | iOS Keychain / Android KeyStore, auto-migrates existing plaintext values |
-| **`<DeepLinkHandler />`** | no-op | Forwards OS `appUrlOpen` events into React Router |
+| **`openUrl(url)`** | `window.open(url, '_blank')` | Native share sheet |
+| **`secureStorage` / `useSecureLocalStorage`** | `localStorage` | iOS Keychain / Android KeyStore, auto-migrates plaintext values |
+| **`<DeepLinkHandler />`** | no-op | Forwards OS `appUrlOpen` into React Router |
 | **`bootstrapNative()`** | no-op | Hides iOS keyboard accessory bar; syncs system-bar icon style with theme |
-| **Safe-area utilities** via `tailwindcss-safe-area` Tailwind plugin | `env(safe-area-inset-*)` | `env(safe-area-inset-*)` + `SystemBars` plugin back-fill on Android |
+| **Safe-area utilities** (Tailwind) | `env(safe-area-inset-*)` | `env(safe-area-inset-*)` + `SystemBars` back-fill on Android |
 
-Everything is SSR-safe and web-safe — each helper does the right thing on
-every platform, so you can import and call them unconditionally from shared
-components.
+Every helper is SSR-safe and web-safe — import and call unconditionally from shared components. Each source file ships with a JSDoc header covering the exact API, gotchas, and usage examples; read them after copying.
 
-## Files Provided by This Skill
+## Files to copy
 
-Copy each file from `.agents/skills/capacitor/files/` into its matching
-location:
-
-### Source files (copy into `src/`)
+Copy from `.agents/skills/capacitor/files/` into the matching project location:
 
 | Skill file | Copy to |
 |---|---|
@@ -47,388 +35,150 @@ location:
 | `files/lib/nativeBootstrap.ts` | `src/lib/nativeBootstrap.ts` |
 | `files/hooks/useSecureLocalStorage.ts` | `src/hooks/useSecureLocalStorage.ts` |
 | `files/components/DeepLinkHandler.tsx` | `src/components/DeepLinkHandler.tsx` |
-
-### Project-root files
-
-| Skill file | Copy to |
-|---|---|
-| `files/capacitor.config.ts` | `capacitor.config.ts` (project root) — edit `appId`, `appName`, `scheme`, background colors |
+| `files/capacitor.config.ts` | `capacitor.config.ts` (project root — edit `appId`, `appName`, `scheme`, background colors) |
 | `files/scripts/patch-cap-config.mjs` | `scripts/patch-cap-config.mjs` — only needed if you add **local** (non-SPM) native plugin classes; otherwise skip |
+| `files/safe-area-shim.css` | `src/safe-area-shim.css` — **only if** you need Android WebView <140 support (see shim file header and troubleshooting below) |
 
-### Optional snippet
+## Setup
 
-| Skill file | What to do |
-|---|---|
-| `files/safe-area-shim.css` | Copy to `src/safe-area-shim.css` **only if** you need to support older Android WebView (<140). See the file's header comment for details. Most modern deployments can skip it. |
-
-## Setup Instructions
-
-### 1. Install Dependencies
+### 1. Install
 
 ```bash
-# Capacitor runtime + plugins
+# Runtime + plugins
 npm install @capacitor/core @capacitor/app @capacitor/filesystem \
   @capacitor/haptics @capacitor/keyboard @capacitor/share \
   capacitor-secure-storage-plugin
 
-# Capacitor toolchain (dev)
+# Toolchain
 npm install -D @capacitor/cli @capacitor/android @capacitor/ios
 
 # Safe-area utilities (Tailwind v4 — this project)
 npm install -D tailwindcss-safe-area
 ```
 
-mkstack ships **Tailwind v4** with a CSS-first configuration (`@import "tailwindcss"` in `src/index.css`, no `tailwind.config.ts`). The safe-area plugin is registered via a CSS import, not a JS plugins array — see step 3.
+mkstack ships **Tailwind v4** with CSS-first config (`@import "tailwindcss"` in `src/index.css`, no `tailwind.config.ts`). If you're adapting these instructions to a Tailwind v3 project, install `tailwindcss-safe-area@0.8.0` instead and register it in `tailwind.config.ts`'s `plugins` array — `1.x` emits no utilities on v3.
 
-If you're porting these instructions to a Tailwind v3 project, install `tailwindcss-safe-area@0.8.0` instead and register it in `tailwind.config.ts`'s `plugins` array. On v4 the `0.8.0` version emits no utilities.
+### 2. Copy the skill files
 
-Each runtime package:
+Copy every file from the table above.
 
-- **`@capacitor/core`** (runtime) — `Capacitor.isNativePlatform()`,
-  `Capacitor.getPlatform()`, `registerPlugin`, `SystemBars`
-- **`@capacitor/cli`** (dev) — the `npx cap` command (`init`, `add`,
-  `sync`, `run`)
-- **`@capacitor/android`** (dev) — the Android Studio project scaffolding
-- **`@capacitor/ios`** (dev) — the Xcode project scaffolding
-- **`@capacitor/app`** (runtime) — `appUrlOpen` event for deep links
-- **`@capacitor/filesystem`** (runtime) — native file writes (used by
-  `downloadTextFile`)
-- **`@capacitor/haptics`** (runtime) — taptic engine integration
-- **`@capacitor/keyboard`** (runtime) — iOS keyboard accessory-bar control
-- **`@capacitor/share`** (runtime) — native share sheet (used by `openUrl`)
-- **`capacitor-secure-storage-plugin`** (runtime) — iOS Keychain / Android
-  KeyStore wrapper (used by `secureStorage`)
-- **`tailwindcss-safe-area`** (dev) — safe-area utilities
-  (`pt-safe`, `pb-safe`, `px-safe`, `top-safe`, `h-dvh-safe`, …)
+### 3. Register the safe-area plugin
 
-### 2. Copy the Skill Files
-
-Copy every file listed in the tables above from
-`.agents/skills/capacitor/files/` into its corresponding location.
-
-### 3. Register the Safe-Area Plugin (Tailwind v4 CSS import)
-
-Add a second `@import` line to `src/index.css`, directly after the existing `@import "tailwindcss";`:
+Add a second `@import` to `src/index.css`, right after the existing `@import "tailwindcss";`:
 
 ```css
-/* src/index.css */
 @import "tailwindcss";
 @import "tailwindcss-safe-area";
 @import "tw-animate-css";
-
-/* …existing @theme, @custom-variant, @layer rules unchanged… */
 ```
 
-**Use `@import`, not `@plugin`.** The safe-area package ships a plain CSS file for Tailwind v4, not a JS plugin entry point — `@plugin "tailwindcss-safe-area";` will fail to resolve.
+**Use `@import`, not `@plugin`.** The package ships a plain CSS file for Tailwind v4, not a JS plugin entry point.
 
-This unlocks utilities like `pt-safe`, `pb-safe`, `px-safe`, `top-safe`,
-`bottom-safe`, `h-dvh-safe`, `min-h-dvh-safe`, `border-t-safe`, plus the
-`-offset-{n}` and `-or-{n}` variants (e.g. `pb-safe-offset-4` = safe area + 1rem;
-`pb-safe-or-8` = max of safe area and 2rem). See the plugin's
-[README](https://github.com/mvllow/tailwindcss-safe-area) for the full
-utility list.
+### 4. Fill in `capacitor.config.ts`
 
-### 4. Edit `capacitor.config.ts`
-
-Open the copied `capacitor.config.ts` and fill in your app identity:
-
-```ts
-const config: CapacitorConfig = {
-  appId: 'com.example.myapp',   // reverse-DNS identifier
-  appName: 'MyApp',             // user-visible name
-  webDir: 'dist',
-  ios: {
-    scheme: 'MyApp',             // custom URL scheme (myapp://)
-    backgroundColor: '#14161f',
-    contentInset: 'never',
-  },
-  android: {
-    backgroundColor: '#14161f',
-    allowMixedContent: false,
-  },
-  // ...
-};
-```
-
-**Important:** `appId` cannot be changed after the app is published to
-either store.
+Edit `appId` (reverse-DNS; **cannot be changed after publishing**), `appName`, `ios.scheme`, and the iOS/Android `backgroundColor` values. All other defaults in the skill's config are production-safe.
 
 ### 5. Update `index.html`
 
-Ensure your viewport meta tag opts into safe-area insets — without
-`viewport-fit=cover`, iOS will not expose `env(safe-area-inset-*)`:
+iOS won't expose `env(safe-area-inset-*)` without `viewport-fit=cover`:
 
 ```html
 <meta name="viewport"
   content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
 ```
 
-### 6. Wire `bootstrapNative()` into `src/main.tsx`
+### 6. Wire up bootstrap and deep links
 
-Call it **before** `createRoot(...).render(...)` so the system bars are
-themed by the time the first React paint lands:
+Call `bootstrapNative()` **before** React mounts, so system bars are themed at first paint:
 
 ```tsx
 // src/main.tsx
-import { createRoot } from 'react-dom/client';
 import { bootstrapNative } from '@/lib/nativeBootstrap';
-import App from './App.tsx';
-import './index.css';
-
 bootstrapNative();
-
 createRoot(document.getElementById('root')!).render(<App />);
 ```
 
-### 7. Wire `<DeepLinkHandler />` into `AppRouter.tsx`
-
-It must live **inside** `<BrowserRouter>` so `useNavigate()` works:
+Render `<DeepLinkHandler />` **inside** `<BrowserRouter>` so `useNavigate()` works:
 
 ```tsx
 // src/AppRouter.tsx
-import { BrowserRouter } from 'react-router-dom';
-import { DeepLinkHandler } from '@/components/DeepLinkHandler';
-import { ScrollToTop } from '@/components/ScrollToTop';
-
-export default function AppRouter() {
-  return (
-    <BrowserRouter>
-      <DeepLinkHandler />
-      <ScrollToTop />
-      {/* <Routes>…</Routes> */}
-    </BrowserRouter>
-  );
-}
+<BrowserRouter>
+  <DeepLinkHandler />
+  <ScrollToTop />
+  {/* <Routes>…</Routes> */}
+</BrowserRouter>
 ```
 
-### 8. Add the Native Platforms
+### 7. Add platforms and build
 
 ```bash
 npx cap add android
-npx cap add ios      # macOS only
+npx cap add ios          # macOS only
+
+npm run build            # produces dist/
+npx cap sync             # copies dist/ into android/ and ios/
+
+npx cap open android     # Android Studio; hit Run
+npx cap open ios         # Xcode (macOS only); hit Run
 ```
 
-This creates `android/` and `ios/` directories at the project root. Commit
-them — they contain project-specific config (signing keys excluded).
-
-### 9. Build & Sync
-
-```bash
-npm run build        # produces dist/
-npx cap sync         # copies dist/ into android/ and ios/
-```
-
-Add a convenience npm script so you can re-sync with one command:
-
-```jsonc
-// package.json
-{
-  "scripts": {
-    "cap:sync": "npx cap sync"
-  }
-}
-```
-
-If you later add **local** (non-SPM) native plugin classes to `android/` or
-`ios/`, wire up the patch script:
-
-```jsonc
-{
-  "scripts": {
-    "cap:sync": "npx cap sync && node scripts/patch-cap-config.mjs"
-  }
-}
-```
-
-### 10. Run on a Device or Emulator
-
-```bash
-npx cap open android    # opens Android Studio
-npx cap open ios        # opens Xcode (macOS only)
-```
-
-Then hit **Run** in the IDE. For headless quick-iteration:
-
-```bash
-npx cap run android
-npx cap run ios
-```
+Commit the generated `android/` and `ios/` directories (signing keys stay excluded via the generated `.gitignore`s). If you later add a **local** (non-SPM) Capacitor plugin class, append `node scripts/patch-cap-config.mjs` to your sync command so `packageClassList` survives each `npx cap sync`.
 
 ## Using the APIs
 
-### Haptics
+Each file's JSDoc header has full usage details. Quick tour:
 
 ```tsx
 import { impactLight, notificationSuccess } from '@/lib/haptics';
-
-<Button onClick={() => { impactLight(); onLike(); }}>Like</Button>
-
-await submitForm();
-notificationSuccess();
-```
-
-All haptics are fire-and-forget; calling them on unsupported platforms (or
-when permission is denied) is a silent no-op.
-
-### Native File Download / Share
-
-```tsx
 import { downloadTextFile, openUrl } from '@/lib/downloadFile';
-
-// Save a text file — Documents on native, `<a download>` on web
-await downloadTextFile('export.json', JSON.stringify(data, null, 2));
-
-// Open a URL — new tab on web, share sheet on native
-await openUrl('https://example.com/article');
-```
-
-### Secure Storage
-
-```tsx
 import { secureStorage } from '@/lib/secureStorage';
-
-await secureStorage.setItem('nwc:active', connectionString);
-const value = await secureStorage.getItem('nwc:active');
-await secureStorage.removeItem('nwc:active');
-```
-
-Or the React hook:
-
-```tsx
 import { useSecureLocalStorage } from '@/hooks/useSecureLocalStorage';
 
-function WalletSettings() {
-  const [conn, setConn, ready] = useSecureLocalStorage<string | null>(
-    'nwc:active',
-    null,
-  );
-  if (!ready) return <Spinner />;
-  return (
-    <Input
-      value={conn ?? ''}
-      onChange={(e) => setConn(e.target.value || null)}
-    />
-  );
-}
+impactLight();                                         // fire-and-forget
+notificationSuccess();                                 // silent no-op on unsupported platforms
+
+await downloadTextFile('export.json', JSON.stringify(data));
+await openUrl('https://example.com');
+
+await secureStorage.setItem('nwc:active', conn);
+await secureStorage.getItem('nwc:active');
+
+const [conn, setConn, ready] = useSecureLocalStorage<string | null>('nwc:active', null);
+if (!ready) return <Spinner />;                        // native reads are async
 ```
 
-The hook has the same signature as `useLocalStorage` but returns a third
-`ready` flag because native secure reads are async. While `!ready` you
-should render a spinner or skip decisions that depend on the stored value.
+## Safe-area utilities
 
-### Safe-area utilities
+Once step 3 is done, `*-safe` utilities are available for padding, margin, position, height, border, and scroll properties. The most useful ones:
 
-Once the Tailwind plugin is registered (setup step 3), a rich set of
-`*-safe` utilities becomes available across padding, margin, position,
-height, border, and scroll properties:
+- `pt-safe`, `pb-safe`, `px-safe`, `py-safe`, `p-safe` (also logical `ps-`/`pe-` and `start-`/`end-` positions)
+- `top-safe`, `bottom-safe`, `inset-safe`, `inset-x-safe`
+- `h-dvh-safe`, `min-h-dvh-safe`, `h-svh-safe`, `h-lvh-safe`, `h-screen-safe`
+- `{prop}-safe-offset-{n}` — safe area **plus** `{n}` (`pb-safe-offset-4` = inset + 1rem)
+- `{prop}-safe-or-{n}` — `max(safe-area, {n})` (`pb-safe-or-8` = at least 2rem)
 
 ```tsx
-{/* sticky top bar that clears the notch */}
-<header className="sticky top-0 pt-safe bg-background">…</header>
-
-{/* bottom nav that clears the home indicator */}
+<header className="sticky top-0 pt-safe">…</header>
 <nav className="fixed inset-x-0 bottom-0 pb-safe">…</nav>
-
-{/* full-height modal that respects both top notch and bottom gesture bar */}
 <Dialog className="h-dvh-safe">…</Dialog>
-
-{/* toast stack that sits below the status bar */}
-<Toaster className="top-safe" />
-
-{/* "at least 2rem of bottom padding, more if the safe area is bigger" */}
 <footer className="pb-safe-or-8">…</footer>
-
-{/* safe area plus an extra 1rem */}
-<div className="pt-safe-offset-4">…</div>
 ```
 
-Common utilities:
+Full list: [plugin README](https://github.com/mvllow/tailwindcss-safe-area).
 
-| Utility | Meaning |
-|---|---|
-| `pt-safe`, `pr-safe`, `pb-safe`, `pl-safe`, `ps-safe`, `pe-safe` | Padding on one side (physical + logical) |
-| `px-safe`, `py-safe`, `p-safe` | Padding on multiple sides |
-| `mt-safe`, …, `m-safe`, `ms-safe`, `me-safe` | Margin equivalents |
-| `top-safe`, `bottom-safe`, `left-safe`, `right-safe`, `start-safe`, `end-safe` | Absolute / fixed positioning |
-| `inset-safe`, `inset-x-safe`, `inset-y-safe` | All-side inset |
-| `border-t-safe`, …, `border-safe`, `border-x-safe`, `border-y-safe` | Border width sized to the inset |
-| `h-dvh-safe`, `h-svh-safe`, `h-lvh-safe`, `h-vh-safe` | Viewport heights minus insets (dynamic / small / large / static) |
-| `min-h-dvh-safe`, `max-h-dvh-safe`, etc. | min/max variants of the above |
-| `h-screen-safe` | Classic viewport height minus insets |
-| `h-fill-safe` | `-webkit-fill-available` minus insets |
-| `{prop}-safe-offset-{n}` | Safe area + `{n}` (e.g. `pb-safe-offset-4`) |
-| `{prop}-safe-or-{n}` | `max(safe-area, {n})` (e.g. `pb-safe-or-8`) |
-| `scroll-p-safe`, `scroll-m-safe`, … | Scroll padding / margin |
-| `safe`, `safe-x`, `safe-y`, `safe-t`, …, `safe-none`, … | Toggle safe-area handling on/off per axis or side |
+## Common follow-ups
 
-See the [plugin README](https://github.com/mvllow/tailwindcss-safe-area)
-for the full list.
-
-## Common Follow-ups
-
-- **Custom native plugins** — If you build a local Swift/Kotlin Capacitor
-  plugin that is *not* shipped via Swift Package Manager, add its class
-  name to `LOCAL_PLUGINS` in `scripts/patch-cap-config.mjs` so
-  `packageClassList` in `capacitor.config.json` is restored after each
-  `npx cap sync`.
-- **App icons** — Use any standard icon generator; Capacitor looks for
-  `android/app/src/main/res/mipmap-*/ic_launcher*.png` and
-  `ios/App/App/Assets.xcassets/AppIcon.appiconset/`.
-- **Splash screen** — Add `@capacitor/splash-screen` and configure it
-  under `plugins.SplashScreen` in `capacitor.config.ts`.
-- **Push notifications** — Add `@capacitor/push-notifications` (FCM on
-  Android, APNs on iOS). The web side can keep using Web Push.
-- **Deep-link verification** — host an
-  `apple-app-site-association` file and an `assetlinks.json` file on your
-  domain so the OS will open verified `https://` links directly in your
-  app without the disambiguation prompt. See the
-  [`DeepLinkHandler.tsx`](./files/components/DeepLinkHandler.tsx) header
-  comment for the full checklist.
-- **Store password manager integration** — for saving / autofilling a
-  Nostr `nsec` via iCloud Keychain or AndroidX Credential Manager, add
-  `@capgo/capacitor-autofill-save-password` and wrap it in a helper
-  analogous to `secureStorage` (see Ditto's `credentialManager.ts` for a
-  reference implementation).
+- **App icons / splash screen** — standard icon generator → `android/app/src/main/res/mipmap-*/` and `ios/App/App/Assets.xcassets/AppIcon.appiconset/`. For splash, add `@capacitor/splash-screen` and configure under `plugins.SplashScreen`.
+- **Push notifications** — add `@capacitor/push-notifications` (FCM / APNs); the web side keeps using Web Push.
+- **Deep-link verification** — host `apple-app-site-association` and `assetlinks.json` on your domain so the OS opens verified `https://` links directly. Full checklist in the `DeepLinkHandler.tsx` header.
+- **Nsec autofill via iCloud Keychain / Credential Manager** — add `@capgo/capacitor-autofill-save-password` and wrap it analogously to `secureStorage`.
 
 ## Troubleshooting
 
-- **Safe-area utilities render as `0` on Android devices (`pt-safe` has
-  no effect on the top notch)** — Chromium WebView versions before 140
-  ([bug 40699457](https://issues.chromium.org/issues/40699457)) report
-  `env(safe-area-inset-*)` as `0`. The `SystemBars` plugin with
-  `insetsHandling: 'css'` (already set in the skill's
-  `capacitor.config.ts`) injects `--safe-area-inset-*` CSS variables
-  with the correct values, but the `tailwindcss-safe-area` package
-  emits rules that use `env(…)` directly and can't see them. Two fixes:
-  1. **Preferred:** ensure your target Android devices are on WebView
-     140+ (released Aug 2025). Any actively-updated Android >=7 should
-     be, since WebView auto-updates via Play Services.
-  2. **Fallback:** copy `files/safe-area-shim.css` into `src/` and
-     `@import` it **after** `@import "tailwindcss-safe-area";` in
-     `src/index.css` — it re-declares the common utilities with
-     `var(--safe-area-inset-*, env(…, 0px))` so the SystemBars-injected
-     variables take over when `env()` reports 0.
-- **`pt-safe` doesn't exist at all** — the CSS import is missing or
-  in the wrong position. Verify `src/index.css` contains
-  `@import "tailwindcss-safe-area";` **after** `@import "tailwindcss";`
-  (source order matters in Tailwind v4). Also verify you installed the
-  v4-compatible version: `npm ls tailwindcss-safe-area` should show
-  `>=1.0.0`. Version `0.8.0` is a JS plugin for Tailwind v3 and emits
-  nothing on v4.
-- **Safe-area utilities have 0px on iOS Safari/Xcode simulator** —
-  missing `viewport-fit=cover` in your `<meta name="viewport">` tag.
-  Without it iOS doesn't expose the insets.
-- **Deep links don't navigate** — make sure `<DeepLinkHandler />` is
-  **inside** `<BrowserRouter>`. It uses `useNavigate()` and will throw
-  silently if it's mounted outside.
-- **`secureStorage` write succeeds but read returns `null`** — the
-  `capacitor-secure-storage-plugin` stores values per-bundle-id. Reinstalling
-  a debug build can rotate the keychain entitlement and orphan previous
-  entries. Clear storage or reinstall clean if this happens in dev.
-- **iOS keyboard keeps showing the accessory bar** — `bootstrapNative()`
-  hides it, but only if called *before* any `<input>` is focused. Make
-  sure it's invoked at the top of `main.tsx`.
-- **Status bar icons don't match theme on custom themes** — the
-  bootstrap watches `<html class="…">` and `<style id="theme-vars">` by
-  default. If your theme mechanism writes CSS variables to a different
-  element, edit `isBackgroundDark()` in `nativeBootstrap.ts` accordingly.
+- **Safe-area utilities render as `0` on Android** — Chromium WebView <140 reports `env(safe-area-inset-*)` as `0` ([bug 40699457](https://issues.chromium.org/issues/40699457)). `SystemBars` (`insetsHandling: 'css'`, already set) injects `--safe-area-inset-*` CSS variables, but `tailwindcss-safe-area` uses `env(…)` directly. **Preferred fix:** target WebView 140+ (Aug 2025; auto-updated on Android ≥7). **Fallback:** copy `files/safe-area-shim.css` to `src/` and `@import` it **after** `@import "tailwindcss-safe-area";` so the variables take over when `env()` is 0.
+- **`pt-safe` doesn't exist** — either `@import "tailwindcss-safe-area";` is missing / in the wrong position (must come **after** `@import "tailwindcss";`), or you installed `0.8.0` (v3-only) on a v4 project. `npm ls tailwindcss-safe-area` should show `>=1.0.0`.
+- **Safe-area is 0 on iOS Safari / simulator** — missing `viewport-fit=cover` in the `<meta name="viewport">` tag.
+- **Deep links don't navigate** — `<DeepLinkHandler />` must be **inside** `<BrowserRouter>`; `useNavigate()` throws silently otherwise.
+- **iOS keyboard still shows the accessory bar** — `bootstrapNative()` must run **before** any `<input>` is focused. Invoke at the top of `main.tsx`.
+
+Remaining edge cases (`secureStorage` returning `null` after debug reinstall, status-bar theming with custom CSS-variable setups) are covered in the corresponding file headers.
