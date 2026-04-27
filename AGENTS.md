@@ -17,7 +17,7 @@ This project is a Nostr client application built with React 19.x, TailwindCSS 3.
 
 - `/src/components/`: UI components including NostrProvider for Nostr integration
   - `/src/components/ui/`: shadcn/ui components (48+ components available)
-  - `/src/components/auth/`: Authentication-related components (LoginArea, LoginDialog, etc.)
+  - `/src/components/auth/`: Authentication-related components (LoginArea, AuthDialog, AccountSwitcher)
 - `/src/hooks/`: Custom hooks including:
   - `useNostr`: Core Nostr protocol integration
   - `useAuthor`: Fetch user profile data by pubkey
@@ -663,9 +663,9 @@ function MyComponent() {
 }
 ```
 
-The `LoginArea` component handles all the login-related UI and interactions, including displaying login dialogs, sign up functionality, and switching between accounts. It should not be wrapped in any conditional logic.
+The `LoginArea` component handles all the login-related UI and interactions, including displaying the unified auth dialog (signup, login with extension/nsec/remote signer) and switching between accounts. It should not be wrapped in any conditional logic.
 
-`LoginArea` displays both "Log in" and "Sign Up" buttons when the user is logged out, and changes to an account switcher once the user is logged in. It is an inline-flex element by default. To make it expand to the width of its container, you can pass a className like `flex` (to make it a block element) or `w-full`. If it is left as inline-flex, it's recommended to set a max width.
+`LoginArea` displays a single "Join" button when the user is logged out, and changes to an account switcher once the user is logged in. The "Join" button opens an `AuthDialog` that lets the user either create a new account or log in with an existing one. It is an inline-flex element by default. To make it expand to the width of its container, you can pass a className like `flex` (to make it a block element) or `w-full`. If it is left as inline-flex, it's recommended to set a max width.
 
 **Important**: Social applications should include a profile menu button in the main interface (typically in headers/navigation) to provide access to account settings, profile editing, and logout functionality. Don't only show `LoginArea` in logged-out states.
 
