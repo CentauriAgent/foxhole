@@ -33,7 +33,7 @@ Components in `@/components/ui` are unstyled, accessible primitives styled with 
 
 ## System Prompt Management
 
-The assistant's behavior is defined by this file (`AGENTS.md`). Edit it directly to change guidelines — updates take effect the next session. Specialized workflows live in `/.agents/skills/` as loadable skills (see "Specialized Skills" below).
+The assistant's behavior is defined by this file (`AGENTS.md`). Edit it directly to change guidelines — updates take effect the next session. Specialized workflows live in `/.agents/skills/` as loadable skills, discoverable through the `skill` tool.
 
 ## Nostr Protocol Integration
 
@@ -387,23 +387,3 @@ describe('MyComponent', () => {
 Use `git status` / `git diff` to review changes and `git log` to learn project conventions. If you make a mistake, `git checkout` restores files.
 
 **Always commit when you are finished.** Non-negotiable — every completed task ends with a commit. Don't wait for the user to ask.
-
-## Specialized Skills
-
-Load via the `skill` tool when the task matches:
-
-- **`ai-chat`** — AI chat UIs, streaming, Shakespeare AI integration.
-- **`capacitor`** — wrap the app as a native iOS/Android app (haptics, share sheet, Keychain/KeyStore, deep links, safe-area CSS).
-- **`edit-profile`** — drop-in form for editing kind-0 profile metadata.
-- **`file-uploads`** — Blossom file upload + NIP-94 imeta tags for attaching media to events.
-- **`nip19-routing`** — populate `NIP19Page`, build NIP-19 links, secure filters for addressable events.
-- **`nip85-stats`** — NIP-85 Trusted Assertion hooks for follower counts, reactions, zaps, and other engagement stats.
-- **`nostr-comments`** — comment systems for any Nostr event or NIP-73 external identifier.
-- **`nostr-encryption`** — NIP-44 / NIP-04 via the user's signer (DMs, private notes).
-- **`nostr-infinite-scroll`** — paginated feeds for Nostr events.
-- **`nostr-relay-pools`** — `nostr.relay(url)` / `nostr.group([urls])` for targeted relay calls.
-- **`note-content`** — render kind 1/11/1111 content (links, hashtags, mentions, emoji, media, invoices, embeds).
-- **`nwc`** — Nostr Wallet Connect, WebLN, Lightning zaps (NIP-57).
-- **`plausible-analytics`** — Plausible tracking wired through `AppConfig`.
-- **`relay-management`** — settings UI for editing the user's NIP-65 relay list.
-- **`theming`** — fonts (@fontsource), color schemes, light/dark, component styling patterns.
