@@ -1,6 +1,3 @@
-// NOTE: This file is stable and usually should not be modified.
-// It is important that all functionality in this file is preserved, and should only be modified if explicitly requested.
-
 import { ChevronDown, LogOut, UserIcon, UserPlus } from 'lucide-react';
 import {
   DropdownMenu,
@@ -29,14 +26,11 @@ export function AccountSwitcher({ onAddAccountClick }: AccountSwitcherProps) {
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
-        <button className='flex items-center gap-3 p-3 rounded-full hover:bg-accent transition-all w-full text-foreground'>
-          <Avatar className='w-10 h-10'>
+        <button className='flex items-center gap-2 h-10 p-1 pr-2.5 rounded-full hover:bg-accent transition-all text-foreground'>
+          <Avatar className='w-8 h-8'>
             <AvatarImage src={currentUser.metadata.picture} alt={getDisplayName(currentUser)} />
             <AvatarFallback>{getDisplayName(currentUser).charAt(0)}</AvatarFallback>
           </Avatar>
-          <div className='flex-1 text-left hidden md:block truncate'>
-            <p className='font-medium text-sm truncate'>{getDisplayName(currentUser)}</p>
-          </div>
           <ChevronDown className='w-4 h-4 text-muted-foreground' />
         </button>
       </DropdownMenuTrigger>
