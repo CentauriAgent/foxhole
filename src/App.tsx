@@ -3,7 +3,7 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createHead, UnheadProvider } from '@unhead/react/client';
-import { InferSeoMetaPlugin } from '@unhead/addons';
+import { InferSeoMetaPlugin } from 'unhead/plugins';
 import { Suspense } from 'react';
 import NostrProvider from '@/components/NostrProvider';
 import { NostrSync } from '@/components/NostrSync';
