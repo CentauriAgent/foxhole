@@ -4,14 +4,41 @@ import { NostrEvent } from '@nostrify/nostrify';
 import { nip19 } from 'nostr-tools';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useComments } from '@/hooks/useComments';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useNostrPublish } from '@/hooks/useNostrPublish';
+import { useToast } from '@/hooks/useToast';
+import { useQueryClient } from '@tanstack/react-query';
 import { CommentForm } from './CommentForm';
 import { NoteContent } from '@/components/NoteContent';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { DropdownMenu, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { MessageSquare, ChevronDown, ChevronRight, MoreHorizontal } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
+  MessageSquare,
+  ChevronDown,
+  ChevronRight,
+  MoreHorizontal,
+  ExternalLink,
+  Trash2,
+} from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { genUserName } from '@/lib/genUserName';
 
@@ -26,17 +53,72 @@ interface CommentProps {
 export function Comment({ root, comment, depth = 0, maxDepth = 3, limit }: CommentProps) {
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [showReplies, setShowReplies] = useState(depth < 2); // Auto-expand first 2 levels
-  
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
   const author = useAuthor(comment.pubkey);
   const { data: commentsData } = useComments(root, limit);
-  
+  const { user } = useCurrentUser();
+  const { mutate: publishEvent, isPending: isDeleting } = useNostrPublish();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
   const metadata = author.data?.metadata;
-  const displayName = metadata?.name ?? genUserName(comment.pubkey)
+  const displayName = metadata?.name ?? genUserName(comment.pubkey);
   const timeAgo = formatDistanceToNow(new Date(comment.created_at * 1000), { addSuffix: true });
+  const nevent = nip19.neventEncode({ id: comment.id, author: comment.pubkey, kind: comment.kind });
+  const isOwnComment = user?.pubkey === comment.pubkey;
 
   // Get direct replies to this comment
   const replies = commentsData?.getDirectReplies(comment.id) || [];
   const hasReplies = replies.length > 0;
+
+  const handleDelete = () => {
+    publishEvent(
+      {
+        kind: 5,
+        content: '',
+        tags: [
+          ['e', comment.id],
+          ['k', comment.kind.toString()],
+        ],
+      },
+      {
+        onSuccess: () => {
+          toast({ title: 'Comment deleted' });
+          setShowDeleteDialog(false);
+          // Optimistically remove the deleted comment from every cached useComments
+          // result. Relays may honor the kind 5 deletion request on refetch, but
+          // that's not guaranteed — this keeps the UI consistent immediately.
+          queryClient.setQueriesData<ReturnType<typeof useComments>['data']>(
+            { queryKey: ['nostr', 'comments'] },
+            (oldData) => {
+              if (!oldData) return oldData;
+              const allComments = oldData.allComments.filter((c) => c.id !== comment.id);
+              const topLevelComments = oldData.topLevelComments.filter(
+                (c) => c.id !== comment.id,
+              );
+              return {
+                ...oldData,
+                allComments,
+                topLevelComments,
+                getDescendants: (id: string) =>
+                  oldData.getDescendants(id).filter((c) => c.id !== comment.id),
+                getDirectReplies: (id: string) =>
+                  oldData.getDirectReplies(id).filter((c) => c.id !== comment.id),
+              };
+            },
+          );
+        },
+        onError: (error) => {
+          toast({
+            title: 'Failed to delete comment',
+            description: error.message,
+            variant: 'destructive',
+          });
+        },
+      },
+    );
+  };
 
   return (
     <div className={`space-y-3 ${depth > 0 ? 'ml-6 border-l-2 border-muted pl-4' : ''}`}>
@@ -55,7 +137,7 @@ export function Comment({ root, comment, depth = 0, maxDepth = 3, limit }: Comme
                   </Avatar>
                 </Link>
                 <div>
-                  <Link 
+                  <Link
                     to={`/${nip19.npubEncode(comment.pubkey)}`}
                     className="font-medium text-sm hover:text-primary transition-colors"
                   >
@@ -83,7 +165,7 @@ export function Comment({ root, comment, depth = 0, maxDepth = 3, limit }: Comme
                   <MessageSquare className="h-3 w-3 mr-1" />
                   Reply
                 </Button>
-                
+
                 {hasReplies && (
                   <Collapsible open={showReplies} onOpenChange={setShowReplies}>
                     <CollapsibleTrigger asChild>
@@ -112,6 +194,33 @@ export function Comment({ root, comment, depth = 0, maxDepth = 3, limit }: Comme
                     <MoreHorizontal className="h-3 w-3" />
                   </Button>
                 </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <a
+                      href={`https://ditto.pub/${nevent}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <ExternalLink className="h-3.5 w-3.5 mr-2" />
+                      Open in Ditto
+                    </a>
+                  </DropdownMenuItem>
+                  {isOwnComment && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onSelect={(e) => {
+                          e.preventDefault();
+                          setShowDeleteDialog(true);
+                        }}
+                        className="text-destructive focus:text-destructive"
+                      >
+                        <Trash2 className="h-3.5 w-3.5 mr-2" />
+                        Delete
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </DropdownMenuContent>
               </DropdownMenu>
             </div>
           </div>
@@ -148,6 +257,33 @@ export function Comment({ root, comment, depth = 0, maxDepth = 3, limit }: Comme
           </CollapsibleContent>
         </Collapsible>
       )}
+
+      {/* Delete confirmation */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete comment?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This publishes a NIP-09 deletion request (kind 5). Relays and clients that
+              honor deletion requests will hide this comment, but deletion is not
+              guaranteed across the network.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                handleDelete();
+              }}
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? 'Deleting…' : 'Delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

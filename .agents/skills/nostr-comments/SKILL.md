@@ -5,7 +5,7 @@ description: Implement Nostr comment systems, add discussion features to posts/a
 
 # Adding Nostr Comments Sections
 
-This skill provides a complete commenting system using NIP-22 (kind 1111) comments that can be added to any Nostr event, URL, hashtag, or NIP-73 external content identifier. The `CommentsSection` component provides a full-featured commenting interface with threaded replies, user authentication, and real-time updates.
+This skill provides a complete commenting system using NIP-22 (kind 1111) comments that can be added to any Nostr event, URL, hashtag, or NIP-73 external content identifier. The `CommentsSection` component renders a lightweight, inline commenting interface with threaded replies, user authentication, and a per-comment actions menu (Open in Ditto, Delete own comment).
 
 **The comment system is not included in the project by default.** When the user wants comment functionality, follow the setup instructions below to install the files.
 
@@ -37,13 +37,17 @@ The comment components depend on pieces that already ship with the template:
 
 - `@/components/NoteContent` — renders comment text (used by `Comment.tsx`)
 - `@/components/auth/LoginArea` — shown to logged-out users (used by `CommentForm.tsx`)
+- `@/components/ui/alert-dialog` — confirms deletion (used by `Comment.tsx`)
 - `@/hooks/useAuthor` — fetches comment author profile (used by `Comment.tsx`)
-- `@/hooks/useCurrentUser` — determines whether to show the composer (used by `CommentForm.tsx`)
-- `@/hooks/useNostrPublish` — publishes kind 1111 events (used by `usePostComment.ts`)
+- `@/hooks/useCurrentUser` — determines whether to show the composer and the Delete action (used by `CommentForm.tsx`, `Comment.tsx`)
+- `@/hooks/useNostrPublish` — publishes kind 1111 comments and kind 5 deletion requests (used by `usePostComment.ts`, `Comment.tsx`)
+- `@/hooks/useToast` — user feedback on delete success/failure (used by `Comment.tsx`)
 
 All of these are standard in the template; no extra work is needed beyond copying the skill files.
 
 ## Basic Usage
+
+`CommentsSection` renders without an outer card, title, or header — it's just the composer followed by the threaded comment list. Wrap it in whatever page layout you want:
 
 ```tsx
 import { CommentsSection } from "@/components/comments/CommentsSection";
@@ -54,12 +58,22 @@ function ArticlePage({ article }: { article: NostrEvent }) {
       {/* Your article content */}
       <div>{/* article content */}</div>
 
-      {/* Comments section */}
-      <CommentsSection root={article} />
+      {/* Comments section — add your own heading if needed */}
+      <section className="space-y-4">
+        <h2 className="text-lg font-semibold">Comments</h2>
+        <CommentsSection root={article} />
+      </section>
     </div>
   );
 }
 ```
+
+## Per-Comment Actions Menu
+
+Each comment has a 3-dots menu with:
+
+- **Open in Ditto** — opens the comment at `https://ditto.pub/<nevent>` in a new tab so users can view replies, react, or zap via Ditto.
+- **Delete** — only shown when the logged-in user is the comment's author. Publishes a NIP-09 (kind 5) deletion request tagging the comment's `id` and `kind`, then optimistically removes the comment from the cached query result via `queryClient.setQueriesData`. Deletion is not guaranteed across the network — the `AlertDialog` confirmation makes this clear to the user.
 
 ## Props and Customization
 
@@ -69,16 +83,14 @@ The `CommentsSection` component accepts the following props:
   - `NostrEvent` — comment on a Nostr event (kind 1 note, long-form article, etc.)
   - `URL` — comment on an external identifier: web URLs (`new URL("https://...")`) or any NIP-73 identifier except hashtags (e.g. `new URL("isbn:9780765382030")`, `new URL("iso3166:US")`)
   - `#${string}` — NIP-73 hashtag only (e.g. `"#bitcoin"`); this template string type is exclusively for hashtags and must not be used for other NIP-73 identifiers
-- **`title`**: Custom title for the comments section (default: "Comments")
 - **`emptyStateMessage`**: Message shown when no comments exist (default: "No comments yet")
 - **`emptyStateSubtitle`**: Subtitle for empty state (default: "Be the first to share your thoughts!")
-- **`className`**: Additional CSS classes for styling
+- **`className`**: Additional CSS classes applied to the outer `<div>` (it's a plain `space-y-6` container, no card/border)
 - **`limit`**: Maximum number of comments to load (default: 500)
 
 ```tsx
 <CommentsSection
   root={event}
-  title="Discussion"
   emptyStateMessage="Start the conversation"
   emptyStateSubtitle="Share your thoughts about this post"
   className="mt-8"
@@ -93,7 +105,6 @@ The comments system supports commenting on external URLs, making it useful for w
 ```tsx
 <CommentsSection
   root={new URL("https://example.com/article")}
-  title="Comments on this article"
 />
 ```
 
@@ -105,13 +116,11 @@ Pass a hashtag string (`#${string}` format) to attach comments to a topic. The h
 // Comments for the #bitcoin hashtag
 <CommentsSection
   root="#bitcoin"
-  title="Bitcoin Discussion"
 />
 
 // Comments for a community-specific tag
 <CommentsSection
   root="#nostr"
-  title="Nostr Community"
 />
 ```
 
@@ -125,7 +134,6 @@ NIP-73 defines a standard set of external content IDs. All NIP-73 identifiers (e
 // ISBN must be without hyphens
 <CommentsSection
   root={new URL("isbn:9780765382030")}
-  title="Book Discussion"
 />
 ```
 
@@ -135,13 +143,11 @@ NIP-73 defines a standard set of external content IDs. All NIP-73 identifiers (e
 // Podcast feed
 <CommentsSection
   root={new URL("podcast:guid:c90e609a-df1e-596a-bd5e-57bcc8aad6cc")}
-  title="Podcast Discussion"
 />
 
 // Podcast episode
 <CommentsSection
   root={new URL("podcast:item:guid:d98d189b-dc7b-45b1-8720-d4b98690f31f")}
-  title="Episode Discussion"
 />
 ```
 
@@ -151,7 +157,6 @@ NIP-73 defines a standard set of external content IDs. All NIP-73 identifiers (e
 // ISAN without version part
 <CommentsSection
   root={new URL("isan:0000-0000-401A-0000-7")}
-  title="Movie Discussion"
 />
 ```
 
@@ -161,7 +166,6 @@ NIP-73 defines a standard set of external content IDs. All NIP-73 identifiers (e
 // Geohash must be lowercase
 <CommentsSection
   root={new URL("geo:ezs42e44yx96")}
-  title="Location Discussion"
 />
 ```
 
@@ -171,13 +175,11 @@ NIP-73 defines a standard set of external content IDs. All NIP-73 identifiers (e
 // ISO 3166 codes must be uppercase
 <CommentsSection
   root={new URL("iso3166:US")}
-  title="USA Discussion"
 />
 
 // Subdivision (state/province)
 <CommentsSection
   root={new URL("iso3166:US-CA")}
-  title="California Discussion"
 />
 ```
 
@@ -187,7 +189,6 @@ NIP-73 defines a standard set of external content IDs. All NIP-73 identifiers (e
 // DOI must be lowercase
 <CommentsSection
   root={new URL("doi:10.1000/xyz123")}
-  title="Paper Discussion"
 />
 ```
 
@@ -197,12 +198,10 @@ NIP-73 defines a standard set of external content IDs. All NIP-73 identifiers (e
 // Bitcoin transaction
 <CommentsSection
   root={new URL("bitcoin:tx:a1075db55d416d3ca199f55b6084e2115b9345e16c5cf302fc80e9d5fbf5d48d")}
-  title="Transaction Discussion"
 />
 
 // Ethereum address
 <CommentsSection
   root={new URL("ethereum:1:address:0xd8da6bf26964af9d7eed9e03e53415d37aa96045")}
-  title="Address Discussion"
 />
 ```

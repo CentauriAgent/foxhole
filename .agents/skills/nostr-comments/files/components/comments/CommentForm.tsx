@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent } from '@/components/ui/card';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { usePostComment } from '@/hooks/usePostComment';
 import { LoginArea } from '@/components/auth/LoginArea';
 import { NostrEvent } from '@nostrify/nostrify';
-import { MessageSquare, Send } from 'lucide-react';
+import { MessageSquare } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface CommentFormProps {
   root: NostrEvent | URL | `#${string}`;
@@ -19,9 +19,9 @@ interface CommentFormProps {
 export function CommentForm({
   root,
   reply,
-  onSuccess, 
+  onSuccess,
   placeholder = "Write a comment...",
-  compact = false 
+  compact = false,
 }: CommentFormProps) {
   const [content, setContent] = useState('');
   const { user } = useCurrentUser();
@@ -29,7 +29,7 @@ export function CommentForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!content.trim() || !user) return;
 
     postComment(
@@ -45,46 +45,37 @@ export function CommentForm({
 
   if (!user) {
     return (
-      <Card className={compact ? "border-dashed" : ""}>
-        <CardContent className={compact ? "p-4" : "p-6"}>
-          <div className="text-center space-y-4">
-            <div className="flex items-center justify-center space-x-2 text-muted-foreground">
-              <MessageSquare className="h-5 w-5" />
-              <span>Sign in to {reply ? 'reply' : 'comment'}</span>
-            </div>
-            <LoginArea />
+      <div className={cn("rounded-2xl border border-dashed bg-muted/30", compact ? "p-4" : "p-6")}>
+        <div className="text-center space-y-4">
+          <div className="flex items-center justify-center space-x-2 text-muted-foreground">
+            <MessageSquare className="h-5 w-5" />
+            <span>Sign in to {reply ? 'reply' : 'comment'}</span>
           </div>
-        </CardContent>
-      </Card>
+          <LoginArea />
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card className={compact ? "border-dashed" : ""}>
-      <CardContent className={compact ? "p-4" : "p-6"}>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder={placeholder}
-            className={compact ? "min-h-[80px]" : "min-h-[100px]"}
-            disabled={isPending}
-          />
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-muted-foreground">
-              {reply ? 'Replying to comment' : 'Adding to the discussion'}
-            </span>
-            <Button 
-              type="submit" 
-              disabled={!content.trim() || isPending}
-              size={compact ? "sm" : "default"}
-            >
-              <Send className="h-4 w-4 mr-2" />
-              {isPending ? 'Posting...' : (reply ? 'Reply' : 'Comment')}
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+    <form onSubmit={handleSubmit} className="space-y-3">
+      <Textarea
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        placeholder={placeholder}
+        className={cn("rounded-2xl resize-none", compact ? "min-h-[80px]" : "min-h-[100px]")}
+        disabled={isPending}
+      />
+      <div className="flex justify-end">
+        <Button
+          type="submit"
+          disabled={!content.trim() || isPending}
+          size={compact ? "sm" : "default"}
+          className="rounded-full px-6"
+        >
+          {isPending ? 'Posting…' : 'Post'}
+        </Button>
+      </div>
+    </form>
   );
 }
