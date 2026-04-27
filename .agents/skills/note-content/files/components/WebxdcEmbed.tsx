@@ -29,7 +29,7 @@ export function WebxdcEmbed({ url, name, icon, className }: WebxdcEmbedProps) {
       )}
     >
       {icon && (
-        <img src={icon} alt="" className="w-10 h-10 rounded object-cover flex-shrink-0" />
+        <img src={icon} alt="" className="w-10 h-10 rounded object-cover shrink-0" />
       )}
       <div className="min-w-0 flex-1">
         <div className="font-medium truncate">{name ?? 'WebXDC app'}</div>
