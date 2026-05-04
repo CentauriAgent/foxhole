@@ -13,7 +13,6 @@ import { NostrLoginProvider } from '@nostrify/react/login';
 import { AppProvider } from '@/components/AppProvider';
 import { AppConfig } from '@/contexts/AppContext';
 import AppRouter from './AppRouter';
-
 const head = createHead({
   plugins: [
     InferSeoMetaPlugin(),
@@ -40,6 +39,15 @@ const defaultConfig: AppConfig = {
     ],
     updatedAt: 0,
   },
+  blossomServerMetadata: {
+    servers: [
+      'https://blossom.ditto.pub/',
+      'https://blossom.dreamith.to/',
+      'https://blossom.primal.net/',
+    ],
+    updatedAt: 0,
+  },
+  useAppBlossomServers: true,
 };
 
 export function App() {

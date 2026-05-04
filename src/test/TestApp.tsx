@@ -28,6 +28,11 @@ export function TestApp({ children }: TestAppProps) {
       ],
       updatedAt: 0,
     },
+    blossomServerMetadata: {
+      servers: ['https://blossom.primal.net/'],
+      updatedAt: 0,
+    },
+    useAppBlossomServers: true,
   };
 
   return (
