@@ -90,9 +90,9 @@ Beyond XSS, Nostr is permissionless — signatures prove authorship, not trustwo
 
 ```ts
 // ❌ Anyone can spoof this event
-nostr.query([{ kinds: [30078], '#d': ['pathos-organizers'], limit: 1 }]);
+nostr.query([{ kinds: [30078], '#d': ['app-organizers'], limit: 1 }]);
 // ✅ Only trust admin authors
-nostr.query([{ kinds: [30078], authors: ADMIN_PUBKEYS, '#d': ['pathos-organizers'], limit: 1 }]);
+nostr.query([{ kinds: [30078], authors: ADMIN_PUBKEYS, '#d': ['app-organizers'], limit: 1 }]);
 ```
 
 For the full threat model — CSP walkthrough, `sanitizeUrl` / `sanitizeCssString` implementations, NIP-72 community moderation, and the pre-merge checklist — load the **`nostr-security`** skill.
