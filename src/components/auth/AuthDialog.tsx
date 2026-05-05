@@ -5,8 +5,6 @@ import {
   Eye,
   EyeOff,
   Key,
-  Copy,
-  Check,
   ChevronDown,
   ChevronUp,
   Loader2,
@@ -29,6 +27,7 @@ import {
   generateNostrConnectParams,
   generateNostrConnectURI,
   type NostrConnectParams,
+  type NostrConnectStatus,
 } from '@/hooks/useLoginActions';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useUploadFile } from '@/hooks/useUploadFile';
@@ -44,6 +43,17 @@ type Step = 'welcome' | 'generate' | 'secure' | 'profile' | 'login' | 'connect';
 
 const validateNsec = (nsec: string) => /^nsec1[a-zA-Z0-9]{58}$/.test(nsec);
 const validateBunkerUri = (uri: string) => uri.startsWith('bunker://');
+
+const connectStatusLabel = (status: NostrConnectStatus | null): string => {
+  switch (status) {
+    case 'awaiting-connect':
+      return 'Waiting for signer connection…';
+    case 'getting-public-key':
+      return 'Getting public key…';
+    default:
+      return '';
+  }
+};
 
 /** Check if running on an actual mobile device (not just a small screen). */
 function isMobileDevice(): boolean {
@@ -89,18 +99,36 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
   // Nostrconnect / bunker state
   const [nostrConnectParams, setNostrConnectParams] = useState<NostrConnectParams | null>(null);
   const [nostrConnectUri, setNostrConnectUri] = useState('');
-  const [isWaitingForConnect, setIsWaitingForConnect] = useState(false);
   const [connectError, setConnectError] = useState<string | null>(null);
-  const [uriCopied, setUriCopied] = useState(false);
+  // Progress status for the nostrconnect handshake. `null` means the user
+  // hasn't kicked off the handshake yet (or they canceled) — we show the QR
+  // / "Open signer app" button. Once the handshake advances we swap in a
+  // spinner with a live status line so the user knows something is working.
+  const [connectStatus, setConnectStatus] = useState<NostrConnectStatus | null>(null);
+  // Tracks whether the user has explicitly initiated the handshake from the
+  // mobile UI. The listen subscription itself starts the moment params are
+  // generated — without this flag we'd flip into the progress view as soon
+  // as the user enters the Remote Signer step, before they've done anything.
+  // Desktop doesn't need this: it stays on the QR until the handshake
+  // advances past `awaiting-connect`.
+  const [hasOpenedSigner, setHasOpenedSigner] = useState(false);
   const [showBunkerInput, setShowBunkerInput] = useState(false);
   const [bunkerUri, setBunkerUri] = useState('');
 
   const login = useLoginActions();
-  // Stable ref so the nostrconnect effect doesn't restart on every render.
+  // Stable refs so the nostrconnect listening effect below doesn't restart on
+  // every parent render. Parents typically pass inline arrow functions for
+  // onClose, and useLoginActions returns a fresh object each render — without
+  // stable refs, an effect depending on them would tear down the in-flight
+  // subscription on every render and cause approved logins to be swallowed.
   const loginRef = useRef(login);
+  const onCloseRef = useRef(onClose);
   useEffect(() => {
     loginRef.current = login;
   }, [login]);
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   const { mutateAsync: publishEvent, isPending: isPublishing } = useNostrPublish();
   const { mutateAsync: uploadFile, isPending: isUploading } = useUploadFile();
@@ -130,9 +158,9 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
       setProfileData({ name: '', about: '', picture: '' });
       setNostrConnectParams(null);
       setNostrConnectUri('');
-      setIsWaitingForConnect(false);
       setConnectError(null);
-      setUriCopied(false);
+      setConnectStatus(null);
+      setHasOpenedSigner(false);
       setShowBunkerInput(false);
       setBunkerUri('');
       /* eslint-enable react-hooks/set-state-in-effect */
@@ -154,57 +182,72 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
   }, [login]);
 
   // Start listening for a nostrconnect response once params are set.
+  //
+  // Deps are intentionally limited to `nostrConnectParams` so that parent
+  // re-renders (which produce fresh onClose closures and a fresh `login`
+  // object from useLoginActions) do NOT tear down an in-flight
+  // subscription. An earlier version used a `cancelled` flag flipped by
+  // the effect's cleanup, which caused a successful nostrconnect response
+  // to be silently swallowed after the signer approved — the subscription
+  // was re-created mid-handshake and the first instance's success branch
+  // saw `cancelled === true`.
+  //
+  // Cancellation is handled explicitly by the `isOpen` effect (on dialog
+  // close) and by handleConnectRetry() (on user cancel/retry).
   useEffect(() => {
-    if (!nostrConnectParams || isWaitingForConnect) return;
-
-    let cancelled = false;
+    if (!nostrConnectParams) return;
 
     const startListening = async () => {
-      setIsWaitingForConnect(true);
-      abortControllerRef.current = new AbortController();
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
 
       try {
         await loginRef.current.nostrconnect(
           nostrConnectParams,
-          abortControllerRef.current.signal,
+          controller.signal,
+          (status) => {
+            if (controller.signal.aborted) return;
+            setConnectStatus(status);
+          },
         );
-        if (!cancelled) onClose();
+        // If the dialog was explicitly closed (handled by the isOpen
+        // effect, which aborts the controller), don't try to re-close it.
+        // Otherwise the user is logged in — close the dialog.
+        if (controller.signal.aborted) return;
+        onCloseRef.current();
       } catch (error) {
-        if (cancelled) return;
+        // AbortError means we intentionally aborted (dialog closed or retry)
         if (error instanceof Error && error.name === 'AbortError') return;
+        if (controller.signal.aborted) return;
         console.error('Nostrconnect failed:', error);
+        setConnectStatus(null);
         setConnectError(error instanceof Error ? error.message : String(error));
-        setIsWaitingForConnect(false);
       }
     };
 
     startListening();
 
-    return () => {
-      cancelled = true;
-    };
-    // NOTE: isWaitingForConnect is intentionally excluded from deps. Including
-    // it would cancel the first run the moment it sets the flag to true and
-    // spawn a duplicate listener.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nostrConnectParams, onClose]);
+    // No cleanup here: we do NOT want a re-render-triggered effect teardown
+    // to cancel the in-flight subscription.
+  }, [nostrConnectParams]);
 
   const handleConnectRetry = useCallback(() => {
+    abortControllerRef.current?.abort();
     setNostrConnectParams(null);
     setNostrConnectUri('');
-    setIsWaitingForConnect(false);
     setConnectError(null);
+    setConnectStatus(null);
+    setHasOpenedSigner(false);
     setTimeout(() => generateConnectSession(), 0);
   }, [generateConnectSession]);
 
-  const handleCopyUri = async () => {
-    await navigator.clipboard.writeText(nostrConnectUri);
-    setUriCopied(true);
-    setTimeout(() => setUriCopied(false), 2000);
-  };
-
   const handleOpenSignerApp = () => {
     if (!nostrConnectUri) return;
+    // Flip into the progress view *synchronously* before navigating so that
+    // when the user returns from the signer app, the dialog is already
+    // showing "Waiting for signer connection…" — not the original button
+    // they're worried they need to re-tap.
+    setHasOpenedSigner(true);
     window.location.href = nostrConnectUri;
   };
 
@@ -367,6 +410,18 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
         return 'Connect signer';
     }
   };
+
+  // Decide whether to render the progress view in place of the QR/button.
+  // Mobile: flip in as soon as the user taps "Open signer app" (tracked by
+  // `hasOpenedSigner`) so they see feedback the moment they return from the
+  // signer. Desktop: keep the QR visible through the `awaiting-connect`
+  // phase (it's still actionable — they might scan with another device) and
+  // only swap in once the signer has acknowledged and we're fetching the
+  // pubkey.
+  const showProgressView = connectStatus !== null && (
+    connectStatus === 'getting-public-key' ||
+    (isMobile && hasOpenedSigner)
+  );
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -666,10 +721,6 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
           {/* Connect step — nostrconnect QR + bunker URI fallback. */}
           {step === 'connect' && (
             <div className="space-y-4">
-              <p className="text-sm text-muted-foreground text-center">
-                {isMobile ? 'Open your signer app to connect.' : 'Scan with your signer app.'}
-              </p>
-
               <div className="flex flex-col items-center space-y-4">
                 {connectError ? (
                   <div className="flex flex-col items-center space-y-3 py-4">
@@ -677,6 +728,24 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
                     <Button variant="outline" onClick={handleConnectRetry}>
                       Try again
                     </Button>
+                  </div>
+                ) : showProgressView ? (
+                  // Progress view — replaces the QR/button once the handshake
+                  // is under way. Gives the user live feedback through each
+                  // phase so a stuck signer is visibly stuck, not silently
+                  // stuck.
+                  <div className="flex flex-col items-center space-y-4 py-6 w-full">
+                    <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                    <p className="text-sm text-muted-foreground text-center min-h-[1.25rem]">
+                      {connectStatusLabel(connectStatus)}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={handleConnectRetry}
+                      className="text-sm text-primary hover:underline underline-offset-4 font-medium"
+                    >
+                      Cancel
+                    </button>
                   </div>
                 ) : nostrConnectUri ? (
                   <>
@@ -692,25 +761,6 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
                         Open signer app
                       </Button>
                     )}
-
-                    <Button
-                      variant="outline"
-                      size={isMobile ? 'default' : 'sm'}
-                      className={isMobile ? 'w-full gap-2' : 'gap-2'}
-                      onClick={handleCopyUri}
-                    >
-                      {uriCopied ? (
-                        <>
-                          <Check className="w-4 h-4" />
-                          Copied
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-4 h-4" />
-                          Copy URI
-                        </>
-                      )}
-                    </Button>
                   </>
                 ) : (
                   <div className="flex items-center justify-center h-[100px]">
