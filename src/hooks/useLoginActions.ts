@@ -6,6 +6,7 @@ import {
   useNostrLogin,
 } from '@nostrify/react/login';
 import { useAppContext } from '@/hooks/useAppContext';
+import { APP_RELAYS } from '@/lib/appRelays';
 
 // NOTE: This file should not be edited except for adding new login methods.
 
@@ -51,7 +52,11 @@ export function useLoginActions() {
       const relays = config.relayMetadata.relays
         .filter((r) => r.write)
         .map((r) => r.url);
-      return relays.length > 0 ? relays : ['wss://relay.ditto.pub'];
+      // Fall back to the app default relays if the user has none configured,
+      // so the remote signer has multiple connection options during handshake.
+      return relays.length > 0
+        ? relays
+        : APP_RELAYS.relays.filter((r) => r.write).map((r) => r.url);
     },
     // Log out the current user
     async logout(): Promise<void> {
