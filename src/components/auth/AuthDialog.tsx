@@ -32,6 +32,7 @@ import {
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useUploadFile } from '@/hooks/useUploadFile';
 import { useIsMobile } from '@/hooks/useIsMobile';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { generateSecretKey, getPublicKey, nip19 } from 'nostr-tools';
 
 interface AuthDialogProps {
@@ -132,6 +133,7 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
 
   const { mutateAsync: publishEvent, isPending: isPublishing } = useNostrPublish();
   const { mutateAsync: uploadFile, isPending: isUploading } = useUploadFile();
+  const { user: currentUser } = useCurrentUser();
   const avatarFileInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -377,6 +379,32 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
   const finishSignup = async (skipProfile = false) => {
     try {
       if (!skipProfile && (profileData.name || profileData.about || profileData.picture)) {
+        // Defensive guard: only publish kind 0 if the current signer is
+        // the freshly generated key. If the auto-switch ever fails (e.g.
+        // a regression in useLoginActions), publishing here would sign
+        // with the *previous* user's signer and overwrite their kind 0
+        // metadata — destroying their profile. Refuse rather than risk
+        // it.
+        let expectedPubkey: string | null = null;
+        try {
+          const decoded = nip19.decode(nsec);
+          if (decoded.type === 'nsec') {
+            expectedPubkey = getPublicKey(decoded.data);
+          }
+        } catch {
+          // fall through to the mismatch branch below
+        }
+
+        if (!expectedPubkey || currentUser?.pubkey !== expectedPubkey) {
+          toast({
+            title: 'Profile not saved',
+            description:
+              'The new account is not active yet, so your profile was not published (this prevents overwriting another account). Try again from your profile settings.',
+            variant: 'destructive',
+          });
+          return;
+        }
+
         const metadata: Record<string, string> = {};
         if (profileData.name) metadata.name = profileData.name;
         if (profileData.about) metadata.about = profileData.about;
