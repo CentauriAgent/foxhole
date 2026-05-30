@@ -427,7 +427,7 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
       case 'welcome':
         return 'Welcome';
       case 'generate':
-        return 'Create account';
+        return 'Create a Nostr account';
       case 'secure':
         return 'Save your key';
       case 'profile':
@@ -474,14 +474,14 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onClose }) => {
 
               <div className="space-y-2">
                 <Button onClick={() => setStep('generate')} className="w-full h-12">
-                  Create new account
+                  Create a new Nostr account
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => setStep('login')}
                   className="w-full h-12"
                 >
-                  I already have an account
+                  Log in to an existing account
                 </Button>
               </div>
             </div>
