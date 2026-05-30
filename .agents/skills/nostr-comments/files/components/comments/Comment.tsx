@@ -40,7 +40,6 @@ import {
   Trash2,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import { genUserName } from '@/lib/genUserName';
 
 interface CommentProps {
   root: NostrEvent | URL | `#${string}`;
@@ -63,7 +62,7 @@ export function Comment({ root, comment, depth = 0, maxDepth = 3, limit }: Comme
   const queryClient = useQueryClient();
 
   const metadata = author.data?.metadata;
-  const displayName = metadata?.name ?? genUserName(comment.pubkey);
+  const displayName = metadata?.name ?? 'Anonymous';
   const timeAgo = formatDistanceToNow(new Date(comment.created_at * 1000), { addSuffix: true });
   const nevent = nip19.neventEncode({ id: comment.id, author: comment.pubkey, kind: comment.kind });
   const isOwnComment = user?.pubkey === comment.pubkey;

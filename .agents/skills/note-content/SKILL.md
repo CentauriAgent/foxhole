@@ -176,11 +176,10 @@ The stubs shipped here are deliberately minimal so the skill works immediately a
 
 ## Tests
 
-`NoteContent.test.tsx` covers URL linkification (kinds 1 and 1111), plain text, hashtag linkification, and mention rendering with generated vs real display names. It uses the template's `TestApp` wrapper. Run via `npm run test` once the files are in `src/`.
+`NoteContent.test.tsx` covers URL linkification (kinds 1 and 1111), plain text, hashtag linkification, and mention rendering with fallback vs real display names. It uses the template's `TestApp` wrapper. Run via `npm run test` once the files are in `src/`.
 
 ## Related
 
 - **`useAuthor`** — used internally for mention resolution and for audio-embed author avatar. Core template.
-- **`genUserName`** — fallback deterministic name when a mentioned user has no kind 0 metadata. Core template.
 - **`NIP19Page`** — the template's `/:nip19` route that handles every kind of NIP-19 link this component generates.
 - **`nwc` skill** — pair with `LightningInvoiceCard` for one-tap invoice payment via WebLN/NWC.
