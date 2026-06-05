@@ -268,12 +268,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 **Important**: Even if you want to hide the title visually, use the `VisuallyHidden` component to maintain accessibility:
 
 ```tsx
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { VisuallyHidden } from "radix-ui";
 
 <DialogHeader>
-  <VisuallyHidden>
+  <VisuallyHidden.Root>
     <DialogTitle>Hidden Title for Screen Readers</DialogTitle>
-  </VisuallyHidden>
+  </VisuallyHidden.Root>
 </DialogHeader>
 ```
 

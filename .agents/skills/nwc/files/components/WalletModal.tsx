@@ -1,4 +1,4 @@
-import { useState, forwardRef } from 'react';
+import { useState } from 'react';
 import { Wallet, Plus, Trash2, Zap, Globe, WalletMinimal, CheckCircle, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -37,12 +37,13 @@ interface WalletModalProps {
 }
 
 // Extracted AddWalletContent to prevent re-renders
-const AddWalletContent = forwardRef<HTMLDivElement, {
+const AddWalletContent = ({ alias, setAlias, connectionUri, setConnectionUri, ref }: {
   alias: string;
   setAlias: (value: string) => void;
   connectionUri: string;
   setConnectionUri: (value: string) => void;
-}>(({ alias, setAlias, connectionUri, setConnectionUri }, ref) => (
+  ref?: React.Ref<HTMLDivElement>;
+}) => (
   <div className="space-y-4 px-4" ref={ref}>
     <div>
       <Label htmlFor="alias">Wallet Name (optional)</Label>
@@ -64,11 +65,20 @@ const AddWalletContent = forwardRef<HTMLDivElement, {
       />
     </div>
   </div>
-));
-AddWalletContent.displayName = 'AddWalletContent';
+);
 
 // Extracted WalletContent to prevent re-renders
-const WalletContent = forwardRef<HTMLDivElement, {
+const WalletContent = ({
+  webln,
+  hasNWC,
+  connections,
+  connectionInfo,
+  activeConnection,
+  handleSetActive,
+  handleRemoveConnection,
+  setAddDialogOpen,
+  ref,
+}: {
   webln: WebLNProvider | null;
   hasNWC: boolean;
   connections: NWCConnection[];
@@ -77,16 +87,8 @@ const WalletContent = forwardRef<HTMLDivElement, {
   handleSetActive: (cs: string) => void;
   handleRemoveConnection: (cs: string) => void;
   setAddDialogOpen: (open: boolean) => void;
-}>(({
-  webln,
-  hasNWC,
-  connections,
-  connectionInfo,
-  activeConnection,
-  handleSetActive,
-  handleRemoveConnection,
-  setAddDialogOpen
-}, ref) => (
+  ref?: React.Ref<HTMLDivElement>;
+}) => (
   <div className="space-y-6 px-4 pb-4" ref={ref}>
     {/* Current Status */}
     <div className="space-y-3">
@@ -201,8 +203,7 @@ const WalletContent = forwardRef<HTMLDivElement, {
       </>
     )}
   </div>
-));
-WalletContent.displayName = 'WalletContent';
+);
 
 export function WalletModal({ children, className }: WalletModalProps) {
   const [open, setOpen] = useState(false);

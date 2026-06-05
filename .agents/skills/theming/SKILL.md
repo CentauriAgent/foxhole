@@ -24,18 +24,13 @@ Any Google Font can be installed via the `@fontsource` / `@fontsource-variable` 
    import '@fontsource-variable/inter';
    ```
 
-3. **Register the family** in `tailwind.config.ts`:
-   ```ts
-   export default {
-     theme: {
-       extend: {
-         fontFamily: {
-           sans: ['Inter Variable', 'Inter', 'system-ui', 'sans-serif'],
-         },
-       },
-     },
-   };
+3. **Register the family** in the `@theme` block of `src/index.css` (Tailwind v4 is CSS-first — there is no `tailwind.config.ts`):
+   ```css
+   @theme {
+     --font-sans: 'Inter Variable', 'Inter', system-ui, sans-serif;
+   }
    ```
+   This makes `font-sans` (and the default body font) resolve to the new family.
 
 ### Suggested families by use case
 
@@ -44,7 +39,7 @@ Any Google Font can be installed via the `@fontsource` / `@fontsource-variable` 
 - **Creative / Artistic:** Poppins, Nunito, Comfortaa
 - **Monospace / Code:** JetBrains Mono, Fira Code, Source Code Pro
 
-For expressive hierarchies, pair a sans body font with a display/serif heading font (e.g. Inter + Playfair Display) and expose the second family as `fontFamily.serif` or `fontFamily.display` in Tailwind.
+For expressive hierarchies, pair a sans body font with a display/serif heading font (e.g. Inter + Playfair Display) and expose the second family as another `@theme` token (e.g. `--font-serif` or `--font-display`), which Tailwind turns into a `font-serif` / `font-display` utility.
 
 ## Color Schemes
 
@@ -55,9 +50,9 @@ Colors are defined as CSS custom properties in `src/index.css` under two selecto
 
 When the user requests a new color scheme:
 
-1. **Update both `:root` and `.dark`** in `src/index.css`. Each variable is an HSL triplet (no `hsl()` wrapper), e.g. `--primary: 222 47% 11%;`.
+1. **Update both `:root` and `.dark`** in `src/index.css`. Each variable is a full color value wrapped in `hsl(...)`, e.g. `--primary: hsl(222.2 47.4% 11.2%);`. The `@theme inline` block above maps each `--<token>` to its `--color-<token>` utility, so you don't edit it when only changing values.
 2. **Keep contrast ratios ≥ 4.5:1** for body text and interactive elements. Test both modes.
-3. **Prefer extending Tailwind's palette** (`tailwind.config.ts`) over hard-coding hex values in components — this keeps the theme consistent and dark-mode-friendly.
+3. **Add new color tokens** under the `@theme inline` block in `src/index.css` (Tailwind v4 is CSS-first — there is no `tailwind.config.ts`). Define the raw value as a `--<token>` on `:root`/`.dark`, then expose it as `--color-<token>: var(--<token>);` inside `@theme inline`.
 4. **Apply colors through semantic tokens** (`bg-primary`, `text-muted-foreground`, `border-input`) rather than raw palette names when possible, so future theme changes propagate.
 
 The shadcn/ui components already consume these semantic tokens, so changing the variables automatically restyles the entire component library.

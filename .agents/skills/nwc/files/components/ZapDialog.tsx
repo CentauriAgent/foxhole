@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, forwardRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Zap, Copy, Check, ExternalLink, Sparkle, Sparkles, Star, Rocket, ArrowLeft, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -64,10 +64,11 @@ interface ZapContentProps {
   setComment: (comment: string) => void;
   inputRef: React.RefObject<HTMLInputElement | null>;
   zap: (amount: number, comment: string) => void;
+  ref?: React.Ref<HTMLDivElement>;
 }
 
 // Moved ZapContent outside of ZapDialog to prevent re-renders causing focus loss
-const ZapContent = forwardRef<HTMLDivElement, ZapContentProps>(({
+const ZapContent = ({
   invoice,
   amount,
   comment,
@@ -82,7 +83,8 @@ const ZapContent = forwardRef<HTMLDivElement, ZapContentProps>(({
   setComment,
   inputRef,
   zap,
-}, ref) => (
+  ref,
+}: ZapContentProps) => (
   <div ref={ref}>
     {invoice ? (
       <div className="flex flex-col h-full min-h-0">
@@ -232,8 +234,7 @@ const ZapContent = forwardRef<HTMLDivElement, ZapContentProps>(({
       </>
     )}
   </div>
-));
-ZapContent.displayName = 'ZapContent';
+);
 
 export function ZapDialog({ target, children, className }: ZapDialogProps) {
   const [open, setOpen] = useState(false);

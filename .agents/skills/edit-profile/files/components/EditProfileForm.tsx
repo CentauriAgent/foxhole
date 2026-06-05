@@ -22,7 +22,7 @@ import { NSchema as n, type NostrMetadata } from '@nostrify/nostrify';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUploadFile } from '@/hooks/useUploadFile';
 
-export const EditProfileForm: React.FC = () => {
+export const EditProfileForm = () => {
   const queryClient = useQueryClient();
 
   const { user, metadata } = useCurrentUser();
@@ -284,14 +284,14 @@ interface ImageUploadFieldProps {
   onUpload: (file: File) => void;
 }
 
-const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
+const ImageUploadField = ({
   field,
   label,
   placeholder,
   description,
   previewType,
   onUpload,
-}) => {
+}: ImageUploadFieldProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   return (
