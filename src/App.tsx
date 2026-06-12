@@ -14,6 +14,7 @@ import { AppProvider } from '@/components/AppProvider';
 import { AppConfig } from '@/contexts/AppContext';
 import { APP_RELAYS } from '@/lib/appRelays';
 import AppRouter from './AppRouter';
+
 const head = createHead({
   plugins: [
     InferSeoMetaPlugin(),
