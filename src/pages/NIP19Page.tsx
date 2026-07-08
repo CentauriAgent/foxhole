@@ -105,13 +105,13 @@ function ProfilePage({ pubkey }: { pubkey: string }) {
                   <Avatar className={cn(
                     "h-20 w-20 ring-2",
                     false 
-                      ? "ring-[hsl(var(--brand))]/50" 
+                      ? "ring-brand/50" 
                       : "ring-border"
                   )}>
                     <AvatarImage src={metadata?.picture} alt={displayName} />
                     <AvatarFallback className={cn(
                       false 
-                        ? "bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))]" 
+                        ? "bg-brand/10 text-brand" 
                         : "bg-muted"
                     )}>
                       {false ? <FoxIcon className="h-10 w-10" /> : <User className="h-8 w-8" />}
@@ -122,14 +122,14 @@ function ProfilePage({ pubkey }: { pubkey: string }) {
                     <div className="flex items-center gap-2 flex-wrap">
                       <h1 className={cn(
                         "text-2xl font-bold truncate",
-                        false && "text-[hsl(var(--brand))]"
+                        false && "text-brand"
                       )}>
                         {displayName}
                       </h1>
                       {false && (
                         <span className={cn(
                           "inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider px-2 py-1 rounded",
-                          "bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))]"
+                          "bg-brand/10 text-brand"
                         )}>
                           <FoxIcon className="h-3 w-3" />
                           Community Member
@@ -211,7 +211,7 @@ function ProfilePage({ pubkey }: { pubkey: string }) {
                         href={metadata.website}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 mt-2 text-sm text-[hsl(var(--brand))] hover:underline"
+                        className="inline-flex items-center gap-1 mt-2 text-sm text-brand hover:underline"
                       >
                         <ExternalLink className="h-3 w-3" />
                         {new URL(metadata.website).hostname}
@@ -232,7 +232,7 @@ function ProfilePage({ pubkey }: { pubkey: string }) {
                 <TabsList className="w-full justify-start bg-transparent border-b border-border rounded-none h-auto p-0 gap-0">
                   <TabsTrigger 
                     value="posts" 
-                    className="relative rounded-none border-b-2 border-transparent data-[state=active]:border-[hsl(var(--brand))] data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 gap-2"
+                    className="relative rounded-none border-b-2 border-transparent data-[state=active]:border-brand data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 gap-2"
                   >
                     <FileText className="h-4 w-4" />
                     <span>Posts</span>
@@ -244,7 +244,7 @@ function ProfilePage({ pubkey }: { pubkey: string }) {
                   </TabsTrigger>
                   <TabsTrigger 
                     value="replies" 
-                    className="relative rounded-none border-b-2 border-transparent data-[state=active]:border-[hsl(var(--brand))] data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 gap-2"
+                    className="relative rounded-none border-b-2 border-transparent data-[state=active]:border-brand data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 gap-2"
                   >
                     <MessageSquare className="h-4 w-4" />
                     <span>Replies</span>

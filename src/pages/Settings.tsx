@@ -216,13 +216,13 @@ export default function Settings() {
 
             <Tabs defaultValue="relays" className="w-full">
               <TabsList className="w-full justify-start bg-transparent border-b border-border rounded-none h-auto p-0 gap-0">
-                <TabsTrigger value="relays" className="relative rounded-none border-b-2 border-transparent data-[state=active]:border-[hsl(var(--brand))] data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 gap-2">
+                <TabsTrigger value="relays" className="relative rounded-none border-b-2 border-transparent data-[state=active]:border-brand data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 gap-2">
                   <Radio className="h-4 w-4" /> Relays
                 </TabsTrigger>
-                <TabsTrigger value="blossom" className="relative rounded-none border-b-2 border-transparent data-[state=active]:border-[hsl(var(--brand))] data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 gap-2">
+                <TabsTrigger value="blossom" className="relative rounded-none border-b-2 border-transparent data-[state=active]:border-brand data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 gap-2">
                   <Server className="h-4 w-4" /> Media Servers
                 </TabsTrigger>
-                <TabsTrigger value="nwc" className="relative rounded-none border-b-2 border-transparent data-[state=active]:border-[hsl(var(--brand))] data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 gap-2">
+                <TabsTrigger value="nwc" className="relative rounded-none border-b-2 border-transparent data-[state=active]:border-brand data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 gap-2">
                   <Wallet className="h-4 w-4" /> Wallet
                 </TabsTrigger>
               </TabsList>

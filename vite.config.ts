@@ -2,6 +2,7 @@ import path from "node:path";
 
 import prerender from "@prerenderer/rollup-plugin";
 import react from "@vitejs/plugin-react-swc";
+import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vitest/config";
 
 // https://vitejs.dev/config/
@@ -12,6 +13,7 @@ export default defineConfig(() => ({
   },
   plugins: [
     react(),
+    tailwindcss(),
     prerender({
       routes: [
         "/",
@@ -27,6 +29,12 @@ export default defineConfig(() => ({
     globals: true,
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
+    exclude: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/{vite,eslint}.config.*',
+      '.agents/**',
+    ],
     onConsoleLog(log) {
       return !log.includes("React Router Future Flag Warning");
     },

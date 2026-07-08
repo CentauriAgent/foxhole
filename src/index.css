@@ -1,63 +1,65 @@
-@import 'tailwindcss';
+@import "tailwindcss";
+@import "tw-animate-css";
 
-@plugin 'tailwindcss-animate';
-@plugin '@tailwindcss/typography';
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 
-@utility container {
-  margin-inline: auto;
-  padding-inline: 1rem;
-  @media (width >= --theme(--breakpoint-sm)) {
-    max-width: none;
-  }
-  @media (width >= 1400px) {
-    max-width: 1400px;
-  }
-}
+@theme inline {
+  --font-sans: "Inter Variable", Inter, system-ui, sans-serif;
 
-@theme {
-  --font-sans: Inter Variable, Inter, system-ui, sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
 
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
 
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
 
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
 
-  --color-destructive: hsl(var(--destructive));
-  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
 
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
 
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
 
-  --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
 
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
 
-  --color-sidebar: hsl(var(--sidebar-background));
-  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
-  --color-sidebar-primary: hsl(var(--sidebar-primary));
-  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
-  --color-sidebar-accent: hsl(var(--sidebar-accent));
-  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
-  --color-sidebar-border: hsl(var(--sidebar-border));
-  --color-sidebar-ring: hsl(var(--sidebar-ring));
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-upvote: var(--upvote);
+  --color-downvote: var(--downvote);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
 
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
+  --radius-xl: calc(var(--radius) + 4px);
 
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
@@ -70,6 +72,7 @@
       height: var(--radix-accordion-content-height);
     }
   }
+
   @keyframes accordion-up {
     from {
       height: var(--radix-accordion-content-height);
@@ -80,123 +83,128 @@
   }
 }
 
-/*
-  The default border color has changed to `currentcolor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
+/* Container utility replacement for v4 (previously configured in tailwind.config) */
+@utility container {
+  margin-inline: auto;
+  padding-inline: 1rem;
+  @media (width >= 1400px) {
+    max-width: 1400px;
+  }
+}
 
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
+:root {
+  --radius: 0.5rem;
+
+  --background: hsl(38 50% 96%);
+  --foreground: hsl(24 50% 8%);
+
+  --card: hsl(38 60% 99%);
+  --card-foreground: hsl(24 50% 8%);
+
+  --popover: hsl(38 60% 99%);
+  --popover-foreground: hsl(24 50% 8%);
+
+  --primary: hsl(25 75% 47%);
+  --primary-foreground: hsl(38 60% 98%);
+
+  --secondary: hsl(35 30% 91%);
+  --secondary-foreground: hsl(24 50% 8%);
+
+  --muted: hsl(35 25% 89%);
+  --muted-foreground: hsl(24 15% 42%);
+
+  --accent: hsl(35 30% 91%);
+  --accent-foreground: hsl(24 50% 8%);
+
+  --destructive: hsl(0 84% 60%);
+  --destructive-foreground: hsl(0 0% 98%);
+
+  --border: hsl(35 20% 83%);
+  --input: hsl(35 20% 83%);
+  --ring: hsl(25 75% 47%);
+
+  /* Foxhole Fox Theme */
+  --brand: hsl(25 75% 47%);
+  --brand-foreground: hsl(38 60% 98%);
+  --brand-glow: hsl(25 75% 47%);
+  --upvote: hsl(40 95% 50%);
+  --downvote: hsl(200 50% 60%);
+
+  --chart-1: hsl(12 76% 61%);
+  --chart-2: hsl(173 58% 39%);
+  --chart-3: hsl(197 37% 24%);
+  --chart-4: hsl(43 74% 66%);
+  --chart-5: hsl(27 87% 67%);
+
+  --sidebar: hsl(38 35% 95%);
+  --sidebar-foreground: hsl(24 20% 28%);
+  --sidebar-primary: hsl(25 75% 47%);
+  --sidebar-primary-foreground: hsl(38 60% 98%);
+  --sidebar-accent: hsl(35 30% 92%);
+  --sidebar-accent-foreground: hsl(24 50% 8%);
+  --sidebar-border: hsl(35 20% 86%);
+  --sidebar-ring: hsl(25 75% 47%);
+}
+
+.dark {
+  --background: hsl(24 20% 7%);
+  --foreground: hsl(38 30% 94%);
+
+  --card: hsl(24 18% 10%);
+  --card-foreground: hsl(38 30% 94%);
+
+  --popover: hsl(24 18% 10%);
+  --popover-foreground: hsl(38 30% 94%);
+
+  --primary: hsl(25 80% 55%);
+  --primary-foreground: hsl(24 20% 7%);
+
+  --secondary: hsl(24 14% 16%);
+  --secondary-foreground: hsl(38 30% 94%);
+
+  --muted: hsl(24 14% 16%);
+  --muted-foreground: hsl(35 18% 52%);
+
+  --accent: hsl(24 14% 16%);
+  --accent-foreground: hsl(38 30% 94%);
+
+  --destructive: hsl(0 62% 40%);
+  --destructive-foreground: hsl(38 30% 94%);
+
+  --border: hsl(24 14% 20%);
+  --input: hsl(24 14% 20%);
+  --ring: hsl(25 80% 55%);
+
+  /* Foxhole Fox Theme - Dark */
+  --brand: hsl(25 85% 58%);
+  --brand-foreground: hsl(24 20% 7%);
+  --brand-glow: hsl(25 85% 58%);
+  --upvote: hsl(40 95% 55%);
+  --downvote: hsl(200 50% 65%);
+
+  --chart-1: hsl(220 70% 50%);
+  --chart-2: hsl(160 60% 45%);
+  --chart-3: hsl(30 80% 55%);
+  --chart-4: hsl(280 65% 60%);
+  --chart-5: hsl(340 75% 55%);
+
+  --sidebar: hsl(24 18% 10%);
+  --sidebar-foreground: hsl(38 20% 88%);
+  --sidebar-primary: hsl(25 80% 55%);
+  --sidebar-primary-foreground: hsl(24 20% 7%);
+  --sidebar-accent: hsl(24 14% 16%);
+  --sidebar-accent-foreground: hsl(38 20% 88%);
+  --sidebar-border: hsl(24 14% 20%);
+  --sidebar-ring: hsl(25 85% 58%);
+}
+
 @layer base {
   *,
   ::after,
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: var(--color-gray-200, currentcolor);
-  }
-}
-
-@layer base {
-  :root {
-    --background: 38 50% 96%;
-    --foreground: 24 50% 8%;
-
-    --card: 38 60% 99%;
-    --card-foreground: 24 50% 8%;
-
-    --popover: 38 60% 99%;
-    --popover-foreground: 24 50% 8%;
-
-    --primary: 25 75% 47%;
-    --primary-foreground: 38 60% 98%;
-
-    --secondary: 35 30% 91%;
-    --secondary-foreground: 24 50% 8%;
-
-    --muted: 35 25% 89%;
-    --muted-foreground: 24 15% 42%;
-
-    --accent: 35 30% 91%;
-    --accent-foreground: 24 50% 8%;
-
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 35 20% 83%;
-    --input: 35 20% 83%;
-    --ring: 25 75% 47%;
-
-    --radius: 0.5rem;
-
-    /* Foxhole Fox Theme */
-    --brand: 25 75% 47%;
-    --brand-foreground: 38 60% 98%;
-    --brand-glow: 25 75% 47%;
-    --upvote: 40 95% 50%;
-    --downvote: 200 50% 60%;
-
-    --sidebar-background: 38 35% 95%;
-    --sidebar-foreground: 24 20% 28%;
-    --sidebar-primary: 25 75% 47%;
-    --sidebar-primary-foreground: 38 60% 98%;
-    --sidebar-accent: 35 30% 92%;
-    --sidebar-accent-foreground: 24 50% 8%;
-    --sidebar-border: 35 20% 86%;
-    --sidebar-ring: 25 75% 47%;
-  }
-
-  .dark {
-    --background: 24 20% 7%;
-    --foreground: 38 30% 94%;
-
-    --card: 24 18% 10%;
-    --card-foreground: 38 30% 94%;
-
-    --popover: 24 18% 10%;
-    --popover-foreground: 38 30% 94%;
-
-    --primary: 25 80% 55%;
-    --primary-foreground: 24 20% 7%;
-
-    --secondary: 24 14% 16%;
-    --secondary-foreground: 38 30% 94%;
-
-    --muted: 24 14% 16%;
-    --muted-foreground: 35 18% 52%;
-
-    --accent: 24 14% 16%;
-    --accent-foreground: 38 30% 94%;
-
-    --destructive: 0 62% 40%;
-    --destructive-foreground: 38 30% 94%;
-
-    --border: 24 14% 20%;
-    --input: 24 14% 20%;
-    --ring: 25 80% 55%;
-
-    /* Foxhole Fox Theme - Dark */
-    --brand: 25 85% 58%;
-    --brand-foreground: 24 20% 7%;
-    --brand-glow: 25 85% 58%;
-    --upvote: 40 95% 55%;
-    --downvote: 200 50% 65%;
-
-    --sidebar-background: 24 18% 10%;
-    --sidebar-foreground: 38 20% 88%;
-    --sidebar-primary: 25 80% 55%;
-    --sidebar-primary-foreground: 24 20% 7%;
-    --sidebar-accent: 24 14% 16%;
-    --sidebar-accent-foreground: 38 20% 88%;
-    --sidebar-border: 24 14% 20%;
-    --sidebar-ring: 25 85% 58%;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
+    border-color: var(--color-border, currentcolor);
   }
 
   body {

@@ -49,7 +49,7 @@ export function ThreadedReply({
         <div 
           className={cn(
             "absolute left-3 top-0 bottom-0 w-px",
-            false ? "bg-[hsl(var(--brand))]/20" : "bg-border"
+            false ? "bg-brand/20" : "bg-border"
           )}
         />
       )}
@@ -89,7 +89,7 @@ export function ThreadedReply({
             {user && den && (
               <button
                 onClick={() => setShowReplyForm(!showReplyForm)}
-                className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-[hsl(var(--brand))] transition-colors"
+                className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-brand transition-colors"
               >
                 <Reply className="h-3 w-3" />
                 Reply
@@ -122,7 +122,7 @@ export function ThreadedReply({
           {showViewMore && den && (
             <Link
               to={`/d/${den}/comment/${reply.id}`}
-              className="mt-2 inline-flex items-center gap-1.5 text-xs text-[hsl(var(--brand))] hover:underline"
+              className="mt-2 inline-flex items-center gap-1.5 text-xs text-brand hover:underline"
             >
               <MessageSquare className="h-3 w-3" />
               View full thread

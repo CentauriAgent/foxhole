@@ -29,7 +29,7 @@ const Discover = () => {
       <div className="container py-8 max-w-4xl">
         <div className="space-y-1 mb-6">
           <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
-            <Compass className="h-8 w-8 text-[hsl(var(--brand))]" />
+            <Compass className="h-8 w-8 text-brand" />
             Discover Dens
           </h1>
           <p className="text-muted-foreground">
@@ -47,7 +47,7 @@ const Discover = () => {
           </div>
         ) : !dens || dens.length === 0 ? (
           <div className="text-center py-16">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[hsl(var(--brand))]/10 mb-4">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand/10 mb-4">
               <span className="text-3xl">🦊</span>
             </div>
             <p className="text-muted-foreground">
@@ -87,20 +87,20 @@ function DiscoverDenCard({ den, loggedIn }: { den: DiscoverDen; loggedIn: boolea
   return (
     <div className={cn(
       'rounded-lg border border-border bg-card p-4 space-y-3',
-      'hover:border-[hsl(var(--brand))]/50 transition-colors',
+      'hover:border-brand/50 transition-colors',
     )}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <Link to={`/d/${den.name}`} className="flex items-center gap-3 group">
           <div className={cn(
             'flex items-center justify-center w-10 h-10 rounded-lg',
-            'bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))]',
+            'bg-brand/10 text-brand',
             'transition-transform group-hover:scale-105',
           )}>
             <FoxIcon className="h-6 w-6" />
           </div>
           <div>
-            <h3 className="font-semibold text-foreground group-hover:text-[hsl(var(--brand))] transition-colors">
+            <h3 className="font-semibold text-foreground group-hover:text-brand transition-colors">
               d/{den.name}
             </h3>
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -115,7 +115,7 @@ function DiscoverDenCard({ den, loggedIn }: { den: DiscoverDen; loggedIn: boolea
             onClick={handleSubscribe}
             disabled={subscribeMutation.isPending}
             size="sm"
-            className="bg-[hsl(var(--brand))] hover:bg-[hsl(var(--brand))]/90 text-[hsl(var(--brand-foreground))]"
+            className="bg-brand hover:bg-brand/90 text-brand-foreground"
           >
             {subscribeMutation.isPending ? 'Joining...' : 'Join'}
           </Button>

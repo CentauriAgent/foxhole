@@ -90,7 +90,7 @@ export default function CreatePost() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))]">
+              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-brand/10 text-brand">
                 <PenSquare className="h-5 w-5" />
               </div>
               <div>
@@ -103,12 +103,12 @@ export default function CreatePost() {
           <CardContent>
             {!user ? (
               <div className="text-center py-12 space-y-4">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[hsl(var(--brand))]/10">
-                  <FoxIcon className="h-8 w-8 text-[hsl(var(--brand))]" />
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand/10">
+                  <FoxIcon className="h-8 w-8 text-brand" />
                 </div>
                 <div>
                   <p className="text-muted-foreground mb-4">Sign in with your Nostr key to create a post</p>
-                  <Button onClick={() => setShowLoginDialog(true)} className="bg-[hsl(var(--brand))] hover:bg-[hsl(var(--brand))]/90 text-[hsl(var(--brand-foreground))]">
+                  <Button onClick={() => setShowLoginDialog(true)} className="bg-brand hover:bg-brand/90 text-brand-foreground">
                     Sign In
                   </Button>
                 </div>
@@ -191,7 +191,7 @@ export default function CreatePost() {
                   <Button
                     type="submit"
                     disabled={isPending || !den.trim() || !content.trim()}
-                    className="gap-2 bg-[hsl(var(--brand))] hover:bg-[hsl(var(--brand))]/90 text-[hsl(var(--brand-foreground))]"
+                    className="gap-2 bg-brand hover:bg-brand/90 text-brand-foreground"
                   >
                     <Send className="h-4 w-4" />
                     {isPending ? 'Publishing...' : 'Dig a New Post'}

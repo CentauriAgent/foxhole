@@ -85,7 +85,7 @@ const Index = () => {
       <section className="relative border-b border-border bg-linear-to-b from-background via-background to-card/30">
         <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden opacity-[0.03]">
           <div className="absolute inset-0" style={{
-            backgroundImage: `radial-gradient(circle at 2px 2px, hsl(var(--primary)) 1px, transparent 0)`,
+            backgroundImage: `radial-gradient(circle at 2px 2px, var(--primary) 1px, transparent 0)`,
             backgroundSize: '48px 48px'
           }} />
         </div>
@@ -120,7 +120,7 @@ const Index = () => {
 
             <div className="pt-4 flex items-center justify-center gap-4">
               <Link to="/create">
-                <Button size="lg" className="gap-2 bg-[hsl(var(--brand))] hover:bg-[hsl(var(--brand))]/90 text-[hsl(var(--brand-foreground))]">
+                <Button size="lg" className="gap-2 bg-brand hover:bg-brand/90 text-brand-foreground">
                   <PenSquare className="h-5 w-5" />
                   Create a Post
                 </Button>
@@ -217,12 +217,12 @@ const Index = () => {
                   </>
                 ) : (
                   <div className="text-center py-16 px-4">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[hsl(var(--brand))]/10 mb-4">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand/10 mb-4">
                       <span className="text-3xl">🦊</span>
                     </div>
                     <p className="text-muted-foreground">No posts yet — be the first!</p>
                     <p className="text-sm text-muted-foreground/70 mt-1">
-                      <Link to="/create" className="text-[hsl(var(--brand))] hover:underline">Create a post</Link> to get the conversation started.
+                      <Link to="/create" className="text-brand hover:underline">Create a post</Link> to get the conversation started.
                     </p>
                   </div>
                 )}

@@ -97,10 +97,10 @@ export function VoteButtons({
         title={user ? "Dig" : "Sign in to vote"}
         className={cn(
           "p-0.5 rounded transition-colors",
-          user && "hover:bg-[hsl(var(--upvote))]/10 cursor-pointer",
+          user && "hover:bg-upvote/10 cursor-pointer",
           !user && "cursor-default",
-          effectiveVote === 'up' ? "text-[hsl(var(--upvote))] bg-[hsl(var(--upvote))]/10" :
-          isPositive ? "text-[hsl(var(--upvote))]" : "text-muted-foreground/60"
+          effectiveVote === 'up' ? "text-upvote bg-upvote/10" :
+          isPositive ? "text-upvote" : "text-muted-foreground/60"
         )}
       >
         <ChevronUp className={iconSize} strokeWidth={2.5} />
@@ -109,8 +109,8 @@ export function VoteButtons({
       <span className={cn(
         "font-semibold tabular-nums",
         textSize,
-        (isPositive || effectiveVote === 'up') && "text-[hsl(var(--upvote))]",
-        (isNegative || effectiveVote === 'down') && "text-[hsl(var(--downvote))]",
+        (isPositive || effectiveVote === 'up') && "text-upvote",
+        (isNegative || effectiveVote === 'down') && "text-downvote",
         !isPositive && !isNegative && !effectiveVote && "text-muted-foreground"
       )}>
         {formatCount(displayScore)}
@@ -122,10 +122,10 @@ export function VoteButtons({
         title={user ? "Bury" : "Sign in to vote"}
         className={cn(
           "p-0.5 rounded transition-colors",
-          user && "hover:bg-[hsl(var(--downvote))]/10 cursor-pointer",
+          user && "hover:bg-downvote/10 cursor-pointer",
           !user && "cursor-default",
-          effectiveVote === 'down' ? "text-[hsl(var(--downvote))] bg-[hsl(var(--downvote))]/10" :
-          isNegative ? "text-[hsl(var(--downvote))]" : "text-muted-foreground/60"
+          effectiveVote === 'down' ? "text-downvote bg-downvote/10" :
+          isNegative ? "text-downvote" : "text-muted-foreground/60"
         )}
       >
         <ChevronDown className={iconSize} strokeWidth={2.5} />

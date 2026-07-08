@@ -26,7 +26,7 @@ export function DenCard({
       to={`/d/${name}`}
       className={cn(
         "block p-4 rounded-lg border border-border bg-card group",
-        "hover:border-[hsl(var(--brand))]/50 hover:bg-muted/30",
+        "hover:border-brand/50 hover:bg-muted/30",
         "transition-all duration-200",
         className
       )}
@@ -34,13 +34,13 @@ export function DenCard({
       <div className="flex items-start gap-3">
         <div className={cn(
           "flex items-center justify-center w-10 h-10 rounded-lg transition-transform group-hover:scale-105",
-          "bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))]"
+          "bg-brand/10 text-brand"
         )}>
           <FoxIcon className="h-6 w-6" />
         </div>
         
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-foreground truncate group-hover:text-[hsl(var(--brand))] transition-colors">
+          <h3 className="font-semibold text-foreground truncate group-hover:text-brand transition-colors">
             d/{name}
           </h3>
           
@@ -78,8 +78,8 @@ export const DenCardCompact = memo(function DenCardCompact({
         className
       )}
     >
-      <FoxIcon className="h-4 w-4 text-muted-foreground group-hover:text-[hsl(var(--brand))] transition-colors" />
-      <span className="flex-1 text-sm font-medium truncate group-hover:text-[hsl(var(--brand))] transition-colors">d/{name}</span>
+      <FoxIcon className="h-4 w-4 text-muted-foreground group-hover:text-brand transition-colors" />
+      <span className="flex-1 text-sm font-medium truncate group-hover:text-brand transition-colors">d/{name}</span>
       <span className="text-xs text-muted-foreground tabular-nums">
         {formatCount(postCount)}
       </span>

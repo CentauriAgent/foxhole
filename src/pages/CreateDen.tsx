@@ -119,7 +119,7 @@ export default function CreateDen() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))]">
+              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-brand/10 text-brand">
                 <Tent className="h-5 w-5" />
               </div>
               <div>
@@ -132,12 +132,12 @@ export default function CreateDen() {
           <CardContent>
             {!user ? (
               <div className="text-center py-12 space-y-4">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[hsl(var(--brand))]/10">
-                  <FoxIcon className="h-8 w-8 text-[hsl(var(--brand))]" />
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand/10">
+                  <FoxIcon className="h-8 w-8 text-brand" />
                 </div>
                 <div>
                   <p className="text-muted-foreground mb-4">Sign in with your Nostr key to create a den</p>
-                  <Button onClick={() => setShowLoginDialog(true)} className="bg-[hsl(var(--brand))] hover:bg-[hsl(var(--brand))]/90 text-[hsl(var(--brand-foreground))]">
+                  <Button onClick={() => setShowLoginDialog(true)} className="bg-brand hover:bg-brand/90 text-brand-foreground">
                     Sign In
                   </Button>
                 </div>
@@ -242,7 +242,7 @@ export default function CreateDen() {
                   <Button
                     onClick={handleContinue}
                     disabled={!sanitizedName}
-                    className="gap-2 bg-[hsl(var(--brand))] hover:bg-[hsl(var(--brand))]/90 text-[hsl(var(--brand-foreground))]"
+                    className="gap-2 bg-brand hover:bg-brand/90 text-brand-foreground"
                   >
                     Review
                   </Button>
@@ -253,11 +253,11 @@ export default function CreateDen() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-4">
                   <div className="flex items-center gap-3">
-                    <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))]">
+                    <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-brand/10 text-brand">
                       <FoxIcon className="h-7 w-7" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-bold text-[hsl(var(--brand))]">d/{sanitizedName}</h2>
+                      <h2 className="text-lg font-bold text-brand">d/{sanitizedName}</h2>
                       {description && <p className="text-sm text-muted-foreground">{description}</p>}
                     </div>
                   </div>
@@ -302,7 +302,7 @@ export default function CreateDen() {
                   <Button
                     type="submit"
                     disabled={isPending}
-                    className="gap-2 bg-[hsl(var(--brand))] hover:bg-[hsl(var(--brand))]/90 text-[hsl(var(--brand-foreground))]"
+                    className="gap-2 bg-brand hover:bg-brand/90 text-brand-foreground"
                   >
                     <Tent className="h-4 w-4" />
                     {isPending ? 'Creating...' : 'Dig a New Den'}

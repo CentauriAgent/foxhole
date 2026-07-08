@@ -50,7 +50,7 @@ export function SearchResultCard({ event, className }: SearchResultCardProps) {
           <span className={cn(
             "inline-flex items-center px-2 py-0.5 rounded-md font-medium",
             isPost 
-              ? "bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))]"
+              ? "bg-brand/10 text-brand"
               : "bg-muted text-muted-foreground"
           )}>
             {isPost ? 'Post' : 'Comment'}
@@ -75,7 +75,7 @@ export function SearchResultCard({ event, className }: SearchResultCardProps) {
         <Link to={eventUrl} className="block">
           {title ? (
             <>
-              <h3 className="font-semibold text-base text-foreground group-hover:text-[hsl(var(--brand))] transition-colors wrap-break-word mb-1">
+              <h3 className="font-semibold text-base text-foreground group-hover:text-brand transition-colors wrap-break-word mb-1">
                 {title}
               </h3>
               {bodyContent && (

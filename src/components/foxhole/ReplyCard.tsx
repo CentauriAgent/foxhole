@@ -63,7 +63,7 @@ export function ReplyCard({
                 Replying to{' '}
                 <Link 
                   to={den ? `/d/${den}/post/${parentPost.id}` : '#'}
-                  className="text-[hsl(var(--brand))] hover:underline"
+                  className="text-brand hover:underline"
                 >
                   {parentPost.content.split('\n')[0]?.slice(0, 60) || 'a post'}
                   {(parentPost.content.split('\n')[0]?.length ?? 0) > 60 && '...'}

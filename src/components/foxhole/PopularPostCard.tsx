@@ -81,7 +81,7 @@ export const PopularPostCard = memo(function PopularPostCard({
         <Link to={postUrl} className="block">
           {title ? (
             <>
-              <h3 className="font-semibold text-sm text-foreground group-hover:text-[hsl(var(--brand))] transition-colors wrap-break-word">
+              <h3 className="font-semibold text-sm text-foreground group-hover:text-brand transition-colors wrap-break-word">
                 {title}
               </h3>
               {bodyContent && (

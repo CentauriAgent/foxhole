@@ -168,7 +168,7 @@ function YourDensCard({ currentDen }: { currentDen?: string }) {
           </Link>
           <Link
             to="/discover"
-            className="flex items-center gap-2 py-1.5 text-sm text-muted-foreground hover:text-[hsl(var(--brand))] transition-colors"
+            className="flex items-center gap-2 py-1.5 text-sm text-muted-foreground hover:text-brand transition-colors"
           >
             <Compass className="h-3.5 w-3.5" />
             Discover Dens

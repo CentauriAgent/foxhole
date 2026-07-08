@@ -175,8 +175,8 @@ export default function Post() {
                   </div>
                 ) : (
                   <div className="p-8 text-center space-y-3">
-                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[hsl(var(--brand))]/10 mb-3">
-                      <FoxIcon className="h-6 w-6 text-[hsl(var(--brand))]" />
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-brand/10 mb-3">
+                      <FoxIcon className="h-6 w-6 text-brand" />
                     </div>
                     <p className="text-muted-foreground">No comments yet</p>
                     {!user && (

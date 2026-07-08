@@ -91,7 +91,7 @@ export function PostCard({
           {title ? (
             <>
               <h3 className={cn(
-                "font-semibold text-foreground group-hover:text-[hsl(var(--brand))] transition-colors wrap-break-word",
+                "font-semibold text-foreground group-hover:text-brand transition-colors wrap-break-word",
                 compact ? "text-sm" : "text-base"
               )}>
                 {title}
@@ -136,7 +136,7 @@ export function PostCard({
               <Bookmark
                 className={cn(
                   "h-4 w-4",
-                  isBookmarked(post.id) && "fill-[hsl(var(--brand))] text-[hsl(var(--brand))]"
+                  isBookmarked(post.id) && "fill-brand text-brand"
                 )}
               />
             </button>

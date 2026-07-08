@@ -105,7 +105,7 @@ export default function DocsTechnical() {
       {/* Header */}
       <div className="not-prose mb-12">
         <div className="flex items-center gap-3 mb-4">
-          <Code className="h-8 w-8 text-[hsl(var(--brand))]" />
+          <Code className="h-8 w-8 text-brand" />
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Technical Guide</h1>
         </div>
         <p className="text-lg text-muted-foreground">
@@ -116,7 +116,7 @@ export default function DocsTechnical() {
       {/* Protocol Overview */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4 not-prose flex items-center gap-2">
-          <Database className="h-6 w-6 text-[hsl(var(--brand))]" />
+          <Database className="h-6 w-6 text-brand" />
           Protocol Overview
         </h2>
 
@@ -137,11 +137,11 @@ export default function DocsTechnical() {
                 className="flex items-center justify-between p-4 rounded-lg border border-border bg-card hover:bg-muted/50 transition-colors group"
               >
                 <div className="flex items-center gap-4">
-                  <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))] font-mono font-bold text-sm">
+                  <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-brand/10 text-brand font-mono font-bold text-sm">
                     {nip.nip.replace('NIP-', '')}
                   </div>
                   <div>
-                    <div className="font-semibold group-hover:text-[hsl(var(--brand))] transition-colors">
+                    <div className="font-semibold group-hover:text-brand transition-colors">
                       {nip.nip}: {nip.title}
                     </div>
                     <div className="text-sm text-muted-foreground">{nip.usage}</div>
@@ -157,7 +157,7 @@ export default function DocsTechnical() {
       {/* Den Communities */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4 not-prose flex items-center gap-2">
-          <Tag className="h-6 w-6 text-[hsl(var(--brand))]" />
+          <Tag className="h-6 w-6 text-brand" />
           Den Communities
         </h2>
 
@@ -198,7 +198,7 @@ export default function DocsTechnical() {
       {/* Event Types */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4 not-prose flex items-center gap-2">
-          <MessageSquare className="h-6 w-6 text-[hsl(var(--brand))]" />
+          <MessageSquare className="h-6 w-6 text-brand" />
           Event Types
         </h2>
 
@@ -317,7 +317,7 @@ export default function DocsTechnical() {
       {/* Voting */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4 not-prose flex items-center gap-2">
-          <ThumbsUp className="h-6 w-6 text-[hsl(var(--brand))]" />
+          <ThumbsUp className="h-6 w-6 text-brand" />
           Voting System
         </h2>
 
@@ -377,7 +377,7 @@ export default function DocsTechnical() {
       {/* Querying */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4 not-prose flex items-center gap-2">
-          <Search className="h-6 w-6 text-[hsl(var(--brand))]" />
+          <Search className="h-6 w-6 text-brand" />
           Querying Data
         </h2>
 

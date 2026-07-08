@@ -129,7 +129,7 @@ export default function Comment() {
             {/* Replying indicator */}
             {parentPost && (
               <div className="flex items-center gap-2 text-xs text-muted-foreground pl-2">
-                <CornerDownRight className="h-4 w-4 text-[hsl(var(--brand))]" />
+                <CornerDownRight className="h-4 w-4 text-brand" />
                 <span>Reply</span>
               </div>
             )}
@@ -216,8 +216,8 @@ export default function Comment() {
                   </div>
                 ) : (
                   <div className="p-8 text-center">
-                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[hsl(var(--brand))]/10 mb-3">
-                      <FoxIcon className="h-6 w-6 text-[hsl(var(--brand))]" />
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-brand/10 mb-3">
+                      <FoxIcon className="h-6 w-6 text-brand" />
                     </div>
                     <p className="text-muted-foreground">No replies yet</p>
                     <p className="text-sm text-muted-foreground/70 mt-1">

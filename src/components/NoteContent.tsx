@@ -48,9 +48,9 @@ export function NoteContent({
       (match, prefix, data) => {
         const id = `${prefix}${data}`;
         if (prefix === 'npub1' || prefix === 'nprofile1') {
-          return `<a href="/${id}" class="text-[hsl(var(--brand))] font-medium hover:underline">@${id.slice(0, 12)}…</a>`;
+          return `<a href="/${id}" class="text-brand font-medium hover:underline">@${id.slice(0, 12)}…</a>`;
         }
-        return `<a href="/${id}" class="text-[hsl(var(--brand))] hover:underline break-all">${match}</a>`;
+        return `<a href="/${id}" class="text-brand hover:underline break-all">${match}</a>`;
       }
     );
 
@@ -58,7 +58,7 @@ export function NoteContent({
     html = html.replace(
       /(?<![&\w/])#(\w+)/g,
       (match, tag) => {
-        return `<a href="/d/${tag.toLowerCase()}" class="text-[hsl(var(--brand))] hover:underline">${match}</a>`;
+        return `<a href="/d/${tag.toLowerCase()}" class="text-brand hover:underline">${match}</a>`;
       }
     );
 
@@ -134,7 +134,7 @@ export function NoteContent({
               href={cleanUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[hsl(var(--brand))] hover:underline break-all"
+              className="text-brand hover:underline break-all"
             >
               {url}
             </a>
@@ -160,7 +160,7 @@ export function NoteContent({
               <Link 
                 key={`nostr-${keyCounter++}`}
                 to={`/${nostrId}`}
-                className="text-[hsl(var(--brand))] hover:underline break-all"
+                className="text-brand hover:underline break-all"
               >
                 {fullMatch}
               </Link>
@@ -175,7 +175,7 @@ export function NoteContent({
           <Link 
             key={`hashtag-${keyCounter++}`}
             to={`/d/${tag}`}
-            className="text-[hsl(var(--brand))] hover:underline"
+            className="text-brand hover:underline"
           >
             {hashtag}
           </Link>
@@ -202,10 +202,10 @@ export function NoteContent({
         className={cn(
           "prose prose-sm dark:prose-invert max-w-none wrap-break-word",
           "prose-headings:font-semibold prose-headings:tracking-tight",
-          "prose-a:text-[hsl(var(--brand))] prose-a:no-underline prose-a:hover:underline",
+          "prose-a:text-brand prose-a:no-underline prose-a:hover:underline",
           "prose-code:rounded prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:text-sm",
           "prose-pre:bg-muted prose-pre:border prose-pre:border-border prose-pre:rounded-lg",
-          "prose-blockquote:border-l-[hsl(var(--brand))] prose-blockquote:text-muted-foreground",
+          "prose-blockquote:border-l-brand prose-blockquote:text-muted-foreground",
           "prose-img:rounded-lg prose-img:border prose-img:border-border",
           className
         )}
@@ -234,7 +234,7 @@ function NostrMention({ pubkey }: { pubkey: string }) {
       className={cn(
         "font-medium hover:underline",
         hasRealName 
-          ? "text-[hsl(var(--brand))]" 
+          ? "text-brand" 
           : "text-muted-foreground hover:text-foreground"
       )}
     >

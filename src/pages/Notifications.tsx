@@ -49,7 +49,7 @@ export default function Notifications() {
         {/* Header */}
         <header className="rounded-lg border border-border bg-card p-6 mb-4">
           <div className="flex items-center gap-4">
-            <div className="flex items-center justify-center w-16 h-16 rounded-xl bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))]">
+            <div className="flex items-center justify-center w-16 h-16 rounded-xl bg-brand/10 text-brand">
               <Bell className="h-8 w-8" />
             </div>
             <div className="flex-1">
@@ -183,7 +183,7 @@ function ReplyNotification({ item }: { item: NotificationItem }) {
           {formatRelativeTime(item.timestamp)}
         </time>
       </div>
-      <MessageSquare className="h-4 w-4 text-[hsl(var(--brand))] shrink-0 mt-1" />
+      <MessageSquare className="h-4 w-4 text-brand shrink-0 mt-1" />
     </div>
   );
 }

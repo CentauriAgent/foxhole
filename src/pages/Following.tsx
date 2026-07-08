@@ -74,11 +74,11 @@ export default function Following() {
               </p>
               <p className="text-sm text-muted-foreground/70 mt-2">
                 Find users to follow on the{' '}
-                <Link to="/popular" className="text-[hsl(var(--brand))] hover:underline">
+                <Link to="/popular" className="text-brand hover:underline">
                   Popular
                 </Link>{' '}
                 page or by{' '}
-                <Link to="/search" className="text-[hsl(var(--brand))] hover:underline">
+                <Link to="/search" className="text-brand hover:underline">
                   searching
                 </Link>.
               </p>

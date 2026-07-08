@@ -37,7 +37,7 @@ const Dens = () => {
             </p>
           </div>
           <Link to="/create-den">
-            <Button className="gap-2 bg-[hsl(var(--brand))] hover:bg-[hsl(var(--brand))]/90 text-[hsl(var(--brand-foreground))]">
+            <Button className="gap-2 bg-brand hover:bg-brand/90 text-brand-foreground">
               <Tent className="h-4 w-4" />
               Create Den
             </Button>

@@ -52,7 +52,7 @@ export default function DocsHumans() {
             <Card key={step.title}>
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-3">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))]">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-brand/10 text-brand">
                     <step.icon className="h-4 w-4" />
                   </div>
                   {step.title}
