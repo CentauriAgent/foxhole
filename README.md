@@ -28,7 +28,6 @@ Every hashtag on Nostr is a Den. No registration needed — just start posting.
 - **Mute Lists** — Mute users; muted accounts filtered from all feeds
 - **Notifications** — Replies, zaps, and reactions in one feed with unread badge on Bell icon
 - **Bookmarks** — Save posts with NIP-51 bookmark lists (kind 10003), view all saved posts at `/bookmarks`
-- **Direct Messages** — Private messaging interface
 - **Report** — Report posts or users
 
 ### Account & Settings
@@ -178,9 +177,8 @@ src/
 │   ├── CreatePost.tsx     # New post form
 │   ├── Search.tsx         # Search posts
 │   ├── Settings.tsx       # Relays, Blossom, NWC settings
-│   ├── Messages.tsx       # Direct messages
 │   ├── NIP19Page.tsx      # Profile view (npub/nprofile)
-│   └── docs/              # About, technical docs, humans
+│   └── docs/              # About and technical docs
 └── lib/
     └── foxhole.ts         # Constants and helpers
 ```
@@ -194,13 +192,12 @@ src/
 | `/dens` | Browse and discover dens |
 | `/d/:den` | View posts in a den |
 | `/d/:den/post/:id` | View a post with replies |
-| `/d/:den/post/:id/comment/:commentId` | View a comment thread |
+| `/d/:den/comment/:eventId` | View a comment thread |
 | `/create` | Create a new post |
 | `/search` | Search posts |
 | `/settings` | Relay, Blossom, and wallet settings |
-| `/messages` | Direct messages |
 | `/docs` | Documentation and about pages |
-| `/:npub` | View a user's profile and posts |
+| `/:nip19` | View a user's profile and posts (npub/nprofile) |
 
 ## Contributing
 

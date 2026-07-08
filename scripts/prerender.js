@@ -18,7 +18,6 @@ const ROUTES = [
   '/',
   '/popular',
   '/docs',
-  '/docs/humans',
   '/docs/technical',
   '/docs/about',
 ];
