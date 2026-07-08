@@ -55,7 +55,14 @@ const server = createServer((req, res) => {
 await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
 const { port } = server.address();
 
-const browser = await puppeteer.launch({ headless: true });
+const browser = await puppeteer.launch({
+  headless: true,
+  // CI runners (GitHub Actions) can't start Chrome's sandbox; keep it
+  // enabled for local builds.
+  args: process.env.CI
+    ? ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+    : [],
+});
 
 try {
   const page = await browser.newPage();
