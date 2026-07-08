@@ -72,7 +72,7 @@ export default function DocsIndex() {
           </div>
         </div>
 
-        <div className="p-6 rounded-xl bg-gradient-to-br from-[hsl(var(--brand))]/5 to-[hsl(var(--brand))]/10 border border-[hsl(var(--brand))]/20">
+        <div className="p-6 rounded-xl bg-linear-to-br from-[hsl(var(--brand))]/5 to-[hsl(var(--brand))]/10 border border-[hsl(var(--brand))]/20">
           <p className="text-lg leading-relaxed">
             Foxhole is a decentralized community forum where you own your identity and content — powered by the{' '}
             <a href="https://github.com/nostr-protocol/nostr" target="_blank" rel="noopener noreferrer" className="text-[hsl(var(--brand))] hover:underline font-medium">

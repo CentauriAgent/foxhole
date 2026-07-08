@@ -113,7 +113,7 @@ export default function Den() {
                     {user && (
                       <Button
                         size="sm"
-                        variant={isSubscribed ? 'outline' : 'default'}
+                        variant={isSubscribed ? 'outline-solid' : 'default'}
                         className={isSubscribed ? '' : 'bg-[hsl(var(--brand))] hover:bg-[hsl(var(--brand))]/90 text-[hsl(var(--brand-foreground))]'}
                         disabled={isSubscribing || isUnsubscribing}
                         onClick={() => isSubscribed ? unsubscribe(identifier) : subscribe(identifier)}

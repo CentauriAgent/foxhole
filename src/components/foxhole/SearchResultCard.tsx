@@ -75,7 +75,7 @@ export function SearchResultCard({ event, className }: SearchResultCardProps) {
         <Link to={eventUrl} className="block">
           {title ? (
             <>
-              <h3 className="font-semibold text-base text-foreground group-hover:text-[hsl(var(--brand))] transition-colors break-words mb-1">
+              <h3 className="font-semibold text-base text-foreground group-hover:text-[hsl(var(--brand))] transition-colors wrap-break-word mb-1">
                 {title}
               </h3>
               {bodyContent && (

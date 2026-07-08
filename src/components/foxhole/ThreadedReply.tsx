@@ -60,7 +60,7 @@ export function ThreadedReply({
         depth > 0 && "ml-6 pt-3"
       )}>
         {/* Vote buttons */}
-        <div className="flex-shrink-0 pt-0.5">
+        <div className="shrink-0 pt-0.5">
           <VoteButtons eventId={reply.id} score={score} size="sm" />
         </div>
 

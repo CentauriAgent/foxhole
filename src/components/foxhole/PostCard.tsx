@@ -65,7 +65,7 @@ export function PostCard({
       className
     )}>
       {/* Vote Column */}
-      <div className="flex-shrink-0 pt-0.5">
+      <div className="shrink-0 pt-0.5">
         <VoteButtons eventId={post.id} score={score} size={compact ? 'sm' : 'md'} />
       </div>
 
@@ -91,7 +91,7 @@ export function PostCard({
           {title ? (
             <>
               <h3 className={cn(
-                "font-semibold text-foreground group-hover:text-[hsl(var(--brand))] transition-colors break-words",
+                "font-semibold text-foreground group-hover:text-[hsl(var(--brand))] transition-colors wrap-break-word",
                 compact ? "text-sm" : "text-base"
               )}>
                 {title}

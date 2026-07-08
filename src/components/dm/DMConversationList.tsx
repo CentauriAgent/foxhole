@@ -61,9 +61,9 @@ const ConversationItemComponent = ({
     >
       <div className="flex items-start gap-3 max-w-full">
         {isLoadingProfile ? (
-          <Skeleton className="h-10 w-10 rounded-full flex-shrink-0" />
+          <Skeleton className="h-10 w-10 rounded-full shrink-0" />
         ) : (
-          <Avatar className="h-10 w-10 flex-shrink-0">
+          <Avatar className="h-10 w-10 shrink-0">
             <AvatarImage src={avatarUrl} alt={displayName} />
             <AvatarFallback>{initials}</AvatarFallback>
           </Avatar>
@@ -73,7 +73,7 @@ const ConversationItemComponent = ({
           <div className="flex items-center justify-between gap-2 mb-1">
             <div className="flex items-center gap-1.5 min-w-0 flex-1">
               {isLoadingProfile ? (
-                <Skeleton className="h-[1.25rem] w-24" />
+                <Skeleton className="h-5 w-24" />
               ) : (
                 <span className="font-medium text-sm truncate">{displayName}</span>
               )}
@@ -81,7 +81,7 @@ const ConversationItemComponent = ({
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <div className="flex-shrink-0">
+                      <div className="shrink-0">
                         <AlertTriangle className="h-3.5 w-3.5 text-yellow-600 dark:text-yellow-500" />
                       </div>
                     </TooltipTrigger>
@@ -95,7 +95,7 @@ const ConversationItemComponent = ({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span className="text-xs text-muted-foreground whitespace-nowrap flex-shrink-0 cursor-default">
+                  <span className="text-xs text-muted-foreground whitespace-nowrap shrink-0 cursor-default">
                     {formatConversationTime(lastActivity)}
                   </span>
                 </TooltipTrigger>
@@ -123,7 +123,7 @@ const ConversationListSkeleton = () => {
     <div className="space-y-2 p-4">
       {[1, 2, 3, 4, 5].map((i) => (
         <div key={i} className="flex items-start gap-3 p-3">
-          <Skeleton className="h-10 w-10 rounded-full flex-shrink-0" />
+          <Skeleton className="h-10 w-10 rounded-full shrink-0" />
           <div className="flex-1 space-y-2">
             <div className="flex justify-between">
               <Skeleton className="h-4 w-24" />
@@ -163,7 +163,7 @@ export const DMConversationList = ({
   return (
     <Card className={cn("h-full flex flex-col overflow-hidden", className)}>
       {/* Header - always visible */}
-      <div className="p-4 border-b flex-shrink-0 flex items-center justify-between">
+      <div className="p-4 border-b shrink-0 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <h2 className="font-semibold text-lg">Messages</h2>
           {(loadingPhase === LOADING_PHASES.CACHE || 
@@ -201,14 +201,14 @@ export const DMConversationList = ({
       </div>
       
       {/* Tab buttons - always visible */}
-      <div className="px-2 pt-2 flex-shrink-0">
+      <div className="px-2 pt-2 shrink-0">
         <div className="grid grid-cols-2 gap-1 bg-muted p-1 rounded-lg">
           <button
             onClick={() => setActiveTab('known')}
             className={cn(
               "text-xs py-2 px-3 rounded-md transition-colors",
               activeTab === 'known' 
-                ? "bg-background shadow-sm font-medium" 
+                ? "bg-background shadow-xs font-medium" 
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
@@ -219,7 +219,7 @@ export const DMConversationList = ({
             className={cn(
               "text-xs py-2 px-3 rounded-md transition-colors",
               activeTab === 'requests' 
-                ? "bg-background shadow-sm font-medium" 
+                ? "bg-background shadow-xs font-medium" 
                 : "text-muted-foreground hover:text-foreground"
             )}
           >

@@ -53,7 +53,7 @@ export const DMMessagingInterface = ({ className }: DMMessagingInterfaceProps) =
       <div className={cn("flex gap-4 overflow-hidden", className)}>
         {/* Conversation List - Left Sidebar */}
         <div className={cn(
-          "md:w-80 md:flex-shrink-0",
+          "md:w-80 md:shrink-0",
           isMobile && !showConversationList && "hidden",
           isMobile && showConversationList && "w-full"
         )}>

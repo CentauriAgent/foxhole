@@ -88,7 +88,7 @@ export default function Post() {
               <article className="rounded-lg border border-border bg-card p-4">
                 <div className="flex gap-4">
                   {/* Vote Column */}
-                  <div className="flex-shrink-0">
+                  <div className="shrink-0">
                     <VoteButtons eventId={eventId!} score={votes?.score ?? 0} />
                   </div>
 

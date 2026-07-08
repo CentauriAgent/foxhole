@@ -46,7 +46,7 @@ export function ReplyCard({
       className
     )}>
       {/* Vote Column */}
-      <div className="flex-shrink-0 pt-0.5">
+      <div className="shrink-0 pt-0.5">
         <VoteButtons eventId={reply.id} score={score} size="sm" />
       </div>
 
@@ -54,7 +54,7 @@ export function ReplyCard({
       <div className="flex-1 min-w-0 space-y-2">
         {/* Replied to context */}
         <div className="flex items-start gap-2 text-xs text-muted-foreground">
-          <CornerDownRight className="h-3 w-3 mt-0.5 flex-shrink-0 text-muted-foreground/50" />
+          <CornerDownRight className="h-3 w-3 mt-0.5 shrink-0 text-muted-foreground/50" />
           <div className="min-w-0 flex-1">
             {parentLoading ? (
               <Skeleton className="h-3 w-48" />

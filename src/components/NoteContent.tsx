@@ -200,9 +200,9 @@ export function NoteContent({
     return (
       <div 
         className={cn(
-          "prose prose-sm dark:prose-invert max-w-none break-words",
+          "prose prose-sm dark:prose-invert max-w-none wrap-break-word",
           "prose-headings:font-semibold prose-headings:tracking-tight",
-          "prose-a:text-[hsl(var(--brand))] prose-a:no-underline hover:prose-a:underline",
+          "prose-a:text-[hsl(var(--brand))] prose-a:no-underline prose-a:hover:underline",
           "prose-code:rounded prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:text-sm",
           "prose-pre:bg-muted prose-pre:border prose-pre:border-border prose-pre:rounded-lg",
           "prose-blockquote:border-l-[hsl(var(--brand))] prose-blockquote:text-muted-foreground",
@@ -215,7 +215,7 @@ export function NoteContent({
   }
 
   return (
-    <div className={cn("whitespace-pre-wrap break-words", className)}>
+    <div className={cn("whitespace-pre-wrap wrap-break-word", className)}>
       {content.length > 0 ? content : event.content}
     </div>
   );

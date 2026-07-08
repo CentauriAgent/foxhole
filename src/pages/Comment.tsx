@@ -100,7 +100,7 @@ export default function Comment() {
                   <article className="rounded-lg border border-border/50 bg-muted/30 p-4 hover:bg-muted/50 transition-colors">
                     <div className="flex gap-3">
                       {/* Vote Column (compact) */}
-                      <div className="flex-shrink-0">
+                      <div className="shrink-0">
                         <VoteButtons eventId={parentPostId!} score={parentVotes?.score ?? 0} size="sm" />
                       </div>
 
@@ -141,7 +141,7 @@ export default function Comment() {
               <article className="rounded-lg border border-border bg-card p-4">
                 <div className="flex gap-4">
                   {/* Vote Column */}
-                  <div className="flex-shrink-0">
+                  <div className="shrink-0">
                     <VoteButtons eventId={eventId!} score={votes?.score ?? 0} />
                   </div>
 

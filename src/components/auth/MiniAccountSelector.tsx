@@ -37,7 +37,7 @@ export function MiniAccountSelector({ onAddAccountClick, className }: MiniAccoun
             <AvatarFallback className="text-xs">{getDisplayName(currentUser).charAt(0)}</AvatarFallback>
           </Avatar>
           <span className='text-xs font-medium truncate max-w-[100px]'>{getDisplayName(currentUser)}</span>
-          <ChevronDown className='w-3 h-3 text-muted-foreground flex-shrink-0' />
+          <ChevronDown className='w-3 h-3 text-muted-foreground shrink-0' />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className='w-56 p-2 animate-scale-in'>

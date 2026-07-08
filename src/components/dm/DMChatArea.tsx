@@ -78,11 +78,11 @@ const MessageBubble = memo(({
         ) : isFileAttachment ? (
           // Kind 15: Use NoteContent to render files/media with imeta tags
           <div className="text-sm">
-            <NoteContent event={messageEvent} className="whitespace-pre-wrap break-words" />
+            <NoteContent event={messageEvent} className="whitespace-pre-wrap wrap-break-word" />
           </div>
         ) : (
           // Kind 4 (NIP-04) and Kind 14 (NIP-17 text): Display plain text
-          <p className="text-sm whitespace-pre-wrap break-words">
+          <p className="text-sm whitespace-pre-wrap wrap-break-word">
             {message.decryptedContent}
           </p>
         )}
@@ -107,7 +107,7 @@ const MessageBubble = memo(({
             <Tooltip delayDuration={200}>
               <TooltipTrigger asChild>
                 <span className={cn(
-                  "flex-shrink-0 opacity-50",
+                  "shrink-0 opacity-50",
                   isFromCurrentUser ? "text-primary-foreground" : "text-muted-foreground"
                 )}>
                   {message.kind === 4 ? (
@@ -131,7 +131,7 @@ const MessageBubble = memo(({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="flex-shrink-0">
+                  <div className="shrink-0">
                     <AlertTriangle className="h-3 w-3 text-yellow-600 dark:text-yellow-500" />
                   </div>
                 </TooltipTrigger>

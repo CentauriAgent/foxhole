@@ -51,7 +51,7 @@ export const PopularPostCard = memo(function PopularPostCard({
       className
     )}>
       {/* Rank + Vote Column */}
-      <div className="flex-shrink-0 flex items-start gap-2">
+      <div className="shrink-0 flex items-start gap-2">
         {rank !== undefined && (
           <span className="text-lg font-bold text-muted-foreground/50 w-6 text-right pt-1">
             {rank}
@@ -81,7 +81,7 @@ export const PopularPostCard = memo(function PopularPostCard({
         <Link to={postUrl} className="block">
           {title ? (
             <>
-              <h3 className="font-semibold text-sm text-foreground group-hover:text-[hsl(var(--brand))] transition-colors break-words">
+              <h3 className="font-semibold text-sm text-foreground group-hover:text-[hsl(var(--brand))] transition-colors wrap-break-word">
                 {title}
               </h3>
               {bodyContent && (

@@ -82,7 +82,7 @@ const Index = () => {
       <SiteHeader />
       
       {/* Hero Section */}
-      <section className="relative border-b border-border bg-gradient-to-b from-background via-background to-card/30">
+      <section className="relative border-b border-border bg-linear-to-b from-background via-background to-card/30">
         <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden opacity-[0.03]">
           <div className="absolute inset-0" style={{
             backgroundImage: `radial-gradient(circle at 2px 2px, hsl(var(--primary)) 1px, transparent 0)`,
@@ -104,11 +104,11 @@ const Index = () => {
             
             <div className="space-y-4">
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight">
-                <span className="bg-gradient-to-br from-foreground via-foreground to-foreground/70 bg-clip-text text-transparent">
+                <span className="bg-linear-to-br from-foreground via-foreground to-foreground/70 bg-clip-text text-transparent">
                   Your Community,
                 </span>
                 <br />
-                <span className="bg-gradient-to-r from-primary via-amber-500 to-primary bg-clip-text text-transparent">
+                <span className="bg-linear-to-r from-primary via-amber-500 to-primary bg-clip-text text-transparent">
                   Your Voice
                 </span>
               </h1>
@@ -134,7 +134,7 @@ const Index = () => {
           </div>
         </div>
         
-        <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent" />
+        <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-24 bg-linear-to-t from-background to-transparent" />
       </section>
       
       <main className="container py-6">
