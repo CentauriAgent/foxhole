@@ -5,7 +5,7 @@ import { nip19 } from 'nostr-tools';
 import { useAuthor } from '@/hooks/useAuthor';
 import { genUserName } from '@/lib/genUserName';
 import { cn } from '@/lib/utils';
-import { hasMarkdown, renderMarkdown } from '@/lib/markdown';
+import { hasMarkdown, renderMarkdown, sanitizeHtml } from '@/lib/markdown';
 
 interface NoteContentProps {
   event: NostrEvent;
@@ -62,13 +62,10 @@ export function NoteContent({
       }
     );
 
-    // Make external links open in new tab
-    html = html.replace(
-      /<a href="(https?:\/\/[^"]+)"/g,
-      '<a href="$1" target="_blank" rel="noopener noreferrer"'
-    );
-
-    return html;
+    // Sanitize the final HTML (DOMPurify): strips script/event handlers and
+    // blocks javascript:/data: URLs, and marks external links to open in a
+    // new tab. This MUST be the last step before dangerouslySetInnerHTML.
+    return sanitizeHtml(html);
   }, [event.content, isMarkdown]);
   
   // Plain text rendering path (original logic)

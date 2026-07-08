@@ -10,6 +10,7 @@ import { nip57 } from 'nostr-tools';
 import type { WebLNProvider } from '@webbtc/webln-types';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNostr } from '@nostrify/react';
+import { safeHttpUrl } from '@/lib/utils';
 import type { NostrEvent } from '@nostrify/nostrify';
 
 export function useZaps(
@@ -180,9 +181,10 @@ export function useZaps(
         return;
       }
 
-      // Get zap endpoint using the old reliable method
-      const zapEndpoint = await nip57.getZapEndpoint(author.data.event);
-      if (!zapEndpoint) {
+      // Get zap endpoint using the old reliable method. The endpoint comes
+      // from third-party LNURL metadata — require a well-formed https URL.
+      const zapEndpoint = safeHttpUrl(await nip57.getZapEndpoint(author.data.event));
+      if (!zapEndpoint || zapEndpoint.protocol !== 'https:') {
         toast({
           title: 'Zap endpoint not found',
           description: 'Could not find a zap endpoint for the author.',
@@ -210,7 +212,9 @@ export function useZaps(
       const signedZapRequest = await user.signer.signEvent(zapRequest);
 
       try {
-        const res = await fetch(`${zapEndpoint}?amount=${zapAmount}&nostr=${encodeURI(JSON.stringify(signedZapRequest))}`);
+        zapEndpoint.searchParams.set('amount', String(zapAmount));
+        zapEndpoint.searchParams.set('nostr', JSON.stringify(signedZapRequest));
+        const res = await fetch(zapEndpoint);
             const responseData = await res.json();
 
             if (!res.ok) {

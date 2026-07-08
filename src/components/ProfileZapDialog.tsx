@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Zap, Copy, Check, ExternalLink, Sparkle, Sparkles, Star, Rocket, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { cn, safeHttpUrl } from '@/lib/utils';
 import {
   Dialog,
   DialogContent,
@@ -128,14 +128,18 @@ export function ProfileZapDialog({
     setIsLoading(true);
 
     try {
-      // Parse Lightning address (user@domain.com format)
-      const [username, domain] = lud16.split('@');
-      if (!username || !domain) {
+      // Parse Lightning address (user@domain.com format). Validate the shape
+      // strictly since lud16 is attacker-controlled profile metadata.
+      const [username, domain, ...rest] = lud16.split('@');
+      if (!username || !domain || rest.length > 0 ||
+          !/^[a-z0-9\-_.+]+$/i.test(username) || !/^[a-z0-9\-.]+$/i.test(domain)) {
         throw new Error('Invalid Lightning address format');
       }
 
       // Fetch LNURL-pay metadata
-      const lnurlResponse = await fetch(`https://${domain}/.well-known/lnurlp/${username}`);
+      const lnurlResponse = await fetch(
+        `https://${domain}/.well-known/lnurlp/${encodeURIComponent(username)}`,
+      );
       if (!lnurlResponse.ok) {
         throw new Error('Failed to fetch Lightning address info');
       }
@@ -150,14 +154,15 @@ export function ProfileZapDialog({
         throw new Error(`Amount must be between ${minSendable} and ${maxSendable} sats`);
       }
 
-      // Get invoice from callback
-      const callback = lnurlData.callback;
-      if (!callback) {
-        throw new Error('No callback URL in LNURL response');
+      // Get invoice from callback. The callback URL comes from a third-party
+      // server response — require a well-formed https URL before fetching.
+      const callback = safeHttpUrl(lnurlData.callback);
+      if (!callback || callback.protocol !== 'https:') {
+        throw new Error('Invalid callback URL in LNURL response');
       }
 
-      const amountMillisats = amount * 1000;
-      const invoiceResponse = await fetch(`${callback}?amount=${amountMillisats}`);
+      callback.searchParams.set('amount', String(amount * 1000));
+      const invoiceResponse = await fetch(callback);
       
       if (!invoiceResponse.ok) {
         const errorData = await invoiceResponse.json().catch(() => ({}));

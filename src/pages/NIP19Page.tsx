@@ -15,6 +15,7 @@ import { useAuthor } from '@/hooks/useAuthor';
 import { useUserPosts } from '@/hooks/useUserPosts';
 import { useUserReplies } from '@/hooks/useUserReplies';
 import { genUserName } from '@/lib/genUserName';
+import { safeHttpUrl } from '@/lib/utils';
 import { useIsFollowing, useFollow, useUnfollow } from '@/hooks/useFollows';
 import { useToast } from '@/hooks/useToast';
 import NotFound from './NotFound';
@@ -70,6 +71,9 @@ function ProfilePage({ pubkey }: { pubkey: string }) {
   
   const metadata = author?.metadata;
   const displayName = metadata?.name || metadata?.display_name || genUserName(pubkey);
+  // Only render the website link if it parses as a real http(s) URL
+  // (profile metadata is attacker-controlled; blocks javascript: hrefs).
+  const websiteUrl = safeHttpUrl(metadata?.website);
   const npub = nip19.npubEncode(pubkey);
   
   const handleTabChange = (value: string) => {
@@ -181,15 +185,15 @@ function ProfilePage({ pubkey }: { pubkey: string }) {
                       </p>
                     )}
 
-                    {metadata?.website && (
-                      <a 
-                        href={metadata.website}
+                    {websiteUrl && (
+                      <a
+                        href={websiteUrl.href}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-1 mt-2 text-sm text-brand hover:underline"
                       >
                         <ExternalLink className="h-3 w-3" />
-                        {new URL(metadata.website).hostname}
+                        {websiteUrl.hostname}
                       </a>
                     )}
 

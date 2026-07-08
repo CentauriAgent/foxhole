@@ -1,3 +1,4 @@
+import DOMPurify from 'dompurify';
 import { marked } from 'marked';
 
 // Configure marked for safe rendering
@@ -48,7 +49,9 @@ function protectNostrRefs(text: string): { text: string; entries: PlaceholderEnt
   const processed = text.replace(
     /nostr:(npub1|note1|nprofile1|nevent1|naddr1)([023456789acdefghjklmnpqrstuvwxyz]+)/g,
     (match) => {
-      const placeholder = `__NOSTR_REF_${counter++}__`;
+      // No underscores/asterisks in the placeholder — markdown would
+      // otherwise reformat it (e.g. __X__ becomes <strong>X</strong>).
+      const placeholder = `%%NOSTRREF${counter++}%%`;
       entries.push({ placeholder, original: match });
       return placeholder;
     }
@@ -68,31 +71,54 @@ function restoreNostrRefs(html: string, entries: PlaceholderEntry[]): string {
   return result;
 }
 
+// Runs on every sanitizeHtml() call via DOMPurify's hook system:
+// - force external links to open safely in a new tab
+// - require http(s) for media sources (DOMPurify's DATA_URI_TAGS default
+//   would otherwise let data: URIs through on img/video/source)
+DOMPurify.addHook('afterSanitizeAttributes', (node) => {
+  if (node.tagName === 'A') {
+    const href = node.getAttribute('href') ?? '';
+    if (/^https?:/i.test(href)) {
+      node.setAttribute('target', '_blank');
+      node.setAttribute('rel', 'noopener noreferrer');
+    }
+  }
+
+  if (['IMG', 'VIDEO', 'AUDIO', 'SOURCE'].includes(node.tagName)) {
+    const src = node.getAttribute('src') ?? '';
+    if (src && !/^https?:/i.test(src)) {
+      node.removeAttribute('src');
+    }
+  }
+});
+
 /**
- * Basic HTML sanitization — strip dangerous tags/attributes while keeping
- * safe markdown output. This is NOT a full sanitizer but good enough for
- * marked output which we control.
+ * Sanitize untrusted HTML with DOMPurify before it reaches
+ * dangerouslySetInnerHTML. Only http(s)/mailto and app-internal
+ * (single-slash relative) URLs are allowed in href/src, which blocks
+ * javascript:, data:, and protocol-relative (//host) URIs.
+ *
+ * Call this on the FINAL HTML string, after all post-processing —
+ * sanitizing earlier would leave later string transforms unprotected.
  */
-function sanitizeHtml(html: string): string {
-  // Remove script tags and event handlers
-  return html
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/\son\w+="[^"]*"/gi, '')
-    .replace(/\son\w+='[^']*'/gi, '')
-    .replace(/<iframe\b[^>]*>/gi, '')
-    .replace(/<\/iframe>/gi, '')
-    .replace(/<object\b[^>]*>/gi, '')
-    .replace(/<\/object>/gi, '')
-    .replace(/<embed\b[^>]*>/gi, '');
+export function sanitizeHtml(html: string): string {
+  return DOMPurify.sanitize(html, {
+    USE_PROFILES: { html: true },
+    FORBID_TAGS: ['style', 'form', 'input', 'button', 'textarea', 'select'],
+    ALLOWED_URI_REGEXP: /^(?:https?:|mailto:|\/(?!\/))/i,
+  });
 }
 
 /**
- * Render markdown content to HTML string.
+ * Render markdown content to an HTML string.
  * Protects Nostr references from being mangled by markdown processing.
+ *
+ * NOTE: the returned HTML is NOT yet sanitized. Callers must run the final
+ * HTML (after any additional post-processing) through sanitizeHtml() before
+ * rendering it with dangerouslySetInnerHTML.
  */
 export function renderMarkdown(content: string): string {
   const { text, entries } = protectNostrRefs(content);
   const html = marked.parse(text, { async: false }) as string;
-  const restored = restoreNostrRefs(html, entries);
-  return sanitizeHtml(restored);
+  return restoreNostrRefs(html, entries);
 }
