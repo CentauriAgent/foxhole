@@ -62,7 +62,7 @@ export function DocsLayout({ children }: DocsLayoutProps) {
                     className={cn(
                       "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors",
                       isActive
-                        ? "bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))] font-medium"
+                        ? "bg-brand/10 text-brand font-medium"
                         : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                     )}
                   >
@@ -87,7 +87,7 @@ export function DocsLayout({ children }: DocsLayoutProps) {
                     className={cn(
                       "inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm transition-colors border",
                       isActive
-                        ? "border-[hsl(var(--brand))] bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))] font-medium"
+                        ? "border-brand bg-brand/10 text-brand font-medium"
                         : "border-border text-muted-foreground hover:text-foreground hover:bg-muted/50"
                     )}
                   >

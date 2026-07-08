@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { MessageSquare, Bookmark } from 'lucide-react';
 import type { NostrEvent } from '@nostrify/nostrify';
@@ -30,8 +31,9 @@ interface PostCardProps {
 
 /**
  * Reddit-style post card with vote buttons, content, and metadata.
+ * Memoized: feed-level state changes only re-render cards whose props changed.
  */
-export function PostCard({ 
+export const PostCard = memo(function PostCard({ 
   post, 
   score = 0,
   replyCount = 0,
@@ -65,8 +67,8 @@ export function PostCard({
       className
     )}>
       {/* Vote Column */}
-      <div className="flex-shrink-0 pt-0.5">
-        <VoteButtons eventId={post.id} score={score} size={compact ? 'sm' : 'md'} />
+      <div className="shrink-0 pt-0.5">
+        <VoteButtons eventId={post.id} authorPubkey={post.pubkey} score={score} size={compact ? 'sm' : 'md'} />
       </div>
 
       {/* Content Column */}
@@ -91,14 +93,14 @@ export function PostCard({
           {title ? (
             <>
               <h3 className={cn(
-                "font-semibold text-foreground group-hover:text-[hsl(var(--brand))] transition-colors break-words",
+                "font-semibold text-foreground group-hover:text-brand transition-colors wrap-break-word",
                 compact ? "text-sm" : "text-base"
               )}>
                 {title}
               </h3>
               {!compact && bodyContent && (
                 <div className="mt-1 text-sm text-muted-foreground line-clamp-3">
-                  <NoteContent event={{ ...post, content: bodyContent }} />
+                  <NoteContent event={{ ...post, content: bodyContent }} disableLinks />
                 </div>
               )}
             </>
@@ -107,7 +109,7 @@ export function PostCard({
               "text-foreground",
               compact ? "text-sm line-clamp-2" : "text-sm line-clamp-4"
             )}>
-              <NoteContent event={post} />
+              <NoteContent event={post} disableLinks />
             </div>
           )}
         </Link>
@@ -119,7 +121,7 @@ export function PostCard({
 
         {/* Actions bar */}
         <div className="flex items-center gap-4 pt-1">
-          <ZapButton target={post as any} zapData={{ count: 0, totalSats }} />
+          <ZapButton target={post} zapData={{ count: 0, totalSats }} />
           <Link 
             to={postUrl}
             className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
@@ -136,7 +138,7 @@ export function PostCard({
               <Bookmark
                 className={cn(
                   "h-4 w-4",
-                  isBookmarked(post.id) && "fill-[hsl(var(--brand))] text-[hsl(var(--brand))]"
+                  isBookmarked(post.id) && "fill-brand text-brand"
                 )}
               />
             </button>
@@ -146,4 +148,4 @@ export function PostCard({
       </div>
     </article>
   );
-}
+});

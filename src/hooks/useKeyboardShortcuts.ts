@@ -63,13 +63,13 @@ export function useKeyboardShortcuts(options: UseKeyboardShortcutsOptions = {}) 
     // Clear all selections
     articles.forEach(el => {
       el.removeAttribute('data-kb-selected');
-      el.classList.remove('ring-2', 'ring-[hsl(var(--brand))]', 'ring-inset', 'bg-muted/80');
+      el.classList.remove('ring-2', 'ring-brand', 'ring-inset', 'bg-muted/80');
     });
     
     if (index >= 0 && index < articles.length) {
       const target = articles[index];
       target.setAttribute('data-kb-selected', 'true');
-      target.classList.add('ring-2', 'ring-[hsl(var(--brand))]', 'ring-inset', 'bg-muted/80');
+      target.classList.add('ring-2', 'ring-brand', 'ring-inset', 'bg-muted/80');
       target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   }, [getPostElements]);
@@ -78,7 +78,7 @@ export function useKeyboardShortcuts(options: UseKeyboardShortcutsOptions = {}) 
     const articles = getPostElements();
     articles.forEach(el => {
       el.removeAttribute('data-kb-selected');
-      el.classList.remove('ring-2', 'ring-[hsl(var(--brand))]', 'ring-inset', 'bg-muted/80');
+      el.classList.remove('ring-2', 'ring-brand', 'ring-inset', 'bg-muted/80');
     });
   }, [getPostElements]);
 

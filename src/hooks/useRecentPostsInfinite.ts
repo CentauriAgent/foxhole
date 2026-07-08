@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import type { NostrEvent } from '@nostrify/nostrify';
+import { useBatchAuthors } from './useBatchAuthors';
 import { useBatchZaps } from './useBatchZaps';
 import { useBatchPostVotes } from './usePostVotes';
 import { useBatchReplyCountsGlobal } from './useBatchReplyCountsGlobal';
@@ -24,17 +25,22 @@ export function useRecentPostsInfinite(options: UseRecentPostsInfiniteOptions = 
 
   const postsQuery = useFoxholePostsInfinite({ limit });
 
+  const pages = postsQuery.data?.pages;
+
   const posts = useMemo(() => {
-    if (!postsQuery.data?.pages) return [];
+    if (!pages) return [];
     const seen = new Set<string>();
-    return postsQuery.data.pages.flat().filter(event => {
+    return pages.flat().filter(event => {
       if (!event.id || seen.has(event.id)) return false;
       seen.add(event.id);
       return true;
     });
-  }, [postsQuery.data?.pages]);
+  }, [pages]);
 
   const postIds = posts.map((p) => p.id);
+
+  // Prefetch author profiles in one batched query (seeds the useAuthor cache)
+  useBatchAuthors(posts.map((p) => p.pubkey));
   const zapsQuery = useBatchZaps(postIds);
   const votesQuery = useBatchPostVotes(postIds);
   const repliesQuery = useBatchReplyCountsGlobal(postIds);

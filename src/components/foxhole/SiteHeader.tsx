@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useLocation } from 'react-router-dom';
-import { Flame, Home, BookOpen, Menu, Search, PenSquare, X, LayoutGrid, User, Settings, LogOut, UserPlus, ArrowRightLeft, Bell, Bookmark, Users, Sun, Moon, Monitor } from 'lucide-react';
+import { Flame, Home, BookOpen, Menu, Search, PenSquare, X, LayoutGrid, User, Settings, LogOut, UserPlus, Bell, Bookmark, Users, Sun, Moon, Monitor } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { nip19 } from 'nostr-tools';
 import { FoxIcon } from './FoxIcon';
 import { Button } from '@/components/ui/button';
 import { LoginArea } from '@/components/auth/LoginArea';
-import LoginDialog from '@/components/auth/LoginDialog';
+import AuthDialog from '@/components/auth/AuthDialog';
 import { useLoggedInAccounts } from '@/hooks/useLoggedInAccounts';
 import { useUnreadNotificationCount, getUnreadDisplay } from '@/hooks/useUnreadNotificationCount';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -47,10 +47,12 @@ export function SiteHeader() {
   const ThemeIcon = theme === 'dark' ? Moon : theme === 'light' ? Sun : Monitor;
   const themeLabel = theme === 'dark' ? 'Dark' : theme === 'light' ? 'Light' : 'System';
 
-  // Close menu on route change
-  useEffect(() => {
+  // Close menu on route change (state adjustment during render, per React docs)
+  const [prevPathname, setPrevPathname] = useState(location.pathname);
+  if (prevPathname !== location.pathname) {
+    setPrevPathname(location.pathname);
     setMobileMenuOpen(false);
-  }, [location.pathname]);
+  }
 
   // Prevent body scroll when menu is open
   useEffect(() => {
@@ -75,11 +77,11 @@ export function SiteHeader() {
           <Link to="/" className="flex items-center gap-2 mr-4 group">
             <div className={cn(
               "flex items-center justify-center w-9 h-9 rounded-lg",
-              "bg-[hsl(var(--brand))] text-[hsl(var(--brand-foreground))]"
+              "bg-brand text-brand-foreground"
             )}>
               <FoxIcon className="h-6 w-6" />
             </div>
-            <span className="font-bold text-xl tracking-tight text-[hsl(var(--brand))]">
+            <span className="font-bold text-xl tracking-tight text-brand">
               Foxhole
             </span>
           </Link>
@@ -93,7 +95,7 @@ export function SiteHeader() {
                 className={cn(
                   "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
                   isActive(item.to)
-                    ? "bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))]"
+                    ? "bg-brand/10 text-brand"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 )}
               >
@@ -115,7 +117,7 @@ export function SiteHeader() {
           
           {/* Create Post Button */}
           <Link to="/create">
-            <Button size="sm" className="hidden sm:inline-flex gap-1.5 bg-[hsl(var(--brand))] hover:bg-[hsl(var(--brand))]/90 text-[hsl(var(--brand-foreground))]">
+            <Button size="sm" className="hidden sm:inline-flex gap-1.5 bg-brand hover:bg-brand/90 text-brand-foreground">
               <PenSquare className="h-4 w-4" />
               <span>New Post</span>
             </Button>
@@ -138,7 +140,7 @@ export function SiteHeader() {
           
           {/* Community badge - hidden on mobile */}
           <div className="hidden lg:flex items-center gap-1.5 text-xs text-muted-foreground">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))]">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-brand/10 text-brand">
               <span>🦊</span>
               <span className="font-medium">Nostr Communities</span>
             </span>
@@ -165,11 +167,11 @@ export function SiteHeader() {
             <Link to="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2">
               <div className={cn(
                 "flex items-center justify-center w-9 h-9 rounded-lg",
-                "bg-[hsl(var(--brand))] text-[hsl(var(--brand-foreground))]"
+                "bg-brand text-brand-foreground"
               )}>
                 <FoxIcon className="h-6 w-6" />
               </div>
-              <span className="font-bold text-xl tracking-tight text-[hsl(var(--brand))]">
+              <span className="font-bold text-xl tracking-tight text-brand">
                 Foxhole
               </span>
             </Link>
@@ -192,7 +194,7 @@ export function SiteHeader() {
                   className={cn(
                     "flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium transition-colors",
                     isActive(item.to)
-                      ? "bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))]"
+                      ? "bg-brand/10 text-brand"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                   )}
                 >
@@ -211,7 +213,7 @@ export function SiteHeader() {
               <Link
                 to="/create"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))]"
+                className="flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium bg-brand/10 text-brand"
               >
                 <PenSquare className="h-5 w-5" />
                 <span>New Post</span>
@@ -304,7 +306,7 @@ export function SiteHeader() {
 
             {/* Community badge */}
             <div className="mt-8 pt-8 border-t border-border">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))] text-sm">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand/10 text-brand text-sm">
                 <span>🦊</span>
                 <span className="font-medium">Nostr Communities</span>
               </div>
@@ -315,10 +317,9 @@ export function SiteHeader() {
       )}
 
       {/* Login dialog for mobile "Add account" */}
-      <LoginDialog
+      <AuthDialog
         isOpen={mobileLoginOpen}
         onClose={() => setMobileLoginOpen(false)}
-        onLogin={() => setMobileLoginOpen(false)}
       />
     </>
   );

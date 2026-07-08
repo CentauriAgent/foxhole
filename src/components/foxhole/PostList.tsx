@@ -5,6 +5,7 @@ import { useBatchPostVotes } from '@/hooks/usePostVotes';
 import { useBatchReplyCounts } from '@/hooks/usePostReplies';
 import { useBatchReplyCountsGlobal } from '@/hooks/useBatchReplyCountsGlobal';
 import { useBatchZaps } from '@/hooks/useBatchZaps';
+import { useBatchAuthors } from '@/hooks/useBatchAuthors';
 import { getPostDen } from '@/lib/foxhole';
 import { FoxIcon } from './FoxIcon';
 
@@ -39,6 +40,9 @@ export function PostList({
   const replyCountsMap = allSameDen && firstDen ? denReplyCountsMap : globalReplyCountsMap;
   const { data: zapsMap } = useBatchZaps(eventIds);
 
+  // Prefetch author profiles in one batched query (seeds the useAuthor cache)
+  useBatchAuthors(posts.map(p => p.pubkey));
+
   if (isLoading) {
     return (
       <div className="space-y-2">
@@ -52,8 +56,8 @@ export function PostList({
   if (posts.length === 0) {
     return (
       <div className="text-center py-16 px-4">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[hsl(var(--brand))]/10 mb-4">
-          <FoxIcon className="h-8 w-8 text-[hsl(var(--brand))]" />
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand/10 mb-4">
+          <FoxIcon className="h-8 w-8 text-brand" />
         </div>
         <p className="text-muted-foreground">{emptyMessage}</p>
       </div>

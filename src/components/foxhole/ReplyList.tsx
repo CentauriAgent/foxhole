@@ -2,6 +2,7 @@ import type { NostrEvent } from '@nostrify/nostrify';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ReplyCard } from './ReplyCard';
 import { useBatchPostVotes } from '@/hooks/usePostVotes';
+import { useBatchAuthors } from '@/hooks/useBatchAuthors';
 import { FoxIcon } from './FoxIcon';
 
 interface ReplyListProps {
@@ -23,6 +24,9 @@ export function ReplyList({
   const eventIds = replies.map(r => r.id);
   const { data: votesMap } = useBatchPostVotes(eventIds);
 
+  // Prefetch author profiles in one batched query (seeds the useAuthor cache)
+  useBatchAuthors(replies.map(r => r.pubkey));
+
   if (isLoading) {
     return (
       <div className="space-y-2">
@@ -36,8 +40,8 @@ export function ReplyList({
   if (replies.length === 0) {
     return (
       <div className="text-center py-16 px-4">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[hsl(var(--brand))]/10 mb-4">
-          <FoxIcon className="h-8 w-8 text-[hsl(var(--brand))]" />
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand/10 mb-4">
+          <FoxIcon className="h-8 w-8 text-brand" />
         </div>
         <p className="text-muted-foreground">{emptyMessage}</p>
         <p className="text-sm text-muted-foreground/70 mt-1">

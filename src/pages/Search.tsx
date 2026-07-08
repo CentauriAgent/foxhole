@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { Search as SearchIcon, Sparkles, X, Globe, HardDrive } from 'lucide-react';
@@ -19,13 +19,13 @@ export default function Search() {
   const [query, setQuery] = useState(queryParam);
   const [den, setDen] = useState(denParam);
 
-  useEffect(() => {
+  // Sync inputs from URL params (state adjustment during render, per React docs)
+  const [prevParams, setPrevParams] = useState({ q: queryParam, den: denParam });
+  if (prevParams.q !== queryParam || prevParams.den !== denParam) {
+    setPrevParams({ q: queryParam, den: denParam });
     setQuery(queryParam);
-  }, [queryParam]);
-
-  useEffect(() => {
     setDen(denParam);
-  }, [denParam]);
+  }
 
   const { data: searchResult, isLoading } = useSearchPosts({
     query: queryParam,
@@ -70,7 +70,7 @@ export default function Search() {
         <div className="max-w-4xl mx-auto space-y-6">
           <header className="rounded-lg border border-border bg-card p-6">
             <div className="flex items-center gap-4 mb-6">
-              <div className="flex items-center justify-center w-16 h-16 rounded-xl bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))]">
+              <div className="flex items-center justify-center w-16 h-16 rounded-xl bg-brand/10 text-brand">
                 <SearchIcon className="h-8 w-8" />
               </div>
               <div className="flex-1">
@@ -105,7 +105,7 @@ export default function Search() {
                 />
               </div>
               
-              <Button type="submit" className="w-full h-11 gap-2 bg-[hsl(var(--brand))] hover:bg-[hsl(var(--brand))]/90 text-[hsl(var(--brand-foreground))]">
+              <Button type="submit" className="w-full h-11 gap-2 bg-brand hover:bg-brand/90 text-brand-foreground">
                 <SearchIcon className="h-4 w-4" />
                 Search
               </Button>
@@ -188,8 +188,8 @@ export default function Search() {
             <Card className="border-dashed">
               <CardContent className="py-16 px-8 text-center">
                 <div className="max-w-md mx-auto space-y-4">
-                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[hsl(var(--brand))]/10 mb-2">
-                    <SearchIcon className="h-10 w-10 text-[hsl(var(--brand))]" />
+                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-brand/10 mb-2">
+                    <SearchIcon className="h-10 w-10 text-brand" />
                   </div>
                   <div>
                     <h3 className="text-xl font-semibold mb-2">Start searching</h3>

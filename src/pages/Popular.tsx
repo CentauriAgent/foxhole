@@ -62,7 +62,7 @@ export default function Popular() {
           <div className="space-y-4">
             <header className="rounded-lg border border-border bg-card p-6">
               <div className="flex items-center gap-4">
-                <div className="flex items-center justify-center w-16 h-16 rounded-xl bg-[hsl(var(--upvote))]/10 text-[hsl(var(--upvote))]">
+                <div className="flex items-center justify-center w-16 h-16 rounded-xl bg-upvote/10 text-upvote">
                   <Flame className="h-8 w-8" />
                 </div>
                 <div className="flex-1">

@@ -2,6 +2,7 @@ import type { NostrFilter } from '@nostrify/nostrify';
 import { useNostr } from '@nostrify/react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { HASHTAG_KIND } from '@/lib/foxhole';
+import { getNextUntil } from '@/lib/pagination';
 
 
 interface UseFoxholePostsInfiniteOptions {
@@ -38,10 +39,8 @@ export function useFoxholePostsInfinite(options: UseFoxholePostsInfiniteOptions 
 
       return events;
     },
-    getNextPageParam: (lastPage) => {
-      if (lastPage.length === 0) return undefined;
-      return lastPage[lastPage.length - 1].created_at - 1;
-    },
+    getNextPageParam: (lastPage, _allPages, lastPageParam) =>
+      getNextUntil(lastPage, lastPageParam),
     initialPageParam: undefined as number | undefined,
     staleTime: 30 * 1000,
   });

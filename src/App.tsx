@@ -3,7 +3,7 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createHead, UnheadProvider } from '@unhead/react/client';
-import { InferSeoMetaPlugin } from '@unhead/addons';
+import { InferSeoMetaPlugin } from 'unhead/plugins';
 import { Suspense } from 'react';
 import NostrProvider from '@/components/NostrProvider';
 import { NostrSync } from '@/components/NostrSync';
@@ -13,6 +13,7 @@ import { NostrLoginProvider } from '@nostrify/react/login';
 import { AppProvider } from '@/components/AppProvider';
 import { NWCProvider } from '@/contexts/NWCContext';
 import { AppConfig } from '@/contexts/AppContext';
+import { APP_RELAYS } from '@/lib/appRelays';
 import AppRouter from './AppRouter';
 
 const head = createHead({
@@ -26,22 +27,24 @@ const queryClient = new QueryClient({
     queries: {
       refetchOnWindowFocus: false,
       staleTime: 60000, // 1 minute
-      gcTime: Infinity,
+      // Bound cache lifetime: with infinite feeds + per-chunk metric queries,
+      // gcTime: Infinity grew memory without bound over a session.
+      gcTime: 30 * 60 * 1000, // 30 minutes
     },
   },
 });
 
 const defaultConfig: AppConfig = {
   theme: "system",
-  relayMetadata: {
-    relays: [
-      { url: 'wss://relay.ditto.pub', read: true, write: true },
-      { url: 'wss://relay.primal.net', read: true, write: true },
-      { url: 'wss://relay.damus.io', read: true, write: true },
-      { url: 'wss://nos.lol', read: true, write: true },
+  relayMetadata: APP_RELAYS,
+  blossomServerMetadata: {
+    servers: [
+      'https://blossom.primal.net/',
+      'https://blossom.ditto.pub/',
     ],
     updatedAt: 0,
   },
+  useAppBlossomServers: true,
 };
 
 export function App() {
@@ -55,7 +58,11 @@ export function App() {
               <NWCProvider>
                 <TooltipProvider>
                   <Toaster />
-                  <Suspense>
+                  <Suspense
+                    fallback={
+                      <div className="flex min-h-screen items-center justify-center bg-background" />
+                    }
+                  >
                     <AppRouter />
                   </Suspense>
                 </TooltipProvider>

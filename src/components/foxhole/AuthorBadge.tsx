@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import { cn } from '@/lib/utils';
@@ -15,8 +16,9 @@ interface AuthorBadgeProps {
 
 /**
  * Display author name with avatar.
+ * Memoized: rendered once per feed row, so list re-renders skip unchanged rows.
  */
-export function AuthorBadge({ 
+export const AuthorBadge = memo(function AuthorBadge({ 
   pubkey, 
   event: _event,
   showAvatar = false,
@@ -55,4 +57,4 @@ export function AuthorBadge({
       <span className="truncate max-w-[150px]">{displayName}</span>
     </Link>
   );
-}
+});

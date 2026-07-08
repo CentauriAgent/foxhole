@@ -5,7 +5,6 @@ import { Users, LogIn } from 'lucide-react';
 import { SiteHeader, PopularPostCard } from '@/components/foxhole';
 import { useFollowingFeed } from '@/hooks/useFollowingFeed';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Button } from '@/components/ui/button';
 import { useInView } from 'react-intersection-observer';
 
 export default function Following() {
@@ -74,11 +73,11 @@ export default function Following() {
               </p>
               <p className="text-sm text-muted-foreground/70 mt-2">
                 Find users to follow on the{' '}
-                <Link to="/popular" className="text-[hsl(var(--brand))] hover:underline">
+                <Link to="/popular" className="text-brand hover:underline">
                   Popular
                 </Link>{' '}
                 page or by{' '}
-                <Link to="/search" className="text-[hsl(var(--brand))] hover:underline">
+                <Link to="/search" className="text-brand hover:underline">
                   searching
                 </Link>.
               </p>

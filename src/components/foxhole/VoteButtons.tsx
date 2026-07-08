@@ -1,15 +1,20 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatCount } from '@/lib/foxhole';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useUserVote } from '@/hooks/useUserVote';
+import { useToast } from '@/hooks/useToast';
 import { useQueryClient } from '@tanstack/react-query';
 
 interface VoteButtonsProps {
   eventId: string;
   score: number;
+  /** Pubkey of the voted event's author — included as NIP-25 'p' tag */
+  authorPubkey?: string;
+  /** Kind of the voted event — included as NIP-25 'k' tag (default 1111) */
+  targetKind?: number;
   upvotes?: number;
   downvotes?: number;
   className?: string;
@@ -26,25 +31,21 @@ interface VoteButtonsProps {
 export function VoteButtons({ 
   eventId,
   score, 
+  authorPubkey,
+  targetKind = 1111,
   className,
   size = 'md',
 }: VoteButtonsProps) {
   const { user } = useCurrentUser();
   const { mutate: publishEvent } = useNostrPublish();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { data: existingVote, isLoading: voteLoading } = useUserVote(eventId);
+  const { data: existingVote } = useUserVote(eventId);
 
-  // Local vote state: tracks optimistic UI. null = no override, synced from server.
+  // Local vote state: optimistic UI override. undefined = no override, fall back to server data.
   const [localVote, setLocalVote] = useState<'up' | 'down' | null | undefined>(undefined);
 
-  // Sync local vote from server data once loaded
-  useEffect(() => {
-    if (!voteLoading && existingVote !== undefined && localVote === undefined) {
-      setLocalVote(existingVote);
-    }
-  }, [existingVote, voteLoading, localVote]);
-
-  // The effective vote is local override if set, otherwise server data
+  // The effective vote is the local override if set, otherwise server data
   const effectiveVote = localVote !== undefined ? localVote : (existingVote ?? null);
 
   // The server score already includes the user's existing vote.
@@ -67,6 +68,7 @@ export function VoteButtons({
     // If already voted this direction, do nothing (no toggle off)
     if (effectiveVote === direction) return;
 
+    const previousVote = localVote;
     setLocalVote(direction);
 
     publishEvent({
@@ -74,14 +76,28 @@ export function VoteButtons({
       content: direction === 'up' ? '+' : '-',
       tags: [
         ['e', eventId],
+        ...(authorPubkey ? [['p', authorPubkey]] : []),
+        ['k', String(targetKind)],
       ],
       created_at: Math.floor(Date.now() / 1000),
-    } as any, {
+    }, {
       onSuccess: () => {
         // Invalidate caches so scores refresh
         queryClient.invalidateQueries({ queryKey: ['foxhole', 'user-vote', eventId] });
         queryClient.invalidateQueries({ queryKey: ['foxhole', 'votes', eventId] });
-        queryClient.invalidateQueries({ queryKey: ['foxhole', 'batch-votes'] });
+        // Mark batch scores stale without an immediate refetch storm across
+        // every cached chunk — they refresh on their next natural fetch.
+        queryClient.invalidateQueries({ queryKey: ['foxhole', 'batch-votes'], refetchType: 'none' });
+      },
+      onError: (error) => {
+        // Roll back the optimistic vote so the UI doesn't lie about a vote
+        // that never reached the relays.
+        setLocalVote(previousVote);
+        toast({
+          title: 'Vote failed',
+          description: error instanceof Error ? error.message : 'Could not publish your vote. Please try again.',
+          variant: 'destructive',
+        });
       },
     });
   };
@@ -97,10 +113,10 @@ export function VoteButtons({
         title={user ? "Dig" : "Sign in to vote"}
         className={cn(
           "p-0.5 rounded transition-colors",
-          user && "hover:bg-[hsl(var(--upvote))]/10 cursor-pointer",
+          user && "hover:bg-upvote/10 cursor-pointer",
           !user && "cursor-default",
-          effectiveVote === 'up' ? "text-[hsl(var(--upvote))] bg-[hsl(var(--upvote))]/10" :
-          isPositive ? "text-[hsl(var(--upvote))]" : "text-muted-foreground/60"
+          effectiveVote === 'up' ? "text-upvote bg-upvote/10" :
+          isPositive ? "text-upvote" : "text-muted-foreground/60"
         )}
       >
         <ChevronUp className={iconSize} strokeWidth={2.5} />
@@ -109,8 +125,8 @@ export function VoteButtons({
       <span className={cn(
         "font-semibold tabular-nums",
         textSize,
-        (isPositive || effectiveVote === 'up') && "text-[hsl(var(--upvote))]",
-        (isNegative || effectiveVote === 'down') && "text-[hsl(var(--downvote))]",
+        (isPositive || effectiveVote === 'up') && "text-upvote",
+        (isNegative || effectiveVote === 'down') && "text-downvote",
         !isPositive && !isNegative && !effectiveVote && "text-muted-foreground"
       )}>
         {formatCount(displayScore)}
@@ -122,10 +138,10 @@ export function VoteButtons({
         title={user ? "Bury" : "Sign in to vote"}
         className={cn(
           "p-0.5 rounded transition-colors",
-          user && "hover:bg-[hsl(var(--downvote))]/10 cursor-pointer",
+          user && "hover:bg-downvote/10 cursor-pointer",
           !user && "cursor-default",
-          effectiveVote === 'down' ? "text-[hsl(var(--downvote))] bg-[hsl(var(--downvote))]/10" :
-          isNegative ? "text-[hsl(var(--downvote))]" : "text-muted-foreground/60"
+          effectiveVote === 'down' ? "text-downvote bg-downvote/10" :
+          isNegative ? "text-downvote" : "text-muted-foreground/60"
         )}
       >
         <ChevronDown className={iconSize} strokeWidth={2.5} />

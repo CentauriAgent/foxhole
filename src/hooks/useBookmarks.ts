@@ -71,7 +71,7 @@ export function useBookmarks() {
         content: bookmarkEvent?.content ?? '',
         tags: newTags,
         created_at: Math.floor(Date.now() / 1000),
-      } as any);
+      });
 
       // Invalidate to refetch the updated list
       queryClient.invalidateQueries({ queryKey: ['bookmarks', pubkey] });

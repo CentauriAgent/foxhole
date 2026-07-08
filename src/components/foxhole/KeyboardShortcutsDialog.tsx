@@ -41,7 +41,7 @@ const shortcuts = [
 
 function KeyBadge({ children }: { children: string }) {
   return (
-    <kbd className="inline-flex items-center justify-center min-w-[24px] h-6 px-1.5 text-xs font-mono font-medium rounded border border-border bg-muted text-foreground shadow-sm">
+    <kbd className="inline-flex items-center justify-center min-w-[24px] h-6 px-1.5 text-xs font-mono font-medium rounded border border-border bg-muted text-foreground shadow-xs">
       {children}
     </kbd>
   );

@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { ChevronLeft, MessageSquare } from 'lucide-react';
-import { SiteHeader, Sidebar, VoteButtons, AuthorBadge, ThreadedReplies, FoxIcon } from '@/components/foxhole';
+import { SiteHeader, VoteButtons, AuthorBadge, ThreadedReplies, FoxIcon } from '@/components/foxhole';
 import { ZapButton } from '@/components/ZapButton';
 import { NostrCommentForm } from '@/components/foxhole/NostrCommentForm';
 import { NoteContent } from '@/components/NoteContent';
@@ -17,14 +17,14 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { formatRelativeTime, getPostDen } from '@/lib/foxhole';
 import { useMuteList } from '@/hooks/useMuteList';
 import { useLinkPreview } from '@/hooks/useLinkPreview';
-import LoginDialog from '@/components/auth/LoginDialog';
+import AuthDialog from '@/components/auth/AuthDialog';
 import NotFound from './NotFound';
 
 export default function Post() {
   const { den: den, eventId } = useParams<{ den: string; eventId: string }>();
   const [showLoginDialog, setShowLoginDialog] = useState(false);
 
-  const { data: post, isLoading: postLoading, error: postError } = usePost(eventId);
+  const { data: post, isLoading: postLoading } = usePost(eventId);
   const { data: votes } = usePostVotes(eventId);
   const { data: repliesData, isLoading: repliesLoading } = usePostReplies(eventId, den || '');
   const { user } = useCurrentUser();
@@ -36,11 +36,12 @@ export default function Post() {
   const { data: replyVotesMap } = useBatchPostVotes(replyIds);
 
   // Filter muted users from replies
+  const directReplies = repliesData?.directReplies;
   const filteredDirectReplies = useMemo(() => {
-    if (!repliesData?.directReplies) return [];
-    if (!mutedPubkeys?.size) return repliesData.directReplies;
-    return repliesData.directReplies.filter(r => !mutedPubkeys.has(r.pubkey));
-  }, [repliesData?.directReplies, mutedPubkeys]);
+    if (!directReplies) return [];
+    if (!mutedPubkeys?.size) return directReplies;
+    return directReplies.filter(r => !mutedPubkeys.has(r.pubkey));
+  }, [directReplies, mutedPubkeys]);
 
   const filteredGetDirectReplies = useCallback((parentId: string) => {
     if (!repliesData) return [];
@@ -58,7 +59,9 @@ export default function Post() {
     description: post?.content.slice(0, 160) || 'View post on Foxhole',
   });
 
-  if (postError || (!postLoading && !post)) {
+  // Only 404 when loading truly finished with no data — a failed background
+  // refetch must not blank a post we already have cached.
+  if (!postLoading && !post) {
     return <NotFound />;
   }
 
@@ -88,8 +91,8 @@ export default function Post() {
               <article className="rounded-lg border border-border bg-card p-4">
                 <div className="flex gap-4">
                   {/* Vote Column */}
-                  <div className="flex-shrink-0">
-                    <VoteButtons eventId={eventId!} score={votes?.score ?? 0} />
+                  <div className="shrink-0">
+                    <VoteButtons eventId={eventId!} authorPubkey={post?.pubkey} score={votes?.score ?? 0} />
                   </div>
 
                   {/* Content Column */}
@@ -113,7 +116,7 @@ export default function Post() {
 
                     {/* Stats */}
                     <div className="flex items-center gap-4 pt-2 text-sm text-muted-foreground">
-                      <ZapButton target={post as any} />
+                      <ZapButton target={post} />
                       <span className="inline-flex items-center gap-1.5">
                         <MessageSquare className="h-4 w-4" />
                         {repliesData?.replyCount ?? 0} comments
@@ -175,8 +178,8 @@ export default function Post() {
                   </div>
                 ) : (
                   <div className="p-8 text-center space-y-3">
-                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[hsl(var(--brand))]/10 mb-3">
-                      <FoxIcon className="h-6 w-6 text-[hsl(var(--brand))]" />
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-brand/10 mb-3">
+                      <FoxIcon className="h-6 w-6 text-brand" />
                     </div>
                     <p className="text-muted-foreground">No comments yet</p>
                     {!user && (
@@ -193,10 +196,9 @@ export default function Post() {
               </div>
             </section>
             
-            <LoginDialog 
-              isOpen={showLoginDialog} 
+            <AuthDialog
+              isOpen={showLoginDialog}
               onClose={() => setShowLoginDialog(false)}
-              onLogin={() => setShowLoginDialog(false)}
             />
           </div>
 

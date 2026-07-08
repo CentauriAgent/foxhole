@@ -31,12 +31,12 @@ import { useToast } from '@/hooks/useToast';
 import { useZaps } from '@/hooks/useZaps';
 import { useWallet } from '@/hooks/useWallet';
 import { useIsMobile } from '@/hooks/useIsMobile';
-import type { Event } from 'nostr-tools';
+import type { NostrEvent } from '@nostrify/nostrify';
 import QRCode from 'qrcode';
 import type { WebLNProvider } from "@webbtc/webln-types";
 
 interface ZapDialogProps {
-  target: Event;
+  target: NostrEvent;
   children?: React.ReactNode;
   className?: string;
 }
@@ -62,7 +62,7 @@ interface ZapContentProps {
   openInWallet: () => void;
   setAmount: (amount: number | string) => void;
   setComment: (comment: string) => void;
-  inputRef: React.RefObject<HTMLInputElement>;
+  inputRef: React.RefObject<HTMLInputElement | null>;
   zap: (amount: number, comment: string) => void;
 }
 
@@ -243,17 +243,11 @@ export function ZapDialog({ target, children, className }: ZapDialogProps) {
   const { webln, activeNWC } = useWallet();
   const { zap, isZapping, invoice, setInvoice } = useZaps(target, webln, activeNWC, () => setOpen(false));
   const [amount, setAmount] = useState<number | string>(100);
-  const [comment, setComment] = useState<string>('');
+  const [comment, setComment] = useState<string>('Zapped with Foxhole!');
   const [copied, setCopied] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   const inputRef = useRef<HTMLInputElement>(null);
   const isMobile = useIsMobile();
-
-  useEffect(() => {
-    if (target) {
-      setComment('Zapped with Foxhole!');
-    }
-  }, [target]);
 
   // Generate QR code
   useEffect(() => {
@@ -311,20 +305,14 @@ export function ZapDialog({ target, children, className }: ZapDialogProps) {
     }
   };
 
-  useEffect(() => {
-    if (open) {
-      setAmount(100);
-      setInvoice(null);
-      setCopied(false);
-      setQrCodeUrl('');
-    } else {
-      // Clean up state when dialog closes
-      setAmount(100);
-      setInvoice(null);
-      setCopied(false);
-      setQrCodeUrl('');
-    }
-  }, [open, setInvoice]);
+  // Reset transient state whenever the dialog opens or closes.
+  const handleOpenChange = (newOpen: boolean) => {
+    setAmount(100);
+    setInvoice(null);
+    setCopied(false);
+    setQrCodeUrl('');
+    setOpen(newOpen);
+  };
 
   const handleZap = () => {
     const finalAmount = typeof amount === 'string' ? parseInt(amount, 10) : amount;
@@ -357,14 +345,7 @@ export function ZapDialog({ target, children, className }: ZapDialogProps) {
     return (
       <Drawer
         open={open}
-        onOpenChange={(newOpen) => {
-          // Reset invoice when closing
-          if (!newOpen) {
-            setInvoice(null);
-            setQrCodeUrl('');
-          }
-          setOpen(newOpen);
-        }}
+        onOpenChange={handleOpenChange}
         dismissible={true} // Always allow dismissal via drag
         snapPoints={invoice ? [0.5, 0.75, 0.98] : [0.98]}
         activeSnapPoint={invoice ? 0.98 : 0.98}
@@ -413,10 +394,10 @@ export function ZapDialog({ target, children, className }: ZapDialogProps) {
               </Button>
             </DrawerClose>
 
-            <DrawerTitle className="text-lg break-words pt-2">
+            <DrawerTitle className="text-lg wrap-break-word pt-2">
               {invoice ? 'Lightning Payment' : 'Send a Zap'}
             </DrawerTitle>
-            <DrawerDescription className="text-sm break-words text-center">
+            <DrawerDescription className="text-sm wrap-break-word text-center">
               {invoice ? (
                 'Pay with Bitcoin Lightning Network'
               ) : (
@@ -433,7 +414,7 @@ export function ZapDialog({ target, children, className }: ZapDialogProps) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <div className={`cursor-pointer ${className || ''}`}>
           {children}
@@ -441,10 +422,10 @@ export function ZapDialog({ target, children, className }: ZapDialogProps) {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] max-h-[95vh] overflow-hidden" data-testid="zap-modal">
         <DialogHeader>
-          <DialogTitle className="text-lg break-words">
+          <DialogTitle className="text-lg wrap-break-word">
             {invoice ? 'Lightning Payment' : 'Send a Zap'}
           </DialogTitle>
-          <DialogDescription className="text-sm text-center break-words">
+          <DialogDescription className="text-sm text-center wrap-break-word">
             {invoice ? (
               'Pay with Bitcoin Lightning Network'
             ) : (

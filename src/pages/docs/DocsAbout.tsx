@@ -23,7 +23,7 @@ export default function DocsAbout() {
     <DocsLayout>
       <div className="not-prose">
         <div className="flex items-center gap-4 mb-6">
-          <FoxIcon className="h-12 w-12 text-[hsl(var(--brand))]" />
+          <FoxIcon className="h-12 w-12 text-brand" />
           <div>
             <h1 className="text-3xl md:text-4xl font-bold tracking-tight">About Foxhole</h1>
             <p className="text-lg text-muted-foreground mt-1">Community-driven, open source, decentralized</p>
@@ -56,7 +56,7 @@ export default function DocsAbout() {
         <div className="grid gap-4 md:grid-cols-2 mb-12">
           {links.map((link) => (
             <a key={link.title} href={link.url} target="_blank" rel="noopener noreferrer">
-              <Card className="h-full hover:border-[hsl(var(--brand))]/50 transition-colors">
+              <Card className="h-full hover:border-brand/50 transition-colors">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base flex items-center gap-2">
                     <link.icon className="h-4 w-4" />

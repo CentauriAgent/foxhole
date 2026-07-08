@@ -5,9 +5,11 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { HASHTAG_KIND, isTopLevelPost } from '@/lib/foxhole';
 import { useFollows } from './useFollows';
 import { useCurrentUser } from './useCurrentUser';
+import { useBatchAuthors } from './useBatchAuthors';
 import { useBatchZaps } from './useBatchZaps';
 import { useBatchPostVotes } from './usePostVotes';
 import { useBatchReplyCountsGlobal } from './useBatchReplyCountsGlobal';
+import { getNextUntil } from '@/lib/pagination';
 
 export interface FollowingPost {
   event: NostrEvent;
@@ -54,26 +56,29 @@ export function useFollowingFeed(options: UseFollowingFeedOptions = {}) {
 
       return events.filter(isTopLevelPost).sort((a, b) => b.created_at - a.created_at);
     },
-    getNextPageParam: (lastPage) => {
-      if (lastPage.length === 0) return undefined;
-      return lastPage[lastPage.length - 1].created_at - 1;
-    },
+    getNextPageParam: (lastPage, _allPages, lastPageParam) =>
+      getNextUntil(lastPage, lastPageParam),
     initialPageParam: undefined as number | undefined,
     enabled: !!user && followList.length > 0,
     staleTime: 30 * 1000,
   });
 
+  const pages = postsQuery.data?.pages;
+
   const posts = useMemo(() => {
-    if (!postsQuery.data?.pages) return [];
+    if (!pages) return [];
     const seen = new Set<string>();
-    return postsQuery.data.pages.flat().filter(event => {
+    return pages.flat().filter(event => {
       if (!event.id || seen.has(event.id)) return false;
       seen.add(event.id);
       return true;
     });
-  }, [postsQuery.data?.pages]);
+  }, [pages]);
 
   const postIds = posts.map((p) => p.id);
+
+  // Prefetch author profiles in one batched query (seeds the useAuthor cache)
+  useBatchAuthors(posts.map((p) => p.pubkey));
   const zapsQuery = useBatchZaps(postIds);
   const votesQuery = useBatchPostVotes(postIds);
   const repliesQuery = useBatchReplyCountsGlobal(postIds);

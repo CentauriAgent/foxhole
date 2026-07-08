@@ -79,7 +79,7 @@ export function useDenPins(denName: string | undefined) {
           ...newPins.map((id) => ['e', id]),
         ],
         created_at: Math.floor(Date.now() / 1000),
-      } as any);
+      });
 
       queryClient.invalidateQueries({ queryKey: ['foxhole', 'den-pins', denName] });
     },
@@ -102,7 +102,7 @@ export function useDenPins(denName: string | undefined) {
           ...newPins.map((id) => ['e', id]),
         ],
         created_at: Math.floor(Date.now() / 1000),
-      } as any);
+      });
 
       queryClient.invalidateQueries({ queryKey: ['foxhole', 'den-pins', denName] });
     },

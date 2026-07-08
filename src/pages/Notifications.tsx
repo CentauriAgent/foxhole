@@ -49,7 +49,7 @@ export default function Notifications() {
         {/* Header */}
         <header className="rounded-lg border border-border bg-card p-6 mb-4">
           <div className="flex items-center gap-4">
-            <div className="flex items-center justify-center w-16 h-16 rounded-xl bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))]">
+            <div className="flex items-center justify-center w-16 h-16 rounded-xl bg-brand/10 text-brand">
               <Bell className="h-8 w-8" />
             </div>
             <div className="flex-1">
@@ -159,7 +159,7 @@ function ReplyNotification({ item }: { item: NotificationItem }) {
 
   return (
     <div className="p-4 flex gap-3 hover:bg-muted/30 transition-colors">
-      <Link to={`/${npub}`} className="flex-shrink-0">
+      <Link to={`/${npub}`} className="shrink-0">
         <Avatar className="h-9 w-9">
           <AvatarImage src={metadata?.picture} alt={displayName} />
           <AvatarFallback className="text-xs font-medium bg-muted text-muted-foreground">
@@ -183,7 +183,7 @@ function ReplyNotification({ item }: { item: NotificationItem }) {
           {formatRelativeTime(item.timestamp)}
         </time>
       </div>
-      <MessageSquare className="h-4 w-4 text-[hsl(var(--brand))] flex-shrink-0 mt-1" />
+      <MessageSquare className="h-4 w-4 text-brand shrink-0 mt-1" />
     </div>
   );
 }
@@ -198,7 +198,7 @@ function ZapNotification({ item }: { item: NotificationItem }) {
 
   return (
     <div className="p-4 flex gap-3 hover:bg-muted/30 transition-colors">
-      <div className="flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-full bg-amber-500/10">
+      <div className="shrink-0 flex items-center justify-center w-9 h-9 rounded-full bg-amber-500/10">
         <Zap className="h-5 w-5 text-amber-500 fill-amber-500" />
       </div>
       <div className="flex-1 min-w-0">
@@ -230,7 +230,7 @@ function ReactionNotification({ item }: { item: NotificationItem }) {
 
   return (
     <div className="p-4 flex gap-3 hover:bg-muted/30 transition-colors">
-      <Link to={`/${npub}`} className="flex-shrink-0">
+      <Link to={`/${npub}`} className="shrink-0">
         <Avatar className="h-9 w-9">
           <AvatarImage src={metadata?.picture} alt={displayName} />
           <AvatarFallback className="text-xs font-medium bg-muted text-muted-foreground">
@@ -249,7 +249,7 @@ function ReactionNotification({ item }: { item: NotificationItem }) {
           {formatRelativeTime(item.timestamp)}
         </time>
       </div>
-      <span className="text-lg flex-shrink-0 mt-0.5">{reactionEmoji}</span>
+      <span className="text-lg shrink-0 mt-0.5">{reactionEmoji}</span>
     </div>
   );
 }

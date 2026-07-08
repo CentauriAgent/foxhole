@@ -1,7 +1,6 @@
 import type { NostrFilter } from '@nostrify/nostrify';
 import { useNostr } from '@nostrify/react';
-import { useQuery } from '@tanstack/react-query';
-import { hashStringArray } from '@/lib/utils';
+import { useChunkedBatchQuery } from '@/hooks/useChunkedBatchQuery';
 
 /**
  * Get reply counts for multiple posts efficiently across all dens.
@@ -9,29 +8,21 @@ import { hashStringArray } from '@/lib/utils';
 export function useBatchReplyCountsGlobal(eventIds: string[]) {
   const { nostr } = useNostr();
 
-  // Create compact stable query key via hash
-  const queryKeyHash = hashStringArray(eventIds);
-
-  return useQuery({
-    queryKey: ['foxhole', 'batch-reply-counts-global', queryKeyHash],
-    queryFn: async ({ signal }) => {
-      if (eventIds.length === 0) {
-        return new Map<string, number>();
-      }
-
+  return useChunkedBatchQuery<number>(
+    ['foxhole', 'batch-reply-counts-global'],
+    eventIds,
+    async (chunk, signal) => {
       const filter: NostrFilter = {
         kinds: [1111],
         '#k': ['1111'],
-        '#e': eventIds,
+        '#e': chunk,
         limit: 500,
       };
 
-      const events = await nostr.query([filter], {
-        signal: AbortSignal.any([signal, AbortSignal.timeout(5000)]),
-      });
+      const events = await nostr.query([filter], { signal });
 
       const countMap = new Map<string, number>();
-      for (const id of eventIds) {
+      for (const id of chunk) {
         countMap.set(id, 0);
       }
       for (const event of events) {
@@ -43,7 +34,5 @@ export function useBatchReplyCountsGlobal(eventIds: string[]) {
       }
       return countMap;
     },
-    enabled: eventIds.length > 0,
-    staleTime: 60 * 1000,
-  });
+  );
 }

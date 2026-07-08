@@ -51,13 +51,13 @@ export const PopularPostCard = memo(function PopularPostCard({
       className
     )}>
       {/* Rank + Vote Column */}
-      <div className="flex-shrink-0 flex items-start gap-2">
+      <div className="shrink-0 flex items-start gap-2">
         {rank !== undefined && (
           <span className="text-lg font-bold text-muted-foreground/50 w-6 text-right pt-1">
             {rank}
           </span>
         )}
-        <VoteButtons eventId={post.id} score={metrics.score} size="sm" />
+        <VoteButtons eventId={post.id} authorPubkey={post.pubkey} score={metrics.score} size="sm" />
       </div>
 
       {/* Content Column */}
@@ -81,18 +81,18 @@ export const PopularPostCard = memo(function PopularPostCard({
         <Link to={postUrl} className="block">
           {title ? (
             <>
-              <h3 className="font-semibold text-sm text-foreground group-hover:text-[hsl(var(--brand))] transition-colors break-words">
+              <h3 className="font-semibold text-sm text-foreground group-hover:text-brand transition-colors wrap-break-word">
                 {title}
               </h3>
               {bodyContent && (
                 <div className="mt-1 text-sm text-muted-foreground line-clamp-2">
-                  <NoteContent event={{ ...post, content: bodyContent }} />
+                  <NoteContent event={{ ...post, content: bodyContent }} disableLinks />
                 </div>
               )}
             </>
           ) : (
             <div className="text-sm text-foreground line-clamp-3">
-              <NoteContent event={post} />
+              <NoteContent event={post} disableLinks />
             </div>
           )}
         </Link>
@@ -100,7 +100,7 @@ export const PopularPostCard = memo(function PopularPostCard({
         {/* Engagement bar */}
         <div className="flex items-center gap-4 pt-1">
           {/* Zap button */}
-          <ZapButton target={post as any} zapData={{ count: metrics.zapCount, totalSats: metrics.totalSats }} />
+          <ZapButton target={post} zapData={{ count: metrics.zapCount, totalSats: metrics.totalSats }} />
           
           {/* Comments */}
           <Link 

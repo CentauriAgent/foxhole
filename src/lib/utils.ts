@@ -24,3 +24,21 @@ export function hashStringArray(items: string[]): string {
   // Include count to distinguish sets of different sizes that hash-collide
   return `${(hash >>> 0).toString(36)}_${sorted.length}`;
 }
+
+/**
+ * Parse an untrusted URL and return it only if it is a valid http(s) URL.
+ * Returns null for anything else (javascript:, data:, malformed input, …).
+ * Use for user-controlled URLs rendered as href/src.
+ */
+export function safeHttpUrl(url: string | undefined | null): URL | null {
+  if (!url) return null;
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+      return parsed;
+    }
+  } catch {
+    // fall through
+  }
+  return null;
+}

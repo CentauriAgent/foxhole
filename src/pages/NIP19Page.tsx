@@ -2,7 +2,7 @@ import { nip19 } from 'nostr-tools';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { User, ExternalLink, MessageSquare, FileText, Zap, Settings, UserPlus, UserMinus } from 'lucide-react';
-import { SiteHeader, Sidebar, PostList, ReplyList, FoxIcon } from '@/components/foxhole';
+import { SiteHeader, Sidebar, PostList, ReplyList } from '@/components/foxhole';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -15,7 +15,7 @@ import { useAuthor } from '@/hooks/useAuthor';
 import { useUserPosts } from '@/hooks/useUserPosts';
 import { useUserReplies } from '@/hooks/useUserReplies';
 import { genUserName } from '@/lib/genUserName';
-import { cn } from '@/lib/utils';
+import { safeHttpUrl } from '@/lib/utils';
 import { useIsFollowing, useFollow, useUnfollow } from '@/hooks/useFollows';
 import { useToast } from '@/hooks/useToast';
 import NotFound from './NotFound';
@@ -71,6 +71,9 @@ function ProfilePage({ pubkey }: { pubkey: string }) {
   
   const metadata = author?.metadata;
   const displayName = metadata?.name || metadata?.display_name || genUserName(pubkey);
+  // Only render the website link if it parses as a real http(s) URL
+  // (profile metadata is attacker-controlled; blocks javascript: hrefs).
+  const websiteUrl = safeHttpUrl(metadata?.website);
   const npub = nip19.npubEncode(pubkey);
   
   const handleTabChange = (value: string) => {
@@ -97,44 +100,20 @@ function ProfilePage({ pubkey }: { pubkey: string }) {
             {authorLoading ? (
               <ProfileHeaderSkeleton />
             ) : (
-              <header className={cn(
-                "rounded-lg border bg-card p-6",
-                "border-border"
-              )}>
+              <header className="rounded-lg border bg-card p-6 border-border">
                 <div className="flex items-start gap-4">
-                  <Avatar className={cn(
-                    "h-20 w-20 ring-2",
-                    false 
-                      ? "ring-[hsl(var(--brand))]/50" 
-                      : "ring-border"
-                  )}>
+                  <Avatar className="h-20 w-20 ring-2 ring-border">
                     <AvatarImage src={metadata?.picture} alt={displayName} />
-                    <AvatarFallback className={cn(
-                      false 
-                        ? "bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))]" 
-                        : "bg-muted"
-                    )}>
-                      {false ? <FoxIcon className="h-10 w-10" /> : <User className="h-8 w-8" />}
+                    <AvatarFallback className="bg-muted">
+                      <User className="h-8 w-8" />
                     </AvatarFallback>
                   </Avatar>
-                  
+
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <h1 className={cn(
-                        "text-2xl font-bold truncate",
-                        false && "text-[hsl(var(--brand))]"
-                      )}>
+                      <h1 className="text-2xl font-bold truncate">
                         {displayName}
                       </h1>
-                      {false && (
-                        <span className={cn(
-                          "inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider px-2 py-1 rounded",
-                          "bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))]"
-                        )}>
-                          <FoxIcon className="h-3 w-3" />
-                          Community Member
-                        </span>
-                      )}
                       {metadata?.lud16 && (
                         <ProfileZapDialog
                           pubkey={pubkey}
@@ -206,15 +185,15 @@ function ProfilePage({ pubkey }: { pubkey: string }) {
                       </p>
                     )}
 
-                    {metadata?.website && (
-                      <a 
-                        href={metadata.website}
+                    {websiteUrl && (
+                      <a
+                        href={websiteUrl.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 mt-2 text-sm text-[hsl(var(--brand))] hover:underline"
+                        className="inline-flex items-center gap-1 mt-2 text-sm text-brand hover:underline"
                       >
                         <ExternalLink className="h-3 w-3" />
-                        {new URL(metadata.website).hostname}
+                        {websiteUrl.hostname}
                       </a>
                     )}
 
@@ -232,7 +211,7 @@ function ProfilePage({ pubkey }: { pubkey: string }) {
                 <TabsList className="w-full justify-start bg-transparent border-b border-border rounded-none h-auto p-0 gap-0">
                   <TabsTrigger 
                     value="posts" 
-                    className="relative rounded-none border-b-2 border-transparent data-[state=active]:border-[hsl(var(--brand))] data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 gap-2"
+                    className="relative rounded-none border-b-2 border-transparent data-[state=active]:border-brand data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 gap-2"
                   >
                     <FileText className="h-4 w-4" />
                     <span>Posts</span>
@@ -244,7 +223,7 @@ function ProfilePage({ pubkey }: { pubkey: string }) {
                   </TabsTrigger>
                   <TabsTrigger 
                     value="replies" 
-                    className="relative rounded-none border-b-2 border-transparent data-[state=active]:border-[hsl(var(--brand))] data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 gap-2"
+                    className="relative rounded-none border-b-2 border-transparent data-[state=active]:border-brand data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 gap-2"
                   >
                     <MessageSquare className="h-4 w-4" />
                     <span>Replies</span>

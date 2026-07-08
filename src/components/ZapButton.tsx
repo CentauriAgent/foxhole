@@ -4,10 +4,10 @@ import { useWallet } from '@/hooks/useWallet';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useAuthor } from '@/hooks/useAuthor';
 import { Zap } from 'lucide-react';
-import type { Event } from 'nostr-tools';
+import type { NostrEvent } from '@nostrify/nostrify';
 
 interface ZapButtonProps {
-  target: Event;
+  target: NostrEvent;
   className?: string;
   showCount?: boolean;
   zapData?: { count: number; totalSats: number; isLoading?: boolean };

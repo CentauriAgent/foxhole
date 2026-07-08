@@ -38,7 +38,7 @@ export default function Den() {
   const { user } = useCurrentUser();
   const { data: mutedPubkeys } = useMuteList();
   const { data: denMetadata } = useDenMetadata(denName);
-  const { pins, isPinned: isPinnedPost } = useDenPins(denName);
+  const { pins } = useDenPins(denName);
   const { data: pinnedPosts } = usePinnedPosts(pins, denName);
 
   const filteredPosts = useMemo(() => {
@@ -101,11 +101,11 @@ export default function Den() {
           <div className="space-y-4">
             <header className="rounded-lg border border-border bg-card p-6">
               <div className="flex items-start gap-4">
-                <div className="flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-xl bg-[hsl(var(--brand))]/10 text-[hsl(var(--brand))] shrink-0">
+                <div className="flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-xl bg-brand/10 text-brand shrink-0">
                   <FoxIcon className="h-7 w-7 sm:h-10 sm:w-10" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h1 className="text-xl sm:text-2xl font-bold text-[hsl(var(--brand))] truncate">d/{denName}</h1>
+                  <h1 className="text-xl sm:text-2xl font-bold text-brand truncate">d/{denName}</h1>
                   <p className="text-muted-foreground text-sm">
                     {denMetadata?.description || `Discussions about ${denName}`}
                   </p>
@@ -114,7 +114,7 @@ export default function Den() {
                       <Button
                         size="sm"
                         variant={isSubscribed ? 'outline' : 'default'}
-                        className={isSubscribed ? '' : 'bg-[hsl(var(--brand))] hover:bg-[hsl(var(--brand))]/90 text-[hsl(var(--brand-foreground))]'}
+                        className={isSubscribed ? '' : 'bg-brand hover:bg-brand/90 text-brand-foreground'}
                         disabled={isSubscribing || isUnsubscribing}
                         onClick={() => isSubscribed ? unsubscribe(identifier) : subscribe(identifier)}
                       >
@@ -122,7 +122,7 @@ export default function Den() {
                       </Button>
                     )}
                     <Link to={`/create?den=${denName}`}>
-                      <Button size="sm" className="gap-1.5 bg-[hsl(var(--brand))] hover:bg-[hsl(var(--brand))]/90 text-[hsl(var(--brand-foreground))]">
+                      <Button size="sm" className="gap-1.5 bg-brand hover:bg-brand/90 text-brand-foreground">
                         <PenSquare className="h-4 w-4" />
                         Post
                       </Button>
@@ -200,12 +200,12 @@ export default function Den() {
                   </>
                 ) : (
                   <div className="text-center py-16 px-4">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[hsl(var(--brand))]/10 mb-4">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand/10 mb-4">
                       <span className="text-3xl">🦊</span>
                     </div>
                     <p className="text-muted-foreground">No posts in d/{denName} yet</p>
                     <p className="text-sm text-muted-foreground/70 mt-1">
-                      <Link to={`/create?den=${denName}`} className="text-[hsl(var(--brand))] hover:underline">Be the first to post!</Link>
+                      <Link to={`/create?den=${denName}`} className="text-brand hover:underline">Be the first to post!</Link>
                     </p>
                   </div>
                 )}

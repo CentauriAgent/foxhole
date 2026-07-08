@@ -46,15 +46,15 @@ export function ReplyCard({
       className
     )}>
       {/* Vote Column */}
-      <div className="flex-shrink-0 pt-0.5">
-        <VoteButtons eventId={reply.id} score={score} size="sm" />
+      <div className="shrink-0 pt-0.5">
+        <VoteButtons eventId={reply.id} authorPubkey={reply.pubkey} score={score} size="sm" />
       </div>
 
       {/* Content Column */}
       <div className="flex-1 min-w-0 space-y-2">
         {/* Replied to context */}
         <div className="flex items-start gap-2 text-xs text-muted-foreground">
-          <CornerDownRight className="h-3 w-3 mt-0.5 flex-shrink-0 text-muted-foreground/50" />
+          <CornerDownRight className="h-3 w-3 mt-0.5 shrink-0 text-muted-foreground/50" />
           <div className="min-w-0 flex-1">
             {parentLoading ? (
               <Skeleton className="h-3 w-48" />
@@ -63,7 +63,7 @@ export function ReplyCard({
                 Replying to{' '}
                 <Link 
                   to={den ? `/d/${den}/post/${parentPost.id}` : '#'}
-                  className="text-[hsl(var(--brand))] hover:underline"
+                  className="text-brand hover:underline"
                 >
                   {parentPost.content.split('\n')[0]?.slice(0, 60) || 'a post'}
                   {(parentPost.content.split('\n')[0]?.length ?? 0) > 60 && '...'}
@@ -95,7 +95,7 @@ export function ReplyCard({
         {/* Reply Content */}
         <Link to={replyUrl} className="block">
           <div className="text-sm text-foreground line-clamp-4">
-            <NoteContent event={reply} />
+            <NoteContent event={reply} disableLinks />
           </div>
         </Link>
 

@@ -6,14 +6,15 @@ import { useToast } from '@/hooks/useToast';
 import { useNWC } from '@/hooks/useNWCContext';
 import type { NWCConnection } from '@/hooks/useNWC';
 import { nip57 } from 'nostr-tools';
-import type { Event } from 'nostr-tools';
+
 import type { WebLNProvider } from '@webbtc/webln-types';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNostr } from '@nostrify/react';
+import { safeHttpUrl } from '@/lib/utils';
 import type { NostrEvent } from '@nostrify/nostrify';
 
 export function useZaps(
-  target: Event | Event[],
+  target: NostrEvent | NostrEvent[],
   webln: WebLNProvider | null,
   _nwcConnection: NWCConnection | null,
   onZapSuccess?: () => void
@@ -59,6 +60,7 @@ export function useZaps(
         const events = await nostr.query([{
           kinds: [9735],
           '#a': [`${actualTarget.kind}:${actualTarget.pubkey}:${identifier}`],
+          limit: 500,
         }], { signal });
         return events;
       } else {
@@ -66,6 +68,7 @@ export function useZaps(
         const events = await nostr.query([{
           kinds: [9735],
           '#e': [actualTarget.id],
+          limit: 500,
         }], { signal });
         return events;
       }
@@ -180,9 +183,10 @@ export function useZaps(
         return;
       }
 
-      // Get zap endpoint using the old reliable method
-      const zapEndpoint = await nip57.getZapEndpoint(author.data.event);
-      if (!zapEndpoint) {
+      // Get zap endpoint using the old reliable method. The endpoint comes
+      // from third-party LNURL metadata — require a well-formed https URL.
+      const zapEndpoint = safeHttpUrl(await nip57.getZapEndpoint(author.data.event));
+      if (!zapEndpoint || zapEndpoint.protocol !== 'https:') {
         toast({
           title: 'Zap endpoint not found',
           description: 'Could not find a zap endpoint for the author.',
@@ -192,18 +196,12 @@ export function useZaps(
         return;
       }
 
-      // Create zap request - use appropriate event format based on kind
-      // For addressable events (30000-39999), pass the object to get 'a' tag
-      // For all other events, pass the ID string to get 'e' tag
-      const event = (actualTarget.kind >= 30000 && actualTarget.kind < 40000)
-        ? actualTarget
-        : actualTarget.id;
-
       const zapAmount = amount * 1000; // convert to millisats
 
+      // makeZapRequest derives the 'e'/'a'/'p'/'k' tags from the event
+      // (including the 'a' tag for addressable kinds 30000-39999).
       const zapRequest = nip57.makeZapRequest({
-        profile: actualTarget.pubkey,
-        event: event,
+        event: actualTarget,
         amount: zapAmount,
         relays: config.relayMetadata.relays.map(r => r.url),
         comment
@@ -216,7 +214,9 @@ export function useZaps(
       const signedZapRequest = await user.signer.signEvent(zapRequest);
 
       try {
-        const res = await fetch(`${zapEndpoint}?amount=${zapAmount}&nostr=${encodeURI(JSON.stringify(signedZapRequest))}`);
+        zapEndpoint.searchParams.set('amount', String(zapAmount));
+        zapEndpoint.searchParams.set('nostr', JSON.stringify(signedZapRequest));
+        const res = await fetch(zapEndpoint);
             const responseData = await res.json();
 
             if (!res.ok) {

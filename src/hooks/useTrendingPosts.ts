@@ -33,11 +33,10 @@ export function useTrendingPosts(options: UseTrendingPostsOptions = {}) {
   const { nostr } = useNostr();
   const { data: subscribedDens } = useSubscribedDens();
 
-  const since = useMemo(() => Math.floor(Date.now() / 1000) - 86400, []);
-
   const postsQuery = useQuery({
-    queryKey: ['foxhole', 'trending-posts-raw', denName ?? 'all', since],
+    queryKey: ['foxhole', 'trending-posts-raw', denName ?? 'all'],
     queryFn: async ({ signal }) => {
+      const since = Math.floor(Date.now() / 1000) - 86400;
       const filter: NostrFilter = {
         kinds: [1111],
         '#k': [HASHTAG_KIND],

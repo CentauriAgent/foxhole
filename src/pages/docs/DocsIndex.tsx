@@ -63,8 +63,8 @@ export default function DocsIndex() {
       <div className="not-prose mb-12">
         <div className="flex items-center gap-4 mb-6">
           <div className="relative">
-            <div className="absolute inset-0 bg-[hsl(var(--brand))]/20 blur-xl rounded-full" aria-hidden="true" />
-            <FoxIcon className="relative h-12 w-12 text-[hsl(var(--brand))]" />
+            <div className="absolute inset-0 bg-brand/20 blur-xl rounded-full" aria-hidden="true" />
+            <FoxIcon className="relative h-12 w-12 text-brand" />
           </div>
           <div>
             <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Foxhole Documentation</h1>
@@ -72,14 +72,14 @@ export default function DocsIndex() {
           </div>
         </div>
 
-        <div className="p-6 rounded-xl bg-gradient-to-br from-[hsl(var(--brand))]/5 to-[hsl(var(--brand))]/10 border border-[hsl(var(--brand))]/20">
+        <div className="p-6 rounded-xl bg-linear-to-br from-brand/5 to-brand/10 border border-brand/20">
           <p className="text-lg leading-relaxed">
             Foxhole is a decentralized community forum where you own your identity and content — powered by the{' '}
-            <a href="https://github.com/nostr-protocol/nostr" target="_blank" rel="noopener noreferrer" className="text-[hsl(var(--brand))] hover:underline font-medium">
+            <a href="https://github.com/nostr-protocol/nostr" target="_blank" rel="noopener noreferrer" className="text-brand hover:underline font-medium">
               Nostr protocol
             </a>{' '}
             and{' '}
-            <a href="https://lightning.network" target="_blank" rel="noopener noreferrer" className="text-[hsl(var(--brand))] hover:underline font-medium">
+            <a href="https://lightning.network" target="_blank" rel="noopener noreferrer" className="text-brand hover:underline font-medium">
               Bitcoin Lightning
             </a>.
           </p>
@@ -88,7 +88,7 @@ export default function DocsIndex() {
 
       <section className="mb-16">
         <h2 className="flex items-center gap-3 text-2xl font-bold mb-6 not-prose">
-          <Sparkles className="h-6 w-6 text-[hsl(var(--brand))]" />
+          <Sparkles className="h-6 w-6 text-brand" />
           Why Foxhole?
         </h2>
 
@@ -97,11 +97,11 @@ export default function DocsIndex() {
             <h3 className="text-xl font-semibold mb-4">Own Your Community</h3>
             <ul className="space-y-2 text-muted-foreground">
               <li className="flex items-start gap-2">
-                <KeyRound className="h-5 w-5 text-[hsl(var(--brand))] shrink-0 mt-0.5" />
+                <KeyRound className="h-5 w-5 text-brand shrink-0 mt-0.5" />
                 <span><strong className="text-foreground">Your keys, your identity</strong> — No email signup, no phone verification. A cryptographic keypair is all you need.</span>
               </li>
               <li className="flex items-start gap-2">
-                <Globe className="h-5 w-5 text-[hsl(var(--brand))] shrink-0 mt-0.5" />
+                <Globe className="h-5 w-5 text-brand shrink-0 mt-0.5" />
                 <span><strong className="text-foreground">Your content, your data</strong> — Posts live on open Nostr relays. No single company controls your content.</span>
               </li>
               <li className="flex items-start gap-2">

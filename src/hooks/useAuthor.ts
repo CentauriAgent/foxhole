@@ -6,19 +6,22 @@ export function useAuthor(pubkey: string | undefined) {
   const { nostr } = useNostr();
 
   return useQuery<{ event?: NostrEvent; metadata?: NostrMetadata }>({
-    queryKey: ['author', pubkey ?? ''],
-    queryFn: async ({ signal }) => {
+    queryKey: ['nostr', 'author', pubkey ?? ''],
+    queryFn: async () => {
       if (!pubkey) {
         return {};
       }
 
       const [event] = await nostr.query(
         [{ kinds: [0], authors: [pubkey!], limit: 1 }],
-        { signal: AbortSignal.any([signal, AbortSignal.timeout(1500)]) },
+        { signal: AbortSignal.timeout(1500) },
       );
 
+      // No kind-0 profile is a normal outcome for many pubkeys — return an
+      // empty result instead of throwing, so react-query doesn't hammer
+      // relays with retries for every profile-less author in a feed.
       if (!event) {
-        throw new Error('No event found');
+        return {};
       }
 
       try {
@@ -29,6 +32,6 @@ export function useAuthor(pubkey: string | undefined) {
       }
     },
     staleTime: 5 * 60 * 1000, // Keep cached data fresh for 5 minutes
-    retry: 3,
+    retry: false,
   });
 }

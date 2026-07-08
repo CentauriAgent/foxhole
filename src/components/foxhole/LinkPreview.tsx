@@ -51,7 +51,7 @@ export function LinkPreview({ data, className }: LinkPreviewProps) {
           </p>
         )}
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground/70 pt-0.5">
-          <ExternalLink className="h-3 w-3 flex-shrink-0" />
+          <ExternalLink className="h-3 w-3 shrink-0" />
           <span className="truncate">{domain}</span>
         </div>
       </div>
