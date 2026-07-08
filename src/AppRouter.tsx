@@ -1,5 +1,6 @@
 import { lazy, useState } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import { KeyboardShortcutsDialog } from "./components/foxhole/KeyboardShortcutsDialog";
@@ -30,6 +31,15 @@ const DocsIndex = lazy(() => import("./pages/docs/DocsIndex"));
 const DocsTechnical = lazy(() => import("./pages/docs/DocsTechnical"));
 const DocsAbout = lazy(() => import("./pages/docs/DocsAbout"));
 
+/**
+ * Route-level error boundary, keyed by pathname so navigating to another
+ * page resets the error state instead of blanking the whole app.
+ */
+function RouteErrorBoundary({ children }: { children: React.ReactNode }) {
+  const location = useLocation();
+  return <ErrorBoundary key={location.pathname}>{children}</ErrorBoundary>;
+}
+
 /** Global keyboard shortcuts wrapper (must be inside BrowserRouter) */
 function KeyboardShortcutsProvider({ children }: { children: React.ReactNode }) {
   const [helpOpen, setHelpOpen] = useState(false);
@@ -48,6 +58,7 @@ export function AppRouter() {
     <BrowserRouter>
       <ScrollToTop />
       <KeyboardShortcutsProvider>
+      <RouteErrorBoundary>
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/popular" element={<Popular />} />
@@ -72,6 +83,7 @@ export function AppRouter() {
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
+      </RouteErrorBoundary>
       </KeyboardShortcutsProvider>
     </BrowserRouter>
   );

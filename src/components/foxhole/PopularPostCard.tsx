@@ -57,7 +57,7 @@ export const PopularPostCard = memo(function PopularPostCard({
             {rank}
           </span>
         )}
-        <VoteButtons eventId={post.id} score={metrics.score} size="sm" />
+        <VoteButtons eventId={post.id} authorPubkey={post.pubkey} score={metrics.score} size="sm" />
       </div>
 
       {/* Content Column */}

@@ -9,6 +9,7 @@ import { useBatchAuthors } from './useBatchAuthors';
 import { useBatchZaps } from './useBatchZaps';
 import { useBatchPostVotes } from './usePostVotes';
 import { useBatchReplyCountsGlobal } from './useBatchReplyCountsGlobal';
+import { getNextUntil } from '@/lib/pagination';
 
 export interface FollowingPost {
   event: NostrEvent;
@@ -55,10 +56,8 @@ export function useFollowingFeed(options: UseFollowingFeedOptions = {}) {
 
       return events.filter(isTopLevelPost).sort((a, b) => b.created_at - a.created_at);
     },
-    getNextPageParam: (lastPage) => {
-      if (lastPage.length === 0) return undefined;
-      return lastPage[lastPage.length - 1].created_at - 1;
-    },
+    getNextPageParam: (lastPage, _allPages, lastPageParam) =>
+      getNextUntil(lastPage, lastPageParam),
     initialPageParam: undefined as number | undefined,
     enabled: !!user && followList.length > 0,
     staleTime: 30 * 1000,

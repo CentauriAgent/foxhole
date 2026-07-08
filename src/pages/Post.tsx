@@ -90,7 +90,7 @@ export default function Post() {
                 <div className="flex gap-4">
                   {/* Vote Column */}
                   <div className="shrink-0">
-                    <VoteButtons eventId={eventId!} score={votes?.score ?? 0} />
+                    <VoteButtons eventId={eventId!} authorPubkey={post?.pubkey} score={votes?.score ?? 0} />
                   </div>
 
                   {/* Content Column */}

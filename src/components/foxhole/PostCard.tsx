@@ -68,7 +68,7 @@ export const PostCard = memo(function PostCard({
     )}>
       {/* Vote Column */}
       <div className="shrink-0 pt-0.5">
-        <VoteButtons eventId={post.id} score={score} size={compact ? 'sm' : 'md'} />
+        <VoteButtons eventId={post.id} authorPubkey={post.pubkey} score={score} size={compact ? 'sm' : 'md'} />
       </div>
 
       {/* Content Column */}

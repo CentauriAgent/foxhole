@@ -7,6 +7,7 @@ import { useBatchAuthors } from './useBatchAuthors';
 import { useBatchZaps } from './useBatchZaps';
 import { useBatchPostVotes } from './usePostVotes';
 import { useBatchReplyCounts } from './usePostReplies';
+import { getNextUntil } from '@/lib/pagination';
 
 export interface DenPostMetrics {
   totalSats: number; zapCount: number; upvotes: number; downvotes: number;
@@ -44,10 +45,8 @@ export function useDenPostsInfinite(den: string, options: UseDenPostsInfiniteOpt
 
       return events.filter(isTopLevelPost).sort((a, b) => b.created_at - a.created_at);
     },
-    getNextPageParam: (lastPage) => {
-      if (lastPage.length === 0) return undefined;
-      return lastPage[lastPage.length - 1].created_at - 1;
-    },
+    getNextPageParam: (lastPage, _allPages, lastPageParam) =>
+      getNextUntil(lastPage, lastPageParam),
     initialPageParam: undefined as number | undefined,
     staleTime: 30 * 1000,
   });

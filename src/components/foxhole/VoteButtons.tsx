@@ -5,11 +5,16 @@ import { formatCount } from '@/lib/foxhole';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useUserVote } from '@/hooks/useUserVote';
+import { useToast } from '@/hooks/useToast';
 import { useQueryClient } from '@tanstack/react-query';
 
 interface VoteButtonsProps {
   eventId: string;
   score: number;
+  /** Pubkey of the voted event's author — included as NIP-25 'p' tag */
+  authorPubkey?: string;
+  /** Kind of the voted event — included as NIP-25 'k' tag (default 1111) */
+  targetKind?: number;
   upvotes?: number;
   downvotes?: number;
   className?: string;
@@ -26,11 +31,14 @@ interface VoteButtonsProps {
 export function VoteButtons({ 
   eventId,
   score, 
+  authorPubkey,
+  targetKind = 1111,
   className,
   size = 'md',
 }: VoteButtonsProps) {
   const { user } = useCurrentUser();
   const { mutate: publishEvent } = useNostrPublish();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const { data: existingVote } = useUserVote(eventId);
 
@@ -60,6 +68,7 @@ export function VoteButtons({
     // If already voted this direction, do nothing (no toggle off)
     if (effectiveVote === direction) return;
 
+    const previousVote = localVote;
     setLocalVote(direction);
 
     publishEvent({
@@ -67,6 +76,8 @@ export function VoteButtons({
       content: direction === 'up' ? '+' : '-',
       tags: [
         ['e', eventId],
+        ...(authorPubkey ? [['p', authorPubkey]] : []),
+        ['k', String(targetKind)],
       ],
       created_at: Math.floor(Date.now() / 1000),
     }, {
@@ -74,7 +85,19 @@ export function VoteButtons({
         // Invalidate caches so scores refresh
         queryClient.invalidateQueries({ queryKey: ['foxhole', 'user-vote', eventId] });
         queryClient.invalidateQueries({ queryKey: ['foxhole', 'votes', eventId] });
-        queryClient.invalidateQueries({ queryKey: ['foxhole', 'batch-votes'] });
+        // Mark batch scores stale without an immediate refetch storm across
+        // every cached chunk — they refresh on their next natural fetch.
+        queryClient.invalidateQueries({ queryKey: ['foxhole', 'batch-votes'], refetchType: 'none' });
+      },
+      onError: (error) => {
+        // Roll back the optimistic vote so the UI doesn't lie about a vote
+        // that never reached the relays.
+        setLocalVote(previousVote);
+        toast({
+          title: 'Vote failed',
+          description: error instanceof Error ? error.message : 'Could not publish your vote. Please try again.',
+          variant: 'destructive',
+        });
       },
     });
   };
