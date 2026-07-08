@@ -100,7 +100,7 @@ export const PostCard = memo(function PostCard({
               </h3>
               {!compact && bodyContent && (
                 <div className="mt-1 text-sm text-muted-foreground line-clamp-3">
-                  <NoteContent event={{ ...post, content: bodyContent }} />
+                  <NoteContent event={{ ...post, content: bodyContent }} disableLinks />
                 </div>
               )}
             </>
@@ -109,7 +109,7 @@ export const PostCard = memo(function PostCard({
               "text-foreground",
               compact ? "text-sm line-clamp-2" : "text-sm line-clamp-4"
             )}>
-              <NoteContent event={post} />
+              <NoteContent event={post} disableLinks />
             </div>
           )}
         </Link>

@@ -10,6 +10,12 @@ import { hasMarkdown, renderMarkdown, sanitizeHtml } from '@/lib/markdown';
 interface NoteContentProps {
   event: NostrEvent;
   className?: string;
+  /**
+   * Render link-styled text instead of real anchors. Use when this content
+   * sits inside another <a>/<Link> (e.g. feed card previews) — nested
+   * anchors are invalid HTML and break hydration.
+   */
+  disableLinks?: boolean;
 }
 
 /** Parses content of text note events so that URLs and hashtags are linkified. 
@@ -17,6 +23,7 @@ interface NoteContentProps {
 export function NoteContent({
   event, 
   className, 
+  disableLinks = false,
 }: NoteContentProps) {
   const isMarkdown = useMemo(() => hasMarkdown(event.content), [event.content]);
 
@@ -65,8 +72,8 @@ export function NoteContent({
     // Sanitize the final HTML (DOMPurify): strips script/event handlers and
     // blocks javascript:/data: URLs, and marks external links to open in a
     // new tab. This MUST be the last step before dangerouslySetInnerHTML.
-    return sanitizeHtml(html);
-  }, [event.content, isMarkdown]);
+    return sanitizeHtml(html, { stripLinks: disableLinks });
+  }, [event.content, isMarkdown, disableLinks]);
   
   // Plain text rendering path (original logic)
   const content = useMemo(() => {
@@ -98,15 +105,22 @@ export function NoteContent({
         const isVideo = /\.(mp4|webm|mov|ogg|m4v|mkv)(\?.*)?$/.test(lower);
 
         if (isImage) {
+          const img = (
+            <img
+              src={cleanUrl}
+              alt=""
+              loading="lazy"
+              className="max-w-full max-h-[500px] rounded-lg border border-border object-contain"
+            />
+          );
           parts.push(
-            <a key={`img-${keyCounter++}`} href={cleanUrl} target="_blank" rel="noopener noreferrer" className="block my-2">
-              <img
-                src={cleanUrl}
-                alt=""
-                loading="lazy"
-                className="max-w-full max-h-[500px] rounded-lg border border-border object-contain"
-              />
-            </a>
+            disableLinks ? (
+              <span key={`img-${keyCounter++}`} className="block my-2">{img}</span>
+            ) : (
+              <a key={`img-${keyCounter++}`} href={cleanUrl} target="_blank" rel="noopener noreferrer" className="block my-2">
+                {img}
+              </a>
+            )
           );
           if (cleanUrl.length < url.length) {
             parts.push(url.slice(cleanUrl.length));
@@ -116,14 +130,24 @@ export function NoteContent({
             <video
               key={`vid-${keyCounter++}`}
               src={cleanUrl}
-              controls
+              controls={!disableLinks}
+              muted={disableLinks}
               preload="metadata"
-              className="max-w-full max-h-[500px] rounded-lg border border-border my-2"
+              className={cn(
+                "max-w-full max-h-[500px] rounded-lg border border-border my-2",
+                disableLinks && "pointer-events-none"
+              )}
             />
           );
           if (cleanUrl.length < url.length) {
             parts.push(url.slice(cleanUrl.length));
           }
+        } else if (disableLinks) {
+          parts.push(
+            <span key={`url-${keyCounter++}`} className="text-brand break-all">
+              {url}
+            </span>
+          );
         } else {
           parts.push(
             <a 
@@ -145,12 +169,18 @@ export function NoteContent({
           if (decoded.type === 'npub') {
             const pubkey = decoded.data;
             parts.push(
-              <NostrMention key={`mention-${keyCounter++}`} pubkey={pubkey} />
+              <NostrMention key={`mention-${keyCounter++}`} pubkey={pubkey} disableLink={disableLinks} />
             );
           } else if (decoded.type === 'nprofile') {
             const pubkey = decoded.data.pubkey;
             parts.push(
-              <NostrMention key={`mention-${keyCounter++}`} pubkey={pubkey} />
+              <NostrMention key={`mention-${keyCounter++}`} pubkey={pubkey} disableLink={disableLinks} />
+            );
+          } else if (disableLinks) {
+            parts.push(
+              <span key={`nostr-${keyCounter++}`} className="text-brand break-all">
+                {fullMatch}
+              </span>
             );
           } else {
             parts.push(
@@ -169,13 +199,19 @@ export function NoteContent({
       } else if (hashtag) {
         const tag = hashtag.slice(1).toLowerCase();
         parts.push(
-          <Link 
-            key={`hashtag-${keyCounter++}`}
-            to={`/d/${tag}`}
-            className="text-brand hover:underline"
-          >
-            {hashtag}
-          </Link>
+          disableLinks ? (
+            <span key={`hashtag-${keyCounter++}`} className="text-brand">
+              {hashtag}
+            </span>
+          ) : (
+            <Link 
+              key={`hashtag-${keyCounter++}`}
+              to={`/d/${tag}`}
+              className="text-brand hover:underline"
+            >
+              {hashtag}
+            </Link>
+          )
         );
       }
       
@@ -191,7 +227,7 @@ export function NoteContent({
     }
     
     return parts;
-  }, [event.content, isMarkdown]);
+  }, [event.content, isMarkdown, disableLinks]);
 
   if (isMarkdown) {
     return (
@@ -219,11 +255,19 @@ export function NoteContent({
 }
 
 // Helper component to display user mentions
-function NostrMention({ pubkey }: { pubkey: string }) {
+function NostrMention({ pubkey, disableLink = false }: { pubkey: string; disableLink?: boolean }) {
   const author = useAuthor(pubkey);
   const npub = nip19.npubEncode(pubkey);
   const hasRealName = !!author.data?.metadata?.name;
   const displayName = author.data?.metadata?.name ?? genUserName(pubkey);
+
+  if (disableLink) {
+    return (
+      <span className={cn("font-medium", hasRealName ? "text-brand" : "text-muted-foreground")}>
+        @{displayName}
+      </span>
+    );
+  }
 
   return (
     <Link 

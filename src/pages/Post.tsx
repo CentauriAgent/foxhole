@@ -24,7 +24,7 @@ export default function Post() {
   const { den: den, eventId } = useParams<{ den: string; eventId: string }>();
   const [showLoginDialog, setShowLoginDialog] = useState(false);
 
-  const { data: post, isLoading: postLoading, error: postError } = usePost(eventId);
+  const { data: post, isLoading: postLoading } = usePost(eventId);
   const { data: votes } = usePostVotes(eventId);
   const { data: repliesData, isLoading: repliesLoading } = usePostReplies(eventId, den || '');
   const { user } = useCurrentUser();
@@ -59,7 +59,9 @@ export default function Post() {
     description: post?.content.slice(0, 160) || 'View post on Foxhole',
   });
 
-  if (postError || (!postLoading && !post)) {
+  // Only 404 when loading truly finished with no data — a failed background
+  // refetch must not blank a post we already have cached.
+  if (!postLoading && !post) {
     return <NotFound />;
   }
 

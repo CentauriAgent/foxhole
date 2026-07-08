@@ -86,13 +86,13 @@ export const PopularPostCard = memo(function PopularPostCard({
               </h3>
               {bodyContent && (
                 <div className="mt-1 text-sm text-muted-foreground line-clamp-2">
-                  <NoteContent event={{ ...post, content: bodyContent }} />
+                  <NoteContent event={{ ...post, content: bodyContent }} disableLinks />
                 </div>
               )}
             </>
           ) : (
             <div className="text-sm text-foreground line-clamp-3">
-              <NoteContent event={post} />
+              <NoteContent event={post} disableLinks />
             </div>
           )}
         </Link>

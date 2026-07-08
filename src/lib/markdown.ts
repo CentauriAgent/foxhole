@@ -101,10 +101,15 @@ DOMPurify.addHook('afterSanitizeAttributes', (node) => {
  * Call this on the FINAL HTML string, after all post-processing —
  * sanitizing earlier would leave later string transforms unprotected.
  */
-export function sanitizeHtml(html: string): string {
+export function sanitizeHtml(html: string, opts?: { stripLinks?: boolean }): string {
   return DOMPurify.sanitize(html, {
     USE_PROFILES: { html: true },
-    FORBID_TAGS: ['style', 'form', 'input', 'button', 'textarea', 'select'],
+    // stripLinks: drop <a> elements (keeping their text) for content rendered
+    // inside another link, where nested anchors are invalid HTML.
+    FORBID_TAGS: [
+      'style', 'form', 'input', 'button', 'textarea', 'select',
+      ...(opts?.stripLinks ? ['a'] : []),
+    ],
     ALLOWED_URI_REGEXP: /^(?:https?:|mailto:|\/(?!\/))/i,
   });
 }

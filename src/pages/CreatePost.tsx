@@ -73,7 +73,11 @@ export default function CreatePost() {
       {
         onSuccess: (event) => {
           clearDraft();
-          queryClient.invalidateQueries({ queryKey: ['foxhole'] });
+          // Seed the post cache with the signed event BEFORE navigating —
+          // relays often haven't indexed a just-published event yet, and the
+          // post page would otherwise render a 404 while they catch up.
+          queryClient.setQueryData(['foxhole', 'post', event.id], event);
+          queryClient.invalidateQueries({ queryKey: ['foxhole'], refetchType: 'active' });
           navigate(`/d/${trimmedDen}/post/${event.id}`);
         },
         onError: (err) => {

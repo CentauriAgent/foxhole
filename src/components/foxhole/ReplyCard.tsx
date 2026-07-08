@@ -95,7 +95,7 @@ export function ReplyCard({
         {/* Reply Content */}
         <Link to={replyUrl} className="block">
           <div className="text-sm text-foreground line-clamp-4">
-            <NoteContent event={reply} />
+            <NoteContent event={reply} disableLinks />
           </div>
         </Link>
 

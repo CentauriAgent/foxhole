@@ -80,13 +80,13 @@ export function SearchResultCard({ event, className }: SearchResultCardProps) {
               </h3>
               {bodyContent && (
                 <div className="text-sm text-muted-foreground line-clamp-3">
-                  <NoteContent event={{ ...event, content: bodyContent }} />
+                  <NoteContent event={{ ...event, content: bodyContent }} disableLinks />
                 </div>
               )}
             </>
           ) : (
             <div className="text-sm text-foreground line-clamp-4">
-              <NoteContent event={event} />
+              <NoteContent event={event} disableLinks />
             </div>
           )}
         </Link>
