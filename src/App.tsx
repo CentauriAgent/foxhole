@@ -27,7 +27,9 @@ const queryClient = new QueryClient({
     queries: {
       refetchOnWindowFocus: false,
       staleTime: 60000, // 1 minute
-      gcTime: Infinity,
+      // Bound cache lifetime: with infinite feeds + per-chunk metric queries,
+      // gcTime: Infinity grew memory without bound over a session.
+      gcTime: 30 * 60 * 1000, // 30 minutes
     },
   },
 });
@@ -56,7 +58,11 @@ export function App() {
               <NWCProvider>
                 <TooltipProvider>
                   <Toaster />
-                  <Suspense>
+                  <Suspense
+                    fallback={
+                      <div className="flex min-h-screen items-center justify-center bg-background" />
+                    }
+                  >
                     <AppRouter />
                   </Suspense>
                 </TooltipProvider>

@@ -1,8 +1,7 @@
 import type { NostrEvent } from '@nostrify/nostrify';
 import { useNostr } from '@nostrify/react';
-import { useQuery } from '@tanstack/react-query';
 import { nip57 } from 'nostr-tools';
-import { hashStringArray } from '@/lib/utils';
+import { useChunkedBatchQuery } from '@/hooks/useChunkedBatchQuery';
 
 export interface ZapData {
   zapCount: number;
@@ -68,26 +67,20 @@ function extractSatsFromZap(zap: NostrEvent): number {
  */
 export function useBatchZaps(eventIds: string[]) {
   const { nostr } = useNostr();
-  
-  // Create compact stable query key via hash
-  const queryKeyHash = hashStringArray(eventIds);
 
-  return useQuery({
-    queryKey: ['foxhole', 'batch-zaps', queryKeyHash],
-    queryFn: async ({ signal }) => {
-      if (eventIds.length === 0) {
-        return new Map<string, ZapData>();
-      }
-
-      // Query all zap receipts for these events
+  return useChunkedBatchQuery<ZapData>(
+    ['foxhole', 'batch-zaps'],
+    eventIds,
+    async (chunk, signal) => {
+      // Query all zap receipts for this chunk of events
       const zapReceipts = await nostr.query(
-        [{ kinds: [9735], '#e': eventIds, limit: 500 }],
-        { signal: AbortSignal.any([signal, AbortSignal.timeout(5000)]) }
+        [{ kinds: [9735], '#e': chunk, limit: 500 }],
+        { signal },
       );
 
       // Initialize map with all event IDs
       const zapsByEvent = new Map<string, ZapData>();
-      for (const id of eventIds) {
+      for (const id of chunk) {
         zapsByEvent.set(id, { zapCount: 0, totalSats: 0, zaps: [] });
       }
 
@@ -106,9 +99,7 @@ export function useBatchZaps(eventIds: string[]) {
 
       return zapsByEvent;
     },
-    enabled: eventIds.length > 0,
-    staleTime: 60 * 1000, // 1 minute
-  });
+  );
 }
 
 /**

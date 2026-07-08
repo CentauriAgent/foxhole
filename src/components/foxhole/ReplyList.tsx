@@ -2,6 +2,7 @@ import type { NostrEvent } from '@nostrify/nostrify';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ReplyCard } from './ReplyCard';
 import { useBatchPostVotes } from '@/hooks/usePostVotes';
+import { useBatchAuthors } from '@/hooks/useBatchAuthors';
 import { FoxIcon } from './FoxIcon';
 
 interface ReplyListProps {
@@ -22,6 +23,9 @@ export function ReplyList({
 }: ReplyListProps) {
   const eventIds = replies.map(r => r.id);
   const { data: votesMap } = useBatchPostVotes(eventIds);
+
+  // Prefetch author profiles in one batched query (seeds the useAuthor cache)
+  useBatchAuthors(replies.map(r => r.pubkey));
 
   if (isLoading) {
     return (

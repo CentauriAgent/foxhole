@@ -5,6 +5,7 @@ import { useBatchPostVotes } from '@/hooks/usePostVotes';
 import { useBatchReplyCounts } from '@/hooks/usePostReplies';
 import { useBatchReplyCountsGlobal } from '@/hooks/useBatchReplyCountsGlobal';
 import { useBatchZaps } from '@/hooks/useBatchZaps';
+import { useBatchAuthors } from '@/hooks/useBatchAuthors';
 import { getPostDen } from '@/lib/foxhole';
 import { FoxIcon } from './FoxIcon';
 
@@ -38,6 +39,9 @@ export function PostList({
   
   const replyCountsMap = allSameDen && firstDen ? denReplyCountsMap : globalReplyCountsMap;
   const { data: zapsMap } = useBatchZaps(eventIds);
+
+  // Prefetch author profiles in one batched query (seeds the useAuthor cache)
+  useBatchAuthors(posts.map(p => p.pubkey));
 
   if (isLoading) {
     return (

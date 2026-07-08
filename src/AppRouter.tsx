@@ -1,30 +1,34 @@
-import { useState } from "react";
+import { lazy, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import { KeyboardShortcutsDialog } from "./components/foxhole/KeyboardShortcutsDialog";
 
+// The home feed loads eagerly (it's the most common entry point);
+// every other page is code-split into its own chunk via React.lazy.
+// The <Suspense> boundary lives in App.tsx.
 import Index from "./pages/Index";
-import Popular from "./pages/Popular";
-import Search from "./pages/Search";
-import Den from "./pages/Den";
-import Post from "./pages/Post";
-import { NIP19Page } from "./pages/NIP19Page";
-import Comment from "./pages/Comment";
-import CreatePost from "./pages/CreatePost";
-import CreateDen from "./pages/CreateDen";
-import Dens from "./pages/Dens";
-import Discover from "./pages/Discover";
-import NotFound from "./pages/NotFound";
-import Settings from "./pages/Settings";
-import Notifications from "./pages/Notifications";
-import Bookmarks from "./pages/Bookmarks";
-import Following from "./pages/Following";
+
+const Popular = lazy(() => import("./pages/Popular"));
+const Search = lazy(() => import("./pages/Search"));
+const Den = lazy(() => import("./pages/Den"));
+const Post = lazy(() => import("./pages/Post"));
+const NIP19Page = lazy(() => import("./pages/NIP19Page").then(m => ({ default: m.NIP19Page })));
+const Comment = lazy(() => import("./pages/Comment"));
+const CreatePost = lazy(() => import("./pages/CreatePost"));
+const CreateDen = lazy(() => import("./pages/CreateDen"));
+const Dens = lazy(() => import("./pages/Dens"));
+const Discover = lazy(() => import("./pages/Discover"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const Settings = lazy(() => import("./pages/Settings"));
+const Notifications = lazy(() => import("./pages/Notifications"));
+const Bookmarks = lazy(() => import("./pages/Bookmarks"));
+const Following = lazy(() => import("./pages/Following"));
 
 // Documentation pages
-import DocsIndex from "./pages/docs/DocsIndex";
-import DocsTechnical from "./pages/docs/DocsTechnical";
-import DocsAbout from "./pages/docs/DocsAbout";
+const DocsIndex = lazy(() => import("./pages/docs/DocsIndex"));
+const DocsTechnical = lazy(() => import("./pages/docs/DocsTechnical"));
+const DocsAbout = lazy(() => import("./pages/docs/DocsAbout"));
 
 /** Global keyboard shortcuts wrapper (must be inside BrowserRouter) */
 function KeyboardShortcutsProvider({ children }: { children: React.ReactNode }) {

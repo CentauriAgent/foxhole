@@ -5,6 +5,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { HASHTAG_KIND, isTopLevelPost } from '@/lib/foxhole';
 import { useFollows } from './useFollows';
 import { useCurrentUser } from './useCurrentUser';
+import { useBatchAuthors } from './useBatchAuthors';
 import { useBatchZaps } from './useBatchZaps';
 import { useBatchPostVotes } from './usePostVotes';
 import { useBatchReplyCountsGlobal } from './useBatchReplyCountsGlobal';
@@ -76,6 +77,9 @@ export function useFollowingFeed(options: UseFollowingFeedOptions = {}) {
   }, [pages]);
 
   const postIds = posts.map((p) => p.id);
+
+  // Prefetch author profiles in one batched query (seeds the useAuthor cache)
+  useBatchAuthors(posts.map((p) => p.pubkey));
   const zapsQuery = useBatchZaps(postIds);
   const votesQuery = useBatchPostVotes(postIds);
   const repliesQuery = useBatchReplyCountsGlobal(postIds);

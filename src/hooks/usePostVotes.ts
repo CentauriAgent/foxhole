@@ -1,7 +1,7 @@
 import type { NostrEvent } from '@nostrify/nostrify';
 import { useNostr } from '@nostrify/react';
 import { useQuery } from '@tanstack/react-query';
-import { hashStringArray } from '@/lib/utils';
+import { useChunkedBatchQuery } from '@/hooks/useChunkedBatchQuery';
 
 interface VoteData {
   upvotes: number;
@@ -82,25 +82,19 @@ export function usePostVotes(eventId: string | undefined) {
  */
 export function useBatchPostVotes(eventIds: string[]) {
   const { nostr } = useNostr();
-  
-  // Create compact stable query key via hash
-  const queryKeyHash = hashStringArray(eventIds);
 
-  return useQuery({
-    queryKey: ['foxhole', 'batch-votes', queryKeyHash],
-    queryFn: async ({ signal }) => {
-      if (eventIds.length === 0) {
-        return new Map<string, VoteData>();
-      }
-
+  return useChunkedBatchQuery<VoteData>(
+    ['foxhole', 'batch-votes'],
+    eventIds,
+    async (chunk, signal) => {
       const reactions = await nostr.query(
-        [{ kinds: [7], '#e': eventIds, limit: 500 }],
-        { signal: AbortSignal.any([signal, AbortSignal.timeout(5000)]) }
+        [{ kinds: [7], '#e': chunk, limit: 500 }],
+        { signal },
       );
 
       // Group reactions by event ID
       const rawByEvent = new Map<string, NostrEvent[]>();
-      for (const id of eventIds) {
+      for (const id of chunk) {
         rawByEvent.set(id, []);
       }
 
@@ -122,9 +116,7 @@ export function useBatchPostVotes(eventIds: string[]) {
 
       return votesByEvent;
     },
-    enabled: eventIds.length > 0,
-    staleTime: 60 * 1000,
-  });
+  );
 }
 
 /**

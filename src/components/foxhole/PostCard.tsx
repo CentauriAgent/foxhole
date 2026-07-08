@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { MessageSquare, Bookmark } from 'lucide-react';
 import type { NostrEvent } from '@nostrify/nostrify';
@@ -30,8 +31,9 @@ interface PostCardProps {
 
 /**
  * Reddit-style post card with vote buttons, content, and metadata.
+ * Memoized: feed-level state changes only re-render cards whose props changed.
  */
-export function PostCard({ 
+export const PostCard = memo(function PostCard({ 
   post, 
   score = 0,
   replyCount = 0,
@@ -146,4 +148,4 @@ export function PostCard({
       </div>
     </article>
   );
-}
+});

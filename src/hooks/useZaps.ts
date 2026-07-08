@@ -60,6 +60,7 @@ export function useZaps(
         const events = await nostr.query([{
           kinds: [9735],
           '#a': [`${actualTarget.kind}:${actualTarget.pubkey}:${identifier}`],
+          limit: 500,
         }], { signal });
         return events;
       } else {
@@ -67,6 +68,7 @@ export function useZaps(
         const events = await nostr.query([{
           kinds: [9735],
           '#e': [actualTarget.id],
+          limit: 500,
         }], { signal });
         return events;
       }
