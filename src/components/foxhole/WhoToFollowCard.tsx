@@ -12,7 +12,6 @@ import { useFollow } from '@/hooks/useFollows';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { genUserName } from '@/lib/genUserName';
-import { identifierToDen } from '@/lib/foxhole';
 import { useToast } from '@/hooks/useToast';
 
 /**

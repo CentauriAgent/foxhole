@@ -1,11 +1,11 @@
 import path from "node:path";
 
-import prerender from "@prerenderer/rollup-plugin";
 import react from "@vitejs/plugin-react-swc";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vitest/config";
 
 // https://vitejs.dev/config/
+// Prerendering happens post-build via scripts/prerender.js (see package.json).
 export default defineConfig(() => ({
   server: {
     host: "::",
@@ -14,16 +14,6 @@ export default defineConfig(() => ({
   plugins: [
     react(),
     tailwindcss(),
-    prerender({
-      routes: [
-        "/",
-        "/popular",
-        "/docs",
-        "/docs/humans",
-        "/docs/technical",
-        "/docs/about",
-      ],
-    }),
   ],
   test: {
     globals: true,

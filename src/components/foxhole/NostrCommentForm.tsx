@@ -6,7 +6,8 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { Send } from 'lucide-react';
 import { denToIdentifier, HASHTAG_KIND } from '@/lib/foxhole';
-import { ImageUpload, buildImetaTags, appendImageUrls } from '@/components/foxhole/ImageUpload';
+import { ImageUpload } from '@/components/foxhole/ImageUpload';
+import { buildImetaTags, appendImageUrls } from '@/lib/imageUpload';
 import type { UploadedImage } from '@/components/foxhole/ImageUpload';
 
 interface NostrCommentFormProps {

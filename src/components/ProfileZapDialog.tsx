@@ -103,16 +103,17 @@ export function ProfileZapDialog({
     };
   }, [invoice]);
 
-  // Reset state when dialog closes
-  useEffect(() => {
-    if (!open) {
+  // Reset transient state whenever the dialog closes.
+  const handleOpenChange = (newOpen: boolean) => {
+    if (!newOpen) {
       setAmount(100);
       setInvoice(null);
       setCopied(false);
       setQrCodeUrl('');
       setIsLoading(false);
     }
-  }, [open]);
+    setOpen(newOpen);
+  };
 
   const fetchInvoice = async () => {
     if (!lud16) {
@@ -352,7 +353,7 @@ export function ProfileZapDialog({
 
   if (isMobile) {
     return (
-      <Drawer open={open} onOpenChange={setOpen}>
+      <Drawer open={open} onOpenChange={handleOpenChange}>
         <DrawerTrigger asChild>
           <div className={cn("cursor-pointer", className)}>
             {children}
@@ -377,7 +378,7 @@ export function ProfileZapDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <div className={cn("cursor-pointer", className)}>
           {children}

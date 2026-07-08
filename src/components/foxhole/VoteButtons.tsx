@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatCount } from '@/lib/foxhole';
@@ -32,19 +32,12 @@ export function VoteButtons({
   const { user } = useCurrentUser();
   const { mutate: publishEvent } = useNostrPublish();
   const queryClient = useQueryClient();
-  const { data: existingVote, isLoading: voteLoading } = useUserVote(eventId);
+  const { data: existingVote } = useUserVote(eventId);
 
-  // Local vote state: tracks optimistic UI. null = no override, synced from server.
+  // Local vote state: optimistic UI override. undefined = no override, fall back to server data.
   const [localVote, setLocalVote] = useState<'up' | 'down' | null | undefined>(undefined);
 
-  // Sync local vote from server data once loaded
-  useEffect(() => {
-    if (!voteLoading && existingVote !== undefined && localVote === undefined) {
-      setLocalVote(existingVote);
-    }
-  }, [existingVote, voteLoading, localVote]);
-
-  // The effective vote is local override if set, otherwise server data
+  // The effective vote is the local override if set, otherwise server data
   const effectiveVote = localVote !== undefined ? localVote : (existingVote ?? null);
 
   // The server score already includes the user's existing vote.
@@ -76,7 +69,7 @@ export function VoteButtons({
         ['e', eventId],
       ],
       created_at: Math.floor(Date.now() / 1000),
-    } as any, {
+    }, {
       onSuccess: () => {
         // Invalidate caches so scores refresh
         queryClient.invalidateQueries({ queryKey: ['foxhole', 'user-vote', eventId] });

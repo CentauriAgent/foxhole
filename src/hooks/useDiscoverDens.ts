@@ -20,11 +20,10 @@ export function useDiscoverDens() {
   const { nostr } = useNostr();
   const { data: subscribedDens } = useSubscribedDens();
 
-  const since = useMemo(() => Math.floor(Date.now() / 1000) - 7 * 86400, []);
-
   const postsQuery = useQuery({
-    queryKey: ['foxhole', 'discover-dens-raw', since],
+    queryKey: ['foxhole', 'discover-dens-raw'],
     queryFn: async ({ signal }) => {
+      const since = Math.floor(Date.now() / 1000) - 7 * 86400;
       const filter: NostrFilter = {
         kinds: [1111],
         '#k': [HASHTAG_KIND],

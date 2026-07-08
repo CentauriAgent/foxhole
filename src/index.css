@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Custom font for Foxhole */
+@import "@fontsource-variable/inter";
+
 @plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));

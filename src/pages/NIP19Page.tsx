@@ -2,7 +2,7 @@ import { nip19 } from 'nostr-tools';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { User, ExternalLink, MessageSquare, FileText, Zap, Settings, UserPlus, UserMinus } from 'lucide-react';
-import { SiteHeader, Sidebar, PostList, ReplyList, FoxIcon } from '@/components/foxhole';
+import { SiteHeader, Sidebar, PostList, ReplyList } from '@/components/foxhole';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -15,7 +15,6 @@ import { useAuthor } from '@/hooks/useAuthor';
 import { useUserPosts } from '@/hooks/useUserPosts';
 import { useUserReplies } from '@/hooks/useUserReplies';
 import { genUserName } from '@/lib/genUserName';
-import { cn } from '@/lib/utils';
 import { useIsFollowing, useFollow, useUnfollow } from '@/hooks/useFollows';
 import { useToast } from '@/hooks/useToast';
 import NotFound from './NotFound';
@@ -97,44 +96,20 @@ function ProfilePage({ pubkey }: { pubkey: string }) {
             {authorLoading ? (
               <ProfileHeaderSkeleton />
             ) : (
-              <header className={cn(
-                "rounded-lg border bg-card p-6",
-                "border-border"
-              )}>
+              <header className="rounded-lg border bg-card p-6 border-border">
                 <div className="flex items-start gap-4">
-                  <Avatar className={cn(
-                    "h-20 w-20 ring-2",
-                    false 
-                      ? "ring-brand/50" 
-                      : "ring-border"
-                  )}>
+                  <Avatar className="h-20 w-20 ring-2 ring-border">
                     <AvatarImage src={metadata?.picture} alt={displayName} />
-                    <AvatarFallback className={cn(
-                      false 
-                        ? "bg-brand/10 text-brand" 
-                        : "bg-muted"
-                    )}>
-                      {false ? <FoxIcon className="h-10 w-10" /> : <User className="h-8 w-8" />}
+                    <AvatarFallback className="bg-muted">
+                      <User className="h-8 w-8" />
                     </AvatarFallback>
                   </Avatar>
-                  
+
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <h1 className={cn(
-                        "text-2xl font-bold truncate",
-                        false && "text-brand"
-                      )}>
+                      <h1 className="text-2xl font-bold truncate">
                         {displayName}
                       </h1>
-                      {false && (
-                        <span className={cn(
-                          "inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider px-2 py-1 rounded",
-                          "bg-brand/10 text-brand"
-                        )}>
-                          <FoxIcon className="h-3 w-3" />
-                          Community Member
-                        </span>
-                      )}
                       {metadata?.lud16 && (
                         <ProfileZapDialog
                           pubkey={pubkey}

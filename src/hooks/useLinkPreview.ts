@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 export interface LinkPreviewData {
   title?: string;
@@ -7,8 +7,6 @@ export interface LinkPreviewData {
   url: string;
   domain: string;
 }
-
-const cache = new Map<string, LinkPreviewData | null>();
 
 /**
  * Extract the first non-media URL from text content.
@@ -29,64 +27,39 @@ export function extractFirstUrl(text: string): string | null {
 
 /**
  * Hook to fetch Open Graph metadata for the first URL found in content.
+ * Cached and deduplicated via react-query (one request per unique URL).
  */
 export function useLinkPreview(content: string): {
   preview: LinkPreviewData | null;
   loading: boolean;
 } {
   const url = extractFirstUrl(content);
-  const [preview, setPreview] = useState<LinkPreviewData | null>(
-    url && cache.has(url) ? cache.get(url)! : null
-  );
-  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (!url) return;
+  const { data, isLoading } = useQuery<LinkPreviewData | null>({
+    queryKey: ['link-preview', url],
+    enabled: !!url,
+    staleTime: Infinity,
+    retry: false,
+    queryFn: async ({ signal }) => {
+      const res = await fetch(
+        `https://api.microlink.io/?url=${encodeURIComponent(url!)}`,
+        { signal },
+      );
+      const data = await res.json();
 
-    if (cache.has(url)) {
-      setPreview(cache.get(url)!);
-      return;
-    }
+      if (data.status === 'success' && data.data) {
+        const d = data.data;
+        return {
+          title: d.title || undefined,
+          description: d.description || undefined,
+          image: d.image?.url || undefined,
+          url: url!,
+          domain: new URL(url!).hostname.replace(/^www\./, ''),
+        };
+      }
+      return null;
+    },
+  });
 
-    let cancelled = false;
-    setLoading(true);
-
-    const encoded = encodeURIComponent(url);
-    fetch(`https://api.microlink.io/?url=${encoded}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (cancelled) return;
-
-        if (data.status === 'success' && data.data) {
-          const d = data.data;
-          const result: LinkPreviewData = {
-            title: d.title || undefined,
-            description: d.description || undefined,
-            image: d.image?.url || undefined,
-            url,
-            domain: new URL(url).hostname.replace(/^www\./, ''),
-          };
-          cache.set(url, result);
-          setPreview(result);
-        } else {
-          cache.set(url, null);
-          setPreview(null);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          cache.set(url, null);
-          setPreview(null);
-        }
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [url]);
-
-  return { preview, loading };
+  return { preview: data ?? null, loading: !!url && isLoading };
 }

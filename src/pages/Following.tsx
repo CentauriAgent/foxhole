@@ -5,7 +5,6 @@ import { Users, LogIn } from 'lucide-react';
 import { SiteHeader, PopularPostCard } from '@/components/foxhole';
 import { useFollowingFeed } from '@/hooks/useFollowingFeed';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Button } from '@/components/ui/button';
 import { useInView } from 'react-intersection-observer';
 
 export default function Following() {

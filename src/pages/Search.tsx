@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { Search as SearchIcon, Sparkles, X, Globe, HardDrive } from 'lucide-react';
@@ -19,13 +19,13 @@ export default function Search() {
   const [query, setQuery] = useState(queryParam);
   const [den, setDen] = useState(denParam);
 
-  useEffect(() => {
+  // Sync inputs from URL params (state adjustment during render, per React docs)
+  const [prevParams, setPrevParams] = useState({ q: queryParam, den: denParam });
+  if (prevParams.q !== queryParam || prevParams.den !== denParam) {
+    setPrevParams({ q: queryParam, den: denParam });
     setQuery(queryParam);
-  }, [queryParam]);
-
-  useEffect(() => {
     setDen(denParam);
-  }, [denParam]);
+  }
 
   const { data: searchResult, isLoading } = useSearchPosts({
     query: queryParam,

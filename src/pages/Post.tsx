@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { ChevronLeft, MessageSquare } from 'lucide-react';
-import { SiteHeader, Sidebar, VoteButtons, AuthorBadge, ThreadedReplies, FoxIcon } from '@/components/foxhole';
+import { SiteHeader, VoteButtons, AuthorBadge, ThreadedReplies, FoxIcon } from '@/components/foxhole';
 import { ZapButton } from '@/components/ZapButton';
 import { NostrCommentForm } from '@/components/foxhole/NostrCommentForm';
 import { NoteContent } from '@/components/NoteContent';
@@ -17,7 +17,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { formatRelativeTime, getPostDen } from '@/lib/foxhole';
 import { useMuteList } from '@/hooks/useMuteList';
 import { useLinkPreview } from '@/hooks/useLinkPreview';
-import LoginDialog from '@/components/auth/LoginDialog';
+import AuthDialog from '@/components/auth/AuthDialog';
 import NotFound from './NotFound';
 
 export default function Post() {
@@ -36,11 +36,12 @@ export default function Post() {
   const { data: replyVotesMap } = useBatchPostVotes(replyIds);
 
   // Filter muted users from replies
+  const directReplies = repliesData?.directReplies;
   const filteredDirectReplies = useMemo(() => {
-    if (!repliesData?.directReplies) return [];
-    if (!mutedPubkeys?.size) return repliesData.directReplies;
-    return repliesData.directReplies.filter(r => !mutedPubkeys.has(r.pubkey));
-  }, [repliesData?.directReplies, mutedPubkeys]);
+    if (!directReplies) return [];
+    if (!mutedPubkeys?.size) return directReplies;
+    return directReplies.filter(r => !mutedPubkeys.has(r.pubkey));
+  }, [directReplies, mutedPubkeys]);
 
   const filteredGetDirectReplies = useCallback((parentId: string) => {
     if (!repliesData) return [];
@@ -113,7 +114,7 @@ export default function Post() {
 
                     {/* Stats */}
                     <div className="flex items-center gap-4 pt-2 text-sm text-muted-foreground">
-                      <ZapButton target={post as any} />
+                      <ZapButton target={post} />
                       <span className="inline-flex items-center gap-1.5">
                         <MessageSquare className="h-4 w-4" />
                         {repliesData?.replyCount ?? 0} comments
@@ -193,10 +194,9 @@ export default function Post() {
               </div>
             </section>
             
-            <LoginDialog 
-              isOpen={showLoginDialog} 
+            <AuthDialog
+              isOpen={showLoginDialog}
               onClose={() => setShowLoginDialog(false)}
-              onLogin={() => setShowLoginDialog(false)}
             />
           </div>
 

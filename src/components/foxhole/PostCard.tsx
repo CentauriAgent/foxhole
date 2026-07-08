@@ -119,7 +119,7 @@ export function PostCard({
 
         {/* Actions bar */}
         <div className="flex items-center gap-4 pt-1">
-          <ZapButton target={post as any} zapData={{ count: 0, totalSats }} />
+          <ZapButton target={post} zapData={{ count: 0, totalSats }} />
           <Link 
             to={postUrl}
             className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"

@@ -12,7 +12,7 @@ import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useCreateDenMetadata } from '@/hooks/useDenMetadata';
 import { useSubscribeToCommunity } from '@/hooks/useCommunitySubscriptions';
 import { MiniAccountSelector } from '@/components/auth/MiniAccountSelector';
-import LoginDialog from '@/components/auth/LoginDialog';
+import AuthDialog from '@/components/auth/AuthDialog';
 import { createPostTags, denToIdentifier } from '@/lib/foxhole';
 import { FoxIcon } from '@/components/foxhole/FoxIcon';
 import { Plus, Tent, Send, BookOpen, ShieldCheck } from 'lucide-react';
@@ -314,10 +314,9 @@ export default function CreateDen() {
         </Card>
       </main>
 
-      <LoginDialog
+      <AuthDialog
         isOpen={showLoginDialog}
         onClose={() => setShowLoginDialog(false)}
-        onLogin={() => setShowLoginDialog(false)}
       />
     </div>
   );

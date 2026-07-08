@@ -47,10 +47,7 @@ export function ThreadedReply({
       {/* Thread line */}
       {depth > 0 && (
         <div 
-          className={cn(
-            "absolute left-3 top-0 bottom-0 w-px",
-            false ? "bg-brand/20" : "bg-border"
-          )}
+          className="absolute left-3 top-0 bottom-0 w-px bg-border"
         />
       )}
 
@@ -76,16 +73,13 @@ export function ThreadedReply({
           </div>
 
           {/* Content */}
-          <div className={cn(
-            "mt-1 text-sm",
-            false ? "text-foreground" : "text-foreground/80"
-          )}>
+          <div className="mt-1 text-sm text-foreground/80">
             <NoteContent event={reply} />
           </div>
 
           {/* Zap + Reply buttons */}
           <div className="mt-1 flex items-center gap-4">
-            <ZapButton target={reply as any} className="text-xs" />
+            <ZapButton target={reply} className="text-xs" />
             {user && den && (
               <button
                 onClick={() => setShowReplyForm(!showReplyForm)}

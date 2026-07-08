@@ -100,7 +100,7 @@ export const PopularPostCard = memo(function PopularPostCard({
         {/* Engagement bar */}
         <div className="flex items-center gap-4 pt-1">
           {/* Zap button */}
-          <ZapButton target={post as any} zapData={{ count: metrics.zapCount, totalSats: metrics.totalSats }} />
+          <ZapButton target={post} zapData={{ count: metrics.zapCount, totalSats: metrics.totalSats }} />
           
           {/* Comments */}
           <Link 

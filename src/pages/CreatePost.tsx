@@ -10,11 +10,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { MiniAccountSelector } from '@/components/auth/MiniAccountSelector';
-import LoginDialog from '@/components/auth/LoginDialog';
+import AuthDialog from '@/components/auth/AuthDialog';
 import { createPostTags } from '@/lib/foxhole';
 import { PenSquare, Send, FileText, Trash2 } from 'lucide-react';
 import { FoxIcon } from '@/components/foxhole/FoxIcon';
-import { ImageUpload, buildImetaTags, appendImageUrls } from '@/components/foxhole/ImageUpload';
+import { ImageUpload } from '@/components/foxhole/ImageUpload';
+import { buildImetaTags, appendImageUrls } from '@/lib/imageUpload';
 import type { UploadedImage } from '@/components/foxhole/ImageUpload';
 import { usePostDraft } from '@/hooks/usePostDraft';
 
@@ -203,10 +204,9 @@ export default function CreatePost() {
         </Card>
       </main>
 
-      <LoginDialog
+      <AuthDialog
         isOpen={showLoginDialog}
         onClose={() => setShowLoginDialog(false)}
-        onLogin={() => setShowLoginDialog(false)}
       />
     </div>
   );

@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useNostr } from '@nostrify/react';
 import { Loader2, Plus, Trash2, Server, Radio, Wallet } from 'lucide-react';
 import { SiteHeader, Sidebar } from '@/components/foxhole';
@@ -28,73 +29,62 @@ export default function Settings() {
   const { mutateAsync: publishEvent, isPending } = useNostrPublish();
   const { toast } = useToast();
 
-  // Relay state
-  const [relays, setRelays] = useState<RelayEntry[]>([]);
+  // Relay list (NIP-65) loaded via react-query; local edits override until saved
+  const { data: relayData, isLoading: relaysLoading } = useQuery({
+    queryKey: ['nostr', 'settings', 'relay-list', user?.pubkey],
+    enabled: !!user,
+    queryFn: async ({ signal }) => {
+      const events = await nostr.query(
+        [{ kinds: [10002], authors: [user!.pubkey], limit: 1 }],
+        { signal: AbortSignal.any([signal, AbortSignal.timeout(5000)]) },
+      );
+      const entries: RelayEntry[] = [];
+      if (events.length > 0) {
+        for (const tag of events[0].tags) {
+          if (tag[0] === 'r' && tag[1]) {
+            const marker = tag[2];
+            entries.push({
+              url: tag[1],
+              read: !marker || marker === 'read',
+              write: !marker || marker === 'write',
+            });
+          }
+        }
+      }
+      return entries;
+    },
+  });
+  const [relayEdits, setRelays] = useState<RelayEntry[] | null>(null);
+  const relays = relayEdits ?? relayData ?? [];
   const [newRelayUrl, setNewRelayUrl] = useState('');
-  const [relaysLoading, setRelaysLoading] = useState(false);
 
-  // Blossom state
-  const [blossomServers, setBlossomServers] = useState<BlossomServer[]>([]);
+  // Blossom server list (kind 10063), same pattern
+  const { data: blossomData, isLoading: blossomLoading } = useQuery({
+    queryKey: ['nostr', 'settings', 'blossom-servers', user?.pubkey],
+    enabled: !!user,
+    queryFn: async ({ signal }) => {
+      const events = await nostr.query(
+        [{ kinds: [10063], authors: [user!.pubkey], limit: 1 }],
+        { signal: AbortSignal.any([signal, AbortSignal.timeout(5000)]) },
+      );
+      const servers: BlossomServer[] = [];
+      if (events.length > 0) {
+        for (const tag of events[0].tags) {
+          if (tag[0] === 'server' && tag[1]) {
+            servers.push({ url: tag[1] });
+          }
+        }
+      }
+      return servers;
+    },
+  });
+  const [blossomEdits, setBlossomServers] = useState<BlossomServer[] | null>(null);
+  const blossomServers = blossomEdits ?? blossomData ?? [];
   const [newBlossomUrl, setNewBlossomUrl] = useState('');
-  const [blossomLoading, setBlossomLoading] = useState(false);
 
-  // NWC state
-  const [nwcString, setNwcString] = useState('');
-  const [nwcSaved, setNwcSaved] = useState(false);
-
-  // Load relay list
-  useEffect(() => {
-    if (!user) return;
-    setRelaysLoading(true);
-    nostr.query([{ kinds: [10002], authors: [user.pubkey], limit: 1 }])
-      .then((events) => {
-        if (events.length > 0) {
-          const entries: RelayEntry[] = [];
-          for (const tag of events[0].tags) {
-            if (tag[0] === 'r' && tag[1]) {
-              const marker = tag[2];
-              entries.push({
-                url: tag[1],
-                read: !marker || marker === 'read',
-                write: !marker || marker === 'write',
-              });
-            }
-          }
-          setRelays(entries);
-        }
-      })
-      .catch(console.error)
-      .finally(() => setRelaysLoading(false));
-  }, [user, nostr]);
-
-  // Load blossom servers
-  useEffect(() => {
-    if (!user) return;
-    setBlossomLoading(true);
-    nostr.query([{ kinds: [10063], authors: [user.pubkey], limit: 1 }])
-      .then((events) => {
-        if (events.length > 0) {
-          const servers: BlossomServer[] = [];
-          for (const tag of events[0].tags) {
-            if (tag[0] === 'server' && tag[1]) {
-              servers.push({ url: tag[1] });
-            }
-          }
-          setBlossomServers(servers);
-        }
-      })
-      .catch(console.error)
-      .finally(() => setBlossomLoading(false));
-  }, [user, nostr]);
-
-  // Load NWC from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem('foxhole:nwc');
-    if (saved) {
-      setNwcString(saved);
-      setNwcSaved(true);
-    }
-  }, []);
+  // NWC state (lazy-initialized from localStorage)
+  const [nwcString, setNwcString] = useState(() => localStorage.getItem('foxhole:nwc') ?? '');
+  const [nwcSaved, setNwcSaved] = useState(() => !!localStorage.getItem('foxhole:nwc'));
 
   if (!user) {
     return (
@@ -151,7 +141,7 @@ export default function Settings() {
     try {
       await publishEvent({ kind: 10002, content: '', tags, created_at: Math.floor(Date.now() / 1000) });
       toast({ title: 'Saved', description: 'Relay list updated' });
-    } catch (e) {
+    } catch {
       toast({ title: 'Error', description: 'Failed to save relay list', variant: 'destructive' });
     }
   };
@@ -180,7 +170,7 @@ export default function Settings() {
     try {
       await publishEvent({ kind: 10063, content: '', tags, created_at: Math.floor(Date.now() / 1000) });
       toast({ title: 'Saved', description: 'Blossom server list updated' });
-    } catch (e) {
+    } catch {
       toast({ title: 'Error', description: 'Failed to save Blossom servers', variant: 'destructive' });
     }
   };

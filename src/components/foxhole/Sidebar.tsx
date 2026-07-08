@@ -103,7 +103,7 @@ function AboutCard() {
   );
 }
 
-function YourDensCard({ currentDen }: { currentDen?: string }) {
+function YourDensCard(_props: { currentDen?: string }) {
   const { user } = useCurrentUser();
   const { data: dens, isLoading } = useSubscribedDens();
   const { data: popularDens } = usePopularDens({ limit: 100 });

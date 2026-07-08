@@ -24,15 +24,17 @@ export function useRecentPostsInfinite(options: UseRecentPostsInfiniteOptions = 
 
   const postsQuery = useFoxholePostsInfinite({ limit });
 
+  const pages = postsQuery.data?.pages;
+
   const posts = useMemo(() => {
-    if (!postsQuery.data?.pages) return [];
+    if (!pages) return [];
     const seen = new Set<string>();
-    return postsQuery.data.pages.flat().filter(event => {
+    return pages.flat().filter(event => {
       if (!event.id || seen.has(event.id)) return false;
       seen.add(event.id);
       return true;
     });
-  }, [postsQuery.data?.pages]);
+  }, [pages]);
 
   const postIds = posts.map((p) => p.id);
   const zapsQuery = useBatchZaps(postIds);

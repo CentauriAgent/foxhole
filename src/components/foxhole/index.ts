@@ -12,7 +12,7 @@ export { Sidebar } from './Sidebar';
 export { FoxIcon } from './FoxIcon';
 export { NostrCommentForm } from './NostrCommentForm';
 export { PostOverflowMenu } from './PostOverflowMenu';
-export { ImageUpload, buildImetaTags, appendImageUrls } from './ImageUpload';
+export { ImageUpload } from './ImageUpload';
 
 // Sort & filter components
 export { SortTabs } from './SortTabs';

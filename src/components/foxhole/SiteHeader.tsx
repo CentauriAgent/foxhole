@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useLocation } from 'react-router-dom';
-import { Flame, Home, BookOpen, Menu, Search, PenSquare, X, LayoutGrid, User, Settings, LogOut, UserPlus, ArrowRightLeft, Bell, Bookmark, Users, Sun, Moon, Monitor } from 'lucide-react';
+import { Flame, Home, BookOpen, Menu, Search, PenSquare, X, LayoutGrid, User, Settings, LogOut, UserPlus, Bell, Bookmark, Users, Sun, Moon, Monitor } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { nip19 } from 'nostr-tools';
 import { FoxIcon } from './FoxIcon';
 import { Button } from '@/components/ui/button';
 import { LoginArea } from '@/components/auth/LoginArea';
-import LoginDialog from '@/components/auth/LoginDialog';
+import AuthDialog from '@/components/auth/AuthDialog';
 import { useLoggedInAccounts } from '@/hooks/useLoggedInAccounts';
 import { useUnreadNotificationCount, getUnreadDisplay } from '@/hooks/useUnreadNotificationCount';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -47,10 +47,12 @@ export function SiteHeader() {
   const ThemeIcon = theme === 'dark' ? Moon : theme === 'light' ? Sun : Monitor;
   const themeLabel = theme === 'dark' ? 'Dark' : theme === 'light' ? 'Light' : 'System';
 
-  // Close menu on route change
-  useEffect(() => {
+  // Close menu on route change (state adjustment during render, per React docs)
+  const [prevPathname, setPrevPathname] = useState(location.pathname);
+  if (prevPathname !== location.pathname) {
+    setPrevPathname(location.pathname);
     setMobileMenuOpen(false);
-  }, [location.pathname]);
+  }
 
   // Prevent body scroll when menu is open
   useEffect(() => {
@@ -315,10 +317,9 @@ export function SiteHeader() {
       )}
 
       {/* Login dialog for mobile "Add account" */}
-      <LoginDialog
+      <AuthDialog
         isOpen={mobileLoginOpen}
         onClose={() => setMobileLoginOpen(false)}
-        onLogin={() => setMobileLoginOpen(false)}
       />
     </>
   );

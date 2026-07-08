@@ -5,15 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "npm i --silent && vite",
-    "build": "npm i --silent && vite build -l error && node scripts/generate-404.js && echo 'Project built successfully!'",
+    "build": "npm i --silent && vite build -l error && node scripts/prerender.js && node scripts/generate-404.js && echo 'Project built successfully!'",
     "lint": "eslint --cache",
-    "test": "npm i --silent && tsc --noEmit && eslint --cache && vitest run --reporter=dot --silent && vite build -l error && node scripts/generate-404.js && echo 'All tests passed!'"
+    "test": "npm i --silent && tsc --noEmit && eslint --cache && vitest run --reporter=dot --silent && vite build -l error && node scripts/prerender.js && node scripts/generate-404.js && echo 'All tests passed!'"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.2.8",
     "@getalby/sdk": "^5.1.1",
     "@hookform/resolvers": "^5.2.2",
-    "@nostrify/nostrify": "^0.52.2",
+    "@nostrify/nostrify": "^0.54.0",
     "@nostrify/react": "^0.6.2",
     "@radix-ui/react-toast": "^1.2.1",
     "@tanstack/react-query": "^5.100.5",
@@ -50,7 +50,6 @@
     "@eslint/js": "^10.0.1",
     "@html-eslint/eslint-plugin": "^0.59.0",
     "@html-eslint/parser": "^0.59.0",
-    "@prerenderer/rollup-plugin": "^0.3.12",
     "@tailwindcss/typography": "^0.5.20",
     "@tailwindcss/vite": "^4.2.4",
     "@testing-library/jest-dom": "^6.9.1",

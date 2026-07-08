@@ -38,7 +38,7 @@ export default function Den() {
   const { user } = useCurrentUser();
   const { data: mutedPubkeys } = useMuteList();
   const { data: denMetadata } = useDenMetadata(denName);
-  const { pins, isPinned: isPinnedPost } = useDenPins(denName);
+  const { pins } = useDenPins(denName);
   const { data: pinnedPosts } = usePinnedPosts(pins, denName);
 
   const filteredPosts = useMemo(() => {
@@ -113,7 +113,7 @@ export default function Den() {
                     {user && (
                       <Button
                         size="sm"
-                        variant={isSubscribed ? 'outline-solid' : 'default'}
+                        variant={isSubscribed ? 'outline' : 'default'}
                         className={isSubscribed ? '' : 'bg-brand hover:bg-brand/90 text-brand-foreground'}
                         disabled={isSubscribing || isUnsubscribing}
                         onClick={() => isSubscribed ? unsubscribe(identifier) : subscribe(identifier)}
